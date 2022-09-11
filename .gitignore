@@ -10,9 +10,14 @@
 !tasks.json
 !*.cpp
 !*.hpp
+!*.c
+!*.h
 !README.md
 !CMakeLists.txt
 
 !vendor/
 !vendor/**/
 !LICENSE
+
+!queries/
+!queries/*.sql
