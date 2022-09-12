@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(katdb)
+project(noLiteDb)
 
-file(GLOB SOURCES src/*.cpp)
- 
+file(GLOB_RECURSE SOURCES src/*.cpp)
+
 # REMOVE MAIN so we can don't need to compile the code again for the tests
 list(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
@@ -14,12 +14,24 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -std=c++20")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(src/include)
+include_directories(vendor/sqlite)
 
-add_library(katdb_lib ${SOURCES})
+# YAMLCPP
+# add_subdirectory(vendor/yaml-cpp lib)
+# set(YAML_CPP_INSTALL OFF)
+# include_directories(vendor/yaml-cpp/include)
 
-add_executable(katdb src/main.cpp)
+# --- SQLITE library
+add_library(c_sqllite3 vendor/sqlite/sqlite/sqlite3.c)
 
-target_link_libraries(katdb katdb_lib)
+# --- Compile library and exec
+
+add_library(noLitedb_lb ${SOURCES})
+#yaml-cpp
+target_link_libraries(noLitedb_lb c_sqllite3)
+
+add_executable(noLiteDb src/main.cpp)
+target_link_libraries(noLiteDb noLitedb_lb)
 
 # --- TESTS
 add_subdirectory(vendor/googletest)
@@ -35,7 +47,7 @@ add_executable(
 )
 target_link_libraries(
   tests
-  katdb_lib
+  noLitedb_lb
   GTest::gtest_main
 )
 

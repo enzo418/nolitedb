@@ -2,6 +2,6 @@
 #include <string>
 #include <variant>
 
-class PropertyRep;
+#include "ISqlStatement.hpp"
 
-typedef std::variant<PropertyRep*, std::string, double> RightValue;
+typedef std::variant<ISqlStatement*, std::string, double> RightValue;

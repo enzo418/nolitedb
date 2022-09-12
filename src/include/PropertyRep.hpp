@@ -6,101 +6,120 @@
 #include "CommonTypes.hpp"
 #include "Concepts.hpp"
 #include "Enums.hpp"
-#include "PropertyCondition.hpp"
+#include "ISqlStatement.hpp"
+#include "SqlStatement.hpp"
+
+class PropertyRep;
 
 template <typename T>
 concept StringLikeOrProperty = (StringLike<T> ||
                                 std::is_same<PropertyRep, T>::value);
 
-class PropertyRep {
+SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
+                                       PropertyRep& rt);
+
+SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
+                                       const std::string& rt);
+
+class PropertyRep : public ISqlStatement {
    public:
     PropertyRep(const std::string& pName);
 
    public:
-    PropertyCondition operator<(PropertyRep& rt) {
-        return PropertyCondition(this, Condition::LT, &rt);
+    std::string_view getName();
+    std::string getStatement() const override;
+
+   public:
+    SqlStatement<std::string> operator<(PropertyRep& rt) {
+        return ::getStatement(this, LT, rt);
     }
 
-    PropertyCondition operator<=(PropertyRep& rt) {
-        return PropertyCondition(this, Condition::LTE, &rt);
+    SqlStatement<std::string> operator<=(PropertyRep& rt) {
+        return ::getStatement(this, Operator::LTE, rt);
     }
 
-    PropertyCondition operator>(PropertyRep& rt) {
-        return PropertyCondition(this, Condition::GT, &rt);
+    SqlStatement<std::string> operator>(PropertyRep& rt) {
+        return ::getStatement(this, Operator::GT, rt);
     }
 
-    PropertyCondition operator>=(PropertyRep& rt) {
-        return PropertyCondition(this, Condition::GTE, &rt);
+    SqlStatement<std::string> operator>=(PropertyRep& rt) {
+        return ::getStatement(this, Operator::GTE, rt);
     }
 
     // EQUAL
-    PropertyCondition operator==(PropertyRep& rt) {
-        return PropertyCondition(this, Condition::EQ, &rt);
+    SqlStatement<std::string> operator==(PropertyRep& rt) {
+        return ::getStatement(this, Operator::EQ, rt);
     }
 
     // NOT EQUAL
-    PropertyCondition operator!=(PropertyRep& rt) {
-        return PropertyCondition(this, Condition::NEQ, &rt);
+    SqlStatement<std::string> operator!=(PropertyRep& rt) {
+        return ::getStatement(this, Operator::NEQ, rt);
     }
 
     // LIKE
-    PropertyCondition operator%(PropertyRep& rt) {
-        return PropertyCondition(this, Condition::LIKE, &rt);
+    SqlStatement<std::string> operator%(PropertyRep& rt) {
+        return ::getStatement(this, Operator::LIKE, rt);
     }
 
     // NOT LIKE
-    PropertyCondition operator^(PropertyRep& rt) {
-        return PropertyCondition(this, Condition::NLIKE, &rt);
+    SqlStatement<std::string> operator^(PropertyRep& rt) {
+        return ::getStatement(this, Operator::NLIKE, rt);
     }
 
    public:  // overloads
     template <typename T>
-    PropertyCondition operator<(T&& rt) {
-        return PropertyCondition(this, Condition::LT, rt);
+    SqlStatement<std::string> operator<(T&& rt) {
+        return ::getStatement(this, Operator::LT,
+                              SqlStatement<T>(rt).getStatement());
     }
 
     template <typename T>
-    PropertyCondition operator<=(T&& rt) {
-        return PropertyCondition(this, Condition::LTE, rt);
+    SqlStatement<std::string> operator<=(T&& rt) {
+        return ::getStatement(this, Operator::LTE,
+                              SqlStatement<T>(rt).getStatement());
     }
 
     template <typename T>
-    PropertyCondition operator>(T&& rt) {
-        return PropertyCondition(this, Condition::GT, rt);
+    SqlStatement<std::string> operator>(T&& rt) {
+        return ::getStatement(this, Operator::GT,
+                              SqlStatement<T>(rt).getStatement());
     }
 
     template <typename T>
-    PropertyCondition operator>=(T&& rt) {
-        return PropertyCondition(this, Condition::GTE, rt);
+    SqlStatement<std::string> operator>=(T&& rt) {
+        return ::getStatement(this, Operator::GTE,
+                              SqlStatement<T>(rt).getStatement());
     }
 
     // EQUAL
     template <typename T>
-    PropertyCondition operator==(T&& rt) {
-        return PropertyCondition(this, Condition::EQ, rt);
+    SqlStatement<std::string> operator==(T&& rt) {
+        return ::getStatement(this, Operator::EQ,
+                              SqlStatement<T>(rt).getStatement());
     }
 
     // NOT EQUAL
     template <typename T>
-    PropertyCondition operator!=(T&& rt) {
-        return PropertyCondition(this, Condition::NEQ, rt);
+    SqlStatement<std::string> operator!=(T&& rt) {
+        return ::getStatement(this, Operator::NEQ,
+                              SqlStatement<T>(rt).getStatement());
     }
 
     // LIKE
     template <StringLike T>
-    PropertyCondition operator%(T&& rt) {
-        return PropertyCondition(this, Condition::LIKE, rt);
+    SqlStatement<std::string> operator%(T&& rt) {
+        return ::getStatement(this, Operator::LIKE,
+                              SqlStatement<T>(rt).getStatement());
     }
 
     // NOT LIKE
     template <StringLike T>
-    PropertyCondition operator^(T&& rt) {
-        return PropertyCondition(this, Condition::NLIKE, rt);
+    SqlStatement<std::string> operator^(T&& rt) {
+        return ::getStatement(this, Operator::NLIKE,
+                              SqlStatement<T>(rt).getStatement());
     }
-
-   public:
-    std::string_view getName();
 
    protected:
     std::string name;
+    PropertyType type;
 };
