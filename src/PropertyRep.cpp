@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <stdexcept>
+#include <variant>
 
 #include "Enums.hpp"
 #include "dbwrapper/ParamsBind.hpp"
@@ -83,34 +84,72 @@ std::optional<PropertyRep> PropertyRep::find(IDB* ctx, int collectionID,
     }
 }
 
-// PropertyCondition PropertyRep::operator<(PropertyRep& rt) {
-//     return PropertyCondition(this, Condition::LT, &rt);
-// }
+std::string getValAsString(const RightValue& val) {
+    if (std::holds_alternative<int>(val)) {
+        return std::to_string(std::get<int>(val));
+    } else if (std::holds_alternative<double>(val)) {
+        return std::to_string(std::get<double>(val));
+    } else if (std::holds_alternative<std::string>(val)) {
+        return utils::paramsbind::encloseQuotesConst(
+            std::get<std::string>(val));
+    } else if (std::holds_alternative<const char*>(val)) {
+        return utils::paramsbind::encloseQuotesConst(
+            std::get<const char*>(val));
+    } else if (std::holds_alternative<PropertyRep>(val)) {
+        return std::get<PropertyRep>(val).getStatement() + ".value";
+    } else {
+        throw std::runtime_error("Type not supported");
+    }
+}
 
-// PropertyCondition PropertyRep::operator<=(PropertyRep& rt) {
-//     return PropertyCondition(this, Condition::LTE, &rt);
-// }
+SqlStatement<std::string> PropertyRep::operator<(RightValue rt) {
+    return SqlStatement<std::string>(this->getStatement() + ".value" +
+                                     OperatorToString(Operator::LT) +
+                                     getValAsString(rt));
+}
 
-// PropertyCondition PropertyRep::operator>(PropertyRep& rt) {
-//     return PropertyCondition(this, Condition::GT, &rt);
-// }
+SqlStatement<std::string> PropertyRep::operator<=(RightValue rt) {
+    return SqlStatement<std::string>(this->getStatement() + ".value" +
+                                     OperatorToString(Operator::LTE) +
+                                     getValAsString(rt));
+}
 
-// PropertyCondition PropertyRep::operator>=(PropertyRep& rt) {
-//     return PropertyCondition(this, Condition::GTE, &rt);
-// }
+SqlStatement<std::string> PropertyRep::operator>(RightValue rt) {
+    return SqlStatement<std::string>(this->getStatement() + ".value" +
+                                     OperatorToString(Operator::GT) +
+                                     getValAsString(rt));
+}
 
-// PropertyCondition PropertyRep::operator==(PropertyRep& rt) {
-//     return PropertyCondition(this, Condition::EQ, &rt);
-// }
+SqlStatement<std::string> PropertyRep::operator>=(RightValue rt) {
+    return SqlStatement<std::string>(this->getStatement() + ".value" +
+                                     OperatorToString(Operator::GTE) +
+                                     getValAsString(rt));
+}
 
-// PropertyCondition PropertyRep::operator!=(PropertyRep& rt) {
-//     return PropertyCondition(this, Condition::NEQ, &rt);
-// }
+// EQUAL
+SqlStatement<std::string> PropertyRep::operator==(RightValue rt) {
+    return SqlStatement<std::string>(this->getStatement() + ".value" +
+                                     OperatorToString(Operator::EQ) +
+                                     getValAsString(rt));
+}
 
-// PropertyCondition PropertyRep::operator%(PropertyRep& rt) {
-//     return PropertyCondition(this, Condition::LIKE, &rt);
-// }
+// NOT EQUAL
+SqlStatement<std::string> PropertyRep::operator!=(RightValue rt) {
+    return SqlStatement<std::string>(this->getStatement() + ".value" +
+                                     OperatorToString(Operator::NEQ) +
+                                     getValAsString(rt));
+}
 
-// PropertyCondition PropertyRep::operator^(PropertyRep& rt) {
-//     return PropertyCondition(this, Condition::NLIKE, &rt);
-// }
+// LIKE
+SqlStatement<std::string> PropertyRep::operator%(RightValue rt) {
+    return SqlStatement<std::string>(this->getStatement() + ".value" +
+                                     OperatorToString(Operator::LIKE) +
+                                     getValAsString(rt));
+}
+
+// NOT LIKE
+SqlStatement<std::string> PropertyRep::operator^(RightValue rt) {
+    return SqlStatement<std::string>(this->getStatement() + ".value" +
+                                     OperatorToString(Operator::NLIKE) +
+                                     getValAsString(rt));
+}

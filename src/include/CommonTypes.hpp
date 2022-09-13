@@ -4,4 +4,4 @@
 
 #include "ISqlStatement.hpp"
 
-typedef std::variant<ISqlStatement*, std::string, double> RightValue;
+// typedef std::variant<ISqlStatement*, std::string, double> RightValue;

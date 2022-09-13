@@ -26,6 +26,11 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
 SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
                                        const char* rt);
 
+class PropertyRep;
+
+typedef std::variant<PropertyRep, std::string, int, double, const char*>
+    RightValue;
+
 class PropertyRep : public ISqlStatement {
    public:
     PropertyRep(const std::string& pName, int id, PropertyType type);
@@ -42,94 +47,25 @@ class PropertyRep : public ISqlStatement {
                                            const std::string& name);
 
    public:
-    SqlStatement<std::string> operator<(PropertyRep& rt) {
-        return ::getStatement(this, LT, rt);
-    }
+    SqlStatement<std::string> operator<(RightValue rt);
 
-    SqlStatement<std::string> operator<=(PropertyRep& rt) {
-        return ::getStatement(this, Operator::LTE, rt);
-    }
+    SqlStatement<std::string> operator<=(RightValue rt);
 
-    SqlStatement<std::string> operator>(PropertyRep& rt) {
-        return ::getStatement(this, Operator::GT, rt);
-    }
+    SqlStatement<std::string> operator>(RightValue rt);
 
-    SqlStatement<std::string> operator>=(PropertyRep& rt) {
-        return ::getStatement(this, Operator::GTE, rt);
-    }
+    SqlStatement<std::string> operator>=(RightValue rt);
 
     // EQUAL
-    SqlStatement<std::string> operator==(PropertyRep& rt) {
-        return ::getStatement(this, Operator::EQ, rt);
-    }
+    SqlStatement<std::string> operator==(RightValue rt);
 
     // NOT EQUAL
-    SqlStatement<std::string> operator!=(PropertyRep& rt) {
-        return ::getStatement(this, Operator::NEQ, rt);
-    }
+    SqlStatement<std::string> operator!=(RightValue rt);
 
     // LIKE
-    SqlStatement<std::string> operator%(PropertyRep& rt) {
-        return ::getStatement(this, Operator::LIKE, rt);
-    }
+    SqlStatement<std::string> operator%(RightValue rt);
 
     // NOT LIKE
-    SqlStatement<std::string> operator^(PropertyRep& rt) {
-        return ::getStatement(this, Operator::NLIKE, rt);
-    }
-
-   public:  // overloads
-    template <typename T>
-    SqlStatement<std::string> operator<(T&& rt) {
-        return ::getStatement(this, Operator::LT,
-                              SqlStatement<T>(rt).getStatement());
-    }
-
-    template <typename T>
-    SqlStatement<std::string> operator<=(T&& rt) {
-        return ::getStatement(this, Operator::LTE,
-                              SqlStatement<T>(rt).getStatement());
-    }
-
-    template <typename T>
-    SqlStatement<std::string> operator>(T&& rt) {
-        return ::getStatement(this, Operator::GT,
-                              SqlStatement<T>(rt).getStatement());
-    }
-
-    template <typename T>
-    SqlStatement<std::string> operator>=(T&& rt) {
-        return ::getStatement(this, Operator::GTE,
-                              SqlStatement<T>(rt).getStatement());
-    }
-
-    // EQUAL
-    template <typename T>
-    SqlStatement<std::string> operator==(T&& rt) {
-        return ::getStatement(this, Operator::EQ,
-                              SqlStatement<T>(rt).getStatement());
-    }
-
-    // NOT EQUAL
-    template <typename T>
-    SqlStatement<std::string> operator!=(T&& rt) {
-        return ::getStatement(this, Operator::NEQ,
-                              SqlStatement<T>(rt).getStatement());
-    }
-
-    // LIKE
-    template <StringLike T>
-    SqlStatement<std::string> operator%(T&& rt) {
-        return ::getStatement(this, Operator::LIKE,
-                              SqlStatement<T>(rt).getStatement());
-    }
-
-    // NOT LIKE
-    template <StringLike T>
-    SqlStatement<std::string> operator^(T&& rt) {
-        return ::getStatement(this, Operator::NLIKE,
-                              SqlStatement<T>(rt).getStatement());
-    }
+    SqlStatement<std::string> operator^(RightValue rt);
 
    protected:
     std::string name;
