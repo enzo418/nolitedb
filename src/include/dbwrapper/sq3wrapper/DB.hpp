@@ -6,10 +6,21 @@ class DBSL3 : public IDB {
    public:
     bool open(const std::string& path) override;
     bool close() override;
-    std::unique_ptr<IDBQueryReader> execute(const std::string& query,
-                                            const Paramsbind& params) override;
+    std::unique_ptr<IDBQueryReader> executeReader(
+        const std::string& query, const Paramsbind& params) override;
+
+    int executeOneStep(const std::string& query,
+                       const Paramsbind& params) override;
+
+    std::optional<int> executeAndGetFirstInt(const std::string& query,
+                                             const Paramsbind& params) override;
+
+    int executeMultipleOnOneStepRaw(const std::string& query,
+                                    const Paramsbind& params) override;
 
     int getLastInsertedRowId() override;
+
+    std::optional<int> getChangesCount() override;
 
     void throwLastError() override;
 

@@ -29,6 +29,8 @@ class PropertyRep : public ISqlStatement {
     std::string_view getName();
     std::string getStatement() const override;
 
+    static std::string getTableNameForTypeValue(PropertyType type);
+
    public:
     SqlStatement<std::string> operator<(PropertyRep& rt) {
         return ::getStatement(this, LT, rt);

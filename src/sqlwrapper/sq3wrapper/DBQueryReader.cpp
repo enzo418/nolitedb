@@ -1,4 +1,3 @@
-#pragma once
 #include "dbwrapper/sq3wrapper/DBQueryReader.hpp"
 
 #include <iostream>
@@ -33,7 +32,7 @@ bool DBRowReaderSL3::isNull(uint16_t i) {
 }
 
 // ---
-bool DBQueryReaderSL3::readRow(std::shared_ptr<IDBRowReader> row) {
+bool DBQueryReaderSL3::readRow(std::shared_ptr<IDBRowReader>& row) {
     if (allReaded) return false;
 
     if (row.get() == nullptr) {

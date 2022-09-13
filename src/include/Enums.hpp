@@ -3,7 +3,7 @@
 #include <stdexcept>
 enum Operator { EQ, NEQ, GT, GTE, LT, LTE, LIKE, NLIKE, AND, OR, NOT };
 
-enum PropertyType { NUMERIC, STRING, RESERVED };
+enum PropertyType { INTEGER = 1, DOUBLE, STRING, RESERVED };
 
 inline const char* OperatorToString(Operator v) {
     switch (v) {

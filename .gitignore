@@ -17,7 +17,7 @@
 
 !vendor/
 !vendor/**/
-!LICENSE
+!LICENSE*
 
 !queries/
 !queries/*.sql

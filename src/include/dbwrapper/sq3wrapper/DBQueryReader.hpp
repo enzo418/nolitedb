@@ -29,7 +29,7 @@ class DBQueryReaderSL3 : public IDBQueryReader {
     ~DBQueryReaderSL3();
 
    public:
-    bool readRow(std::shared_ptr<IDBRowReader> row) override;
+    bool readRow(std::shared_ptr<IDBRowReader>& row) override;
 
    private:
     bool allReaded {false};

@@ -16,5 +16,5 @@ class IDBRowReader {
 
 class IDBQueryReader {
    public:
-    virtual bool readRow(std::shared_ptr<IDBRowReader> row) = 0;
+    virtual bool readRow(std::shared_ptr<IDBRowReader>& row) = 0;
 };

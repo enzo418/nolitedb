@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/build/katdb",
+            "program": "${workspaceFolder}/build/noLiteDb",
             "args": [],
             "preLaunchTask": "build",
             "cwd": "${workspaceFolder}"

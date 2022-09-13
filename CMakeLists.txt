@@ -15,21 +15,29 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(src/include)
 include_directories(vendor/sqlite)
+include_directories(vendor/logger/include)
+include_directories(vendor/lrucache11)
 
-# YAMLCPP
-# add_subdirectory(vendor/yaml-cpp lib)
-# set(YAML_CPP_INSTALL OFF)
-# include_directories(vendor/yaml-cpp/include)
+# --- YAMLCPP
+# i thought to use yaml-cpp but doesn't have an easy way to get the data type
+# and that was crucial for this library
+add_subdirectory(vendor/yaml-cpp lib)
+set(YAML_CPP_INSTALL OFF)
+include_directories(vendor/yaml-cpp/include)
+
+# --- json (nlohmann)
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+set(JSON_Install OFF CACHE INTERNAL "")
+add_subdirectory(vendor/json)
 
 # --- SQLITE library
 add_library(c_sqllite3 vendor/sqlite/sqlite/sqlite3.c)
 
-# --- Compile library and exec
-
+# --- Add nolitedb library
 add_library(noLitedb_lb ${SOURCES})
-#yaml-cpp
-target_link_libraries(noLitedb_lb c_sqllite3)
+target_link_libraries(noLitedb_lb c_sqllite3 yaml-cpp nlohmann_json::nlohmann_json)
 
+# --- Add nolitedb executable
 add_executable(noLiteDb src/main.cpp)
 target_link_libraries(noLiteDb noLitedb_lb)
 
