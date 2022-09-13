@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "Enums.hpp"
+#include "dbwrapper/ParamsBind.hpp"
 #include "logger/Logger.h"
 
 PropertyRep::PropertyRep(const std::string& pName, int pId, PropertyType pType)
@@ -18,7 +19,13 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
 
 SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
                                        const std::string& rt) {
-    return SqlStatement<std::string>(lf->getStatement() + " " +
+    return SqlStatement<std::string>(lf->getStatement() + ".value " +
+                                     OperatorToString(op) + " " + rt);
+}
+
+SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
+                                       const char* rt) {
+    return SqlStatement<std::string>(lf->getStatement() + ".value " +
                                      OperatorToString(op) + " " + rt);
 }
 

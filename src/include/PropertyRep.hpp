@@ -23,6 +23,9 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
 SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
                                        const std::string& rt);
 
+SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
+                                       const char* rt);
+
 class PropertyRep : public ISqlStatement {
    public:
     PropertyRep(const std::string& pName, int id, PropertyType type);

@@ -66,7 +66,9 @@ int main() {
     auto [model, maker, year] =
         collQuery.prepareProperties("model", "maker", "year");
 
-    auto res = collQuery.select(model, maker, year).execute();
+    auto res = collQuery.select(model, maker, year)
+                   .where(maker == std::string("ford"))
+                   .execute();
 
     std::cout << "\n\nRES: " << res << std::endl;
 

@@ -170,7 +170,7 @@ void SelectQuery::joinValues() {
     }
 }
 
-SelectQuery* SelectQuery::where(const SqlStatement<std::string>& st) {
-    this->qctx->sql << "where " << st.getStatement();
-    return this;
+SelectQuery& SelectQuery::where(const SqlStatement<std::string>& st) {
+    this->qctx->sql << " where " << st.getStatement();
+    return *this;
 }
