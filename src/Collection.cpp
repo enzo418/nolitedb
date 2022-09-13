@@ -1,11 +1,12 @@
 #include "Collection.hpp"
 
+#include <optional>
 #include <stdexcept>
 
 #include "dbwrapper/IDB.hpp"
 #include "logger/Logger.h"
 // max to 20 collections
-lru11::Cache<int, std::unordered_map<std::string, int>>
+lru11::Cache<int, std::unordered_map<std::string, PropertyRep>>
     Collection::propertyCache(20);
 
 Collection::Collection(IDB* pCtx, int pId, const std::string& pName)
@@ -13,28 +14,8 @@ Collection::Collection(IDB* pCtx, int pId, const std::string& pName)
 
 int Collection::getID() { return this->id; }
 
-std::optional<int> Collection::getPropertyID(const std::string& key) {
-    // check cache
-    if (propertyCache.contains(this->id)) {
-        if (propertyCache.get(this->id).contains(key)) {
-            return propertyCache.get(this->id).at(key);
-        }
-    }
-
-    LogDebug("Cache miss with key %s", key.c_str());
-
-    // else check db
-    auto id = ctx->executeAndGetFirstInt(
-        "SELECT id FROM property where coll_id = @colid and name = @name",
-        {{"@colid", this->id}, {"@name", key}});
-
-    if (id.has_value()) updatePropCache(key, id.value());
-
-    return id;
-}
-
 bool Collection::hasProperty(const std::string& key) {
-    return getPropertyID(key).has_value();
+    return tryGetProperty(key).has_value();
 }
 
 bool Collection::addProperty(const std::string& key, PropertyType type) {
@@ -47,9 +28,41 @@ bool Collection::addProperty(const std::string& key, PropertyType type) {
 
     int id = ctx->getLastInsertedRowId();
 
-    if (id >= 0) updatePropCache(key, id);
+    if (id >= 0) updatePropCache(key, PropertyRep(key, id, type));
 
     return id >= 0;
+}
+
+std::optional<PropertyRep> Collection::tryGetProperty(const std::string& key) {
+    // check cache
+    if (propertyCache.contains(this->id)) {
+        if (propertyCache.get(this->id).contains(key)) {
+            return propertyCache.get(this->id).at(key);
+        }
+    }
+
+    LogDebug("Cache miss with key '%s'", key.c_str());
+
+    // else check db
+    std::optional<int> id;
+    auto property = PropertyRep::find(ctx, this->id, key);
+    if (property.has_value()) {
+        id = property.value().getId();
+        updatePropCache(key, property.value());
+    }
+
+    return property;
+}
+
+PropertyRep Collection::getProperty(const std::string& key) {
+    auto prop = this->tryGetProperty(key);
+    if (prop.has_value()) {
+        return prop.value();
+    } else {
+        LogError("Property '%s' was requested but wasn't found.", key.c_str());
+
+        throw std::runtime_error("Missing property");
+    }
 }
 
 Collection Collection::find(IDB* ctx, const std::string& name) {
@@ -74,9 +87,9 @@ int Collection::create(IDB& ctx, const std::string& name) {
     return ctx.getLastInsertedRowId();
 }
 
-void Collection::updatePropCache(const std::string& key, int propId) {
-    std::unordered_map<std::string, int> map;
+void Collection::updatePropCache(const std::string& key, PropertyRep prop) {
+    std::unordered_map<std::string, PropertyRep> map;
     propertyCache.tryGet(this->id, map);
-    map.insert({key, propId});
+    map.insert({key, prop});
     propertyCache.insert(this->id, map);  // updates the position
 }

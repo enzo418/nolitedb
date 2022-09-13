@@ -42,6 +42,8 @@ bool DBSL3::close() {
 
 std::unique_ptr<IDBQueryReader> DBSL3::executeReader(const std::string& query,
                                                      const Paramsbind& params) {
+    LogTrace("Executing: %s", query.c_str());
+
     // prepare sql
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
@@ -81,13 +83,9 @@ std::unique_ptr<IDBQueryReader> DBSL3::executeReader(const std::string& query,
 
 int DBSL3::executeMultipleOnOneStepRaw(const std::string& query,
                                        const Paramsbind& params) {
-    std::string sql(query);
+    std::string sql = utils::paramsbind::parseSQL(query, params);
 
-    for (auto& param : params) {
-        utils::replaceAllOccurrences(
-            sql, param.first,
-            utils::paramsbind::getBindValueAsString(param.second, true));
-    }
+    LogTrace("Executing: %s", sql.c_str());
 
     char* err = 0;
     int rc = sqlite3_exec(db, sql.c_str(), 0, 0, &err);

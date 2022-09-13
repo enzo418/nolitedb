@@ -1,5 +1,14 @@
 #include "PropertyRep.hpp"
 
+#include <optional>
+#include <stdexcept>
+
+#include "Enums.hpp"
+#include "logger/Logger.h"
+
+PropertyRep::PropertyRep(const std::string& pName, int pId, PropertyType pType)
+    : name(pName), id(pId), type(pType) {}
+
 SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
                                        PropertyRep& rt) {
     return SqlStatement<std::string>(lf->getStatement() + " " +
@@ -13,9 +22,10 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
                                      OperatorToString(op) + " " + rt);
 }
 
-PropertyRep::PropertyRep(const std::string& pName) : name(pName) {};
+int PropertyRep::getId() const { return id; }
 
-std::string_view PropertyRep::getName() { return name; }
+PropertyType PropertyRep::getType() const { return type; }
+std::string_view PropertyRep::getName() const { return name; }
 
 std::string PropertyRep::getStatement() const {
     switch (this->type) {
@@ -40,6 +50,29 @@ std::string PropertyRep::getTableNameForTypeValue(PropertyType type) {
             return "value_string";
         default:
             throw std::runtime_error("type not supported");
+    }
+}
+
+std::optional<PropertyRep> PropertyRep::find(IDB* ctx, int collectionID,
+                                             const std::string& name) {
+    // else check db
+    auto reader = ctx->executeReader(
+        "SELECT id, type FROM property where coll_id = @colid and name = @name",
+        {{"@colid", collectionID}, {"@name", name}});
+
+    int id;
+    int type;
+
+    std::shared_ptr<IDBRowReader> row;
+    if (reader->readRow(row)) {
+        id = row->readInt32(0);
+        type = row->readInt32(1);
+
+        return PropertyRep(name, id, (PropertyType)type);
+    } else {
+        LogWarning("Missing property from col %i with name %s", collectionID,
+                   name.c_str());
+        return std::nullopt;
     }
 }
 

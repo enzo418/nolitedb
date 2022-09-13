@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <optional>
 #include <string>
 #include <type_traits>
 
@@ -8,6 +9,7 @@
 #include "Enums.hpp"
 #include "ISqlStatement.hpp"
 #include "SqlStatement.hpp"
+#include "dbwrapper/IDB.hpp"
 
 class PropertyRep;
 
@@ -23,13 +25,18 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
 
 class PropertyRep : public ISqlStatement {
    public:
-    PropertyRep(const std::string& pName);
+    PropertyRep(const std::string& pName, int id, PropertyType type);
 
    public:
-    std::string_view getName();
+    int getId() const;
+    PropertyType getType() const;
+    std::string_view getName() const;
     std::string getStatement() const override;
 
     static std::string getTableNameForTypeValue(PropertyType type);
+
+    static std::optional<PropertyRep> find(IDB* ctx, int collectionID,
+                                           const std::string& name);
 
    public:
     SqlStatement<std::string> operator<(PropertyRep& rt) {
@@ -124,4 +131,5 @@ class PropertyRep : public ISqlStatement {
    protected:
     std::string name;
     PropertyType type;
+    int id {-1};
 };

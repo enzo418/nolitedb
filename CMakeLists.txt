@@ -17,6 +17,7 @@ include_directories(src/include)
 include_directories(vendor/sqlite)
 include_directories(vendor/logger/include)
 include_directories(vendor/lrucache11)
+include_directories(vendor/others)
 
 # --- YAMLCPP
 # i thought to use yaml-cpp but doesn't have an easy way to get the data type

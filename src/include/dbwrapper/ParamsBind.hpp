@@ -27,4 +27,6 @@ namespace utils::paramsbind {
 
     // same as above
     std::string encloseQuotesConst(const std::string&);
+
+    std::string parseSQL(const std::string&, const Paramsbind&);
 };  // namespace utils::paramsbind

@@ -6,6 +6,7 @@
 #include <variant>
 #include <vector>
 
+#include "Enums.hpp"
 #include "dbwrapper/sq3wrapper/DB.hpp"
 #include "dbwrapper/sq3wrapper/DBInitializer.hpp"
 #include "include/PropertyRep.hpp"
@@ -33,13 +34,13 @@ int main() {
                   << "]\n";
     }
 
-    auto model = PropertyRep("model");
-    auto year = PropertyRep("year");
+    auto md = PropertyRep("md", -1, PropertyType::STRING);
+    auto yy = PropertyRep("yy", -1, PropertyType::STRING);
 
-    auto c = (model > year) && (year != model);
+    auto c = (md > yy) && (yy != md);
 
-    auto c1 = model < year;
-    auto c2 = model < 200;
+    auto c1 = md < yy;
+    auto c2 = md < 200;
 
     auto c3 = c1 && c2;
     auto c4 = c1 || c3;
@@ -54,24 +55,20 @@ int main() {
         db.throwLastError();
     }
 
-    // auto id = db.executeAndGetFirstInt(
-    //     "SELECT id FROM property where coll_id = @colid and name = @name",
-    //     {{"@colid", 1}, {"@name", "maker"}});
-
-    // std::cout << "id: " << id.value_or(-1) << std::endl;
-
-    // return 0;
-
     auto factory = QueryFactory();
     auto collQuery = factory.create(&db, "cars");
 
     json cars = {{{"maker", "ford"}, {"model", "focus"}, {"year", 2011}},
                  {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
 
-    collQuery.insert(cars);
+    collQuery.insert(cars).execute();
 
-    // auto [query, model, maker, year] =
-    //     factory.properties("model", "maker", "year");
+    auto [model, maker, year] =
+        collQuery.prepareProperties("model", "maker", "year");
+
+    auto res = collQuery.select(model, maker, year).execute();
+
+    std::cout << "\n\nRES: " << res << std::endl;
 
     // std::cout << year.getName() << std::endl;
 
