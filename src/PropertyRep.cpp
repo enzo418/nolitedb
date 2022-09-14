@@ -142,14 +142,14 @@ SqlStatement<std::string> PropertyRep::operator!=(RightValue rt) {
 
 // LIKE
 SqlStatement<std::string> PropertyRep::operator%(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" +
-                                     OperatorToString(Operator::LIKE) +
+    return SqlStatement<std::string>(this->getStatement() + ".value" + " " +
+                                     OperatorToString(Operator::LIKE) + " " +
                                      getValAsString(rt));
 }
 
 // NOT LIKE
 SqlStatement<std::string> PropertyRep::operator^(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" +
-                                     OperatorToString(Operator::NLIKE) +
+    return SqlStatement<std::string>(this->getStatement() + ".value" + " " +
+                                     OperatorToString(Operator::NLIKE) + " " +
                                      getValAsString(rt));
 }

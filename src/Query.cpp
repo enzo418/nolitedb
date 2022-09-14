@@ -116,7 +116,11 @@ Query QueryFactory::create(IDB* ctx, const std::string& collName) {
 SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
                          std::vector<PropertyRep>&& pProperties)
     : ExecutableQuery<json>(pCtx, nullptr), properties(pProperties) {
-    this->joinValues();
+    this->addFromClause();
+
+    // add the joins needed for the select clause, where, order by,... are added
+    // by them
+    this->addJoinClauses(this->properties);
 
     this->setExecutableFunction([this](QueryCtx& ctx) {
         json result = json::array();
@@ -155,11 +159,13 @@ SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
     });
 }
 
-void SelectQuery::joinValues() {
+void SelectQuery::addFromClause() {
     this->qctx->sql << " from \"document\" as " << this->documentTableAlias
                     << " ";
+}
 
-    for (auto& prop : this->properties) {
+void SelectQuery::addJoinClauses(std::vector<PropertyRep>& props) {
+    for (auto& prop : props) {
         this->qctx->sql << utils::paramsbind::parseSQL(
             " left join @value_table as @p_a on (@doc_alias.id = "
             "@p_a.doc_id and @p_a.prop_id = @p_id)",
