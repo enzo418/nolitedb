@@ -7,6 +7,7 @@
 #include "Enums.hpp"
 #include "ISqlStatement.hpp"
 #include "SqlStatement.hpp"
+#include "Utils.hpp"
 
 class PropertyRep;
 
@@ -15,11 +16,11 @@ class PropertyRep;
  * Holds pointers to the properties that are in the logic expression.
  */
 struct SqlLogicExpression : ISqlStatement {
-    SqlLogicExpression(std::string st, std::vector<PropertyRep*> pPr);
+    SqlLogicExpression(std::string st, std::set<PropertyRep*> pPr);
 
     std::string getStatement() const override;
 
-    std::vector<PropertyRep*> getActingProps() const;
+    std::set<PropertyRep*> getActingProps() const;
 
     SqlLogicExpression operator&&(const SqlLogicExpression& q);
 
@@ -28,6 +29,6 @@ struct SqlLogicExpression : ISqlStatement {
     SqlLogicExpression operator~();
 
    protected:
-    std::vector<PropertyRep*> actingProps;
+    std::set<PropertyRep*> actingProps;
     std::string st;
 };

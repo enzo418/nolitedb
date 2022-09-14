@@ -1,5 +1,6 @@
 #include "Query.hpp"
 
+#include <algorithm>
 #include <map>
 #include <sstream>
 #include <stdexcept>
@@ -7,6 +8,7 @@
 
 #include "Document.hpp"
 #include "Enums.hpp"
+#include "SqlExpression.hpp"
 #include "dbwrapper/ParamsBind.hpp"
 #include "logger/Logger.h"
 
@@ -116,13 +118,15 @@ Query QueryFactory::create(IDB* ctx, const std::string& collName) {
 SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
                          std::vector<PropertyRep>&& pProperties)
     : ExecutableQuery<json>(pCtx, nullptr), properties(pProperties) {
-    this->addFromClause();
+    qctx->selectCtx->addFromClause();
 
     // add the joins needed for the select clause, where, order by,... are added
     // by them
-    this->addJoinClauses(this->properties);
+    qctx->selectCtx->addJoinClauses(this->properties);
 
     this->setExecutableFunction([this](QueryCtx& ctx) {
+        ctx.buildSelectQuery();  // sets ctx.sql
+
         json result = json::array();
 
         auto reader = ctx.db->executeReader(ctx.sql.str(), ctx.bind);
@@ -159,38 +163,49 @@ SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
     });
 }
 
-void SelectQuery::addFromClause() {
-    this->qctx->sql << " from \"document\" as " << this->documentTableAlias
-                    << " ";
+void SelectQueryData::addFromClause() {
+    from_join << " from \"document\" as " << this->documentTableAlias << " ";
 }
 
-void SelectQuery::addJoinClauses(std::vector<PropertyRep>& props) {
+bool SelectQueryData::propAlreadyHasJoin(PropertyRep& prop) {
+    // I overloaded the == operator! No worries
+    return std::find_if(propsWithJoin.begin(), propsWithJoin.end(),
+                        [&prop](PropertyRep itProp) {
+                            return itProp.getId() == prop.getId();
+                        }) != propsWithJoin.end();
+}
+
+void SelectQueryData::addJoinClause(PropertyRep& prop) {
+    from_join << utils::paramsbind::parseSQL(
+        " left join @value_table as @p_a on (@doc_alias.id = "
+        "@p_a.doc_id and @p_a.prop_id = @p_id)",
+        {{"@value_table", prop.getTableNameForTypeValue(prop.getType())},
+         {"@p_a", prop.getStatement()},
+         {"@p_id", prop.getId()},
+         {"@doc_alias", documentTableAlias}});
+}
+
+void SelectQueryData::addJoinClauses(std::vector<PropertyRep>& props) {
     for (auto& prop : props) {
-        this->qctx->sql << utils::paramsbind::parseSQL(
-            " left join @value_table as @p_a on (@doc_alias.id = "
-            "@p_a.doc_id and @p_a.prop_id = @p_id)",
-            {{"@value_table", prop.getTableNameForTypeValue(prop.getType())},
-             {"@p_a", prop.getStatement()},
-             {"@p_id", prop.getId()},
-             {"@doc_alias", this->documentTableAlias}});
+        if (!this->propAlreadyHasJoin(prop)) {
+            this->addJoinClause(prop);
+            this->propsWithJoin.push_back(prop);  // yes, copy it
+        }
     }
 }
 
-void SelectQuery::addJoinClauses(const std::vector<PropertyRep*>& props) {
-    for (auto& prop : props) {
-        this->qctx->sql << utils::paramsbind::parseSQL(
-            " left join @value_table as @p_a on (@doc_alias.id = "
-            "@p_a.doc_id and @p_a.prop_id = @p_id)",
-            {{"@value_table", prop->getTableNameForTypeValue(prop->getType())},
-             {"@p_a", prop->getStatement()},
-             {"@p_id", prop->getId()},
-             {"@doc_alias", this->documentTableAlias}});
+void SelectQueryData::addJoinClauses(const std::set<PropertyRep*>& props) {
+    for (const auto& prop : props) {
+        if (!this->propAlreadyHasJoin(*prop)) {
+            this->addJoinClause(*prop);
+            this->propsWithJoin.push_back(*prop);
+        }
     }
 }
 
 SelectQuery& SelectQuery::where(const SqlLogicExpression& st) {
-    this->addJoinClauses(st.getActingProps());
+    qctx->selectCtx->addJoinClauses(st.getActingProps());
 
-    this->qctx->sql << " where " << st.getStatement();
+    this->qctx->selectCtx->where << " where " << st.getStatement();
     return *this;
 }

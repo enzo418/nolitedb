@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
@@ -8,6 +10,7 @@
 #include "Concepts.hpp"
 #include "MoveOnlyFunction.h"
 #include "PropertyRep.hpp"
+#include "SqlExpression.hpp"
 #include "dbwrapper/IDB.hpp"
 #include "dbwrapper/ParamsBind.hpp"
 #include "logger/Logger.h"
@@ -18,9 +21,57 @@ using namespace nlohmann;
 template <typename Q>
 concept IsPropertyRep = std::is_same<Q, PropertyRep>::value;
 
+/**
+ * @brief Holds data to build a SQL Select query with all the possible clauses
+ * that you can have.
+ *
+ */
+struct SelectQueryData {
+    const char* documentTableAlias = "__doc";
+
+    std::stringstream select;
+    std::stringstream from_join;
+    std::stringstream where;
+    std::stringstream groupBy;
+    std::stringstream having;
+    std::stringstream limit_offset;
+
+    // properties to which the union of their tables has already been added to
+    // the from clause
+    std::vector<PropertyRep> propsWithJoin;
+
+   private:
+    friend class SelectQuery;
+    friend class QueryCtx;
+
+    void addFromClause();
+    void addJoinClause(PropertyRep&);
+    void addJoinClauses(std::vector<PropertyRep>&);
+    void addJoinClauses(const std::set<PropertyRep*>&);
+
+    bool propAlreadyHasJoin(PropertyRep&);
+
+    void resetQuery() {
+        select.str("");
+        from_join.str("");
+        where.str("");
+        groupBy.str("");
+        having.str("");
+        limit_offset.str("");
+
+        propsWithJoin = {};
+    }
+};
+
+/**
+ * @brief Hold enough data to make a SQL query to a database.
+ * An instance of this class gets passed between classes like in a state
+ * pattern.
+ */
 struct QueryCtx {
     QueryCtx(IDB* db, const Collection& cl) : db(db), cl(cl) {}
 
+    std::unique_ptr<SelectQueryData> selectCtx;
     std::stringstream sql;
     Paramsbind bind;
     Collection cl;
@@ -29,6 +80,23 @@ struct QueryCtx {
     void resetQuery() {
         sql.str("");
         bind = {};
+
+        if (selectCtx) {
+            selectCtx->resetQuery();
+        }
+    }
+
+    void buildSelectQuery() {
+        if (!selectCtx) {
+            throw std::runtime_error(
+                "Invalid query context use, 'select ctx' was not initilized");
+        }
+
+        sql.str("");  // just making sure
+
+        sql << selectCtx->select.str() << selectCtx->from_join.str()
+            << selectCtx->where.str() << selectCtx->groupBy.str()
+            << selectCtx->having.str() << selectCtx->limit_offset.str();
     }
 };
 
@@ -71,14 +139,8 @@ class SelectQuery : public ExecutableQuery<json> {
    public:
     SelectQuery& where(const SqlLogicExpression&);
 
-   protected:
-    void addFromClause();
-    void addJoinClauses(std::vector<PropertyRep>&);
-    void addJoinClauses(const std::vector<PropertyRep*>&);
-
    private:
     std::vector<PropertyRep> properties;
-    const char* documentTableAlias = "__doc";
 };
 
 class Query : public BaseQuery {
@@ -102,27 +164,33 @@ class Query : public BaseQuery {
         return representations;
     }
 
-    // lets suppose that all are PropertyRep for now but we could have
+    // TODO: lets suppose that all are PropertyRep for now but we could have
     // sum(prop), ...
     template <IsPropertyRep... Q>
-    SelectQuery select(const Q&... props) {
+    SelectQuery select(Q&... props) {
+        if (!this->qctx->selectCtx) {
+            this->qctx->selectCtx = std::make_unique<SelectQueryData>();
+        }
+
         qctx->resetQuery();
 
-        qctx->sql << "select ";
+        this->qctx->selectCtx->select << "select ";
 
         std::vector<PropertyRep> unpackedProps = {props...};
 
         if (sizeof...(props) > 0) {
-            for (const PropertyRep& prop : unpackedProps) {
-                qctx->sql << utils::paramsbind::parseSQL(
-                                 "@table.value as @prop_name",
-                                 {{"@table", prop.getStatement()},
-                                  {"@prop_name", std::string(prop.getName())}})
-                          << ",";
-            }
+            for (int i = 0; i < unpackedProps.size(); i++) {
+                const auto& prop = unpackedProps[i];
 
-            // set cursor at , so we overwrite it later
-            qctx->sql.seekp(-1, std::ios_base::end);
+                this->qctx->selectCtx->select << utils::paramsbind::parseSQL(
+                    "@table.value as @prop_name",
+                    {{"@table", prop.getStatement()},
+                     {"@prop_name", std::string(prop.getName())}});
+
+                if (i != unpackedProps.size() - 1) {
+                    this->qctx->selectCtx->select << ",";
+                }
+            }
         } else {
             // get all properties from the collection and add it to the select
             // and the unpacked props vector
