@@ -44,6 +44,11 @@ std::unique_ptr<IDBQueryReader> DBSL3::executeReader(const std::string& query,
                                                      const Paramsbind& params) {
     LogTrace("Executing: %s", query.c_str());
 
+    if (query.empty()) {
+        LogFatal("Empty query");
+        throw std::runtime_error("Empty query");
+    }
+
     // prepare sql
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
