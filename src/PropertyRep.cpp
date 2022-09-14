@@ -111,6 +111,26 @@ std::string PropertyRep::generateConditionStatement(Operator op,
            getValAsString(rt);
 }
 
+AggregateFunction PropertyRep::count(const char* alias) {
+    return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::COUNT);
+}
+
+AggregateFunction PropertyRep::average(const char* alias) {
+    return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::AVG);
+}
+
+AggregateFunction PropertyRep::min(const char* alias) {
+    return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::MIN);
+}
+
+AggregateFunction PropertyRep::max(const char* alias) {
+    return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::MAX);
+}
+
+AggregateFunction PropertyRep::sum(const char* alias) {
+    return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::SUM);
+}
+
 SqlLogicExpression PropertyRep::operator<(PropertyRep& rt) {
     return SqlLogicExpression(generateConditionStatement(Operator::LT, rt),
                               {this, &rt});

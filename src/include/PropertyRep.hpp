@@ -29,6 +29,68 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
 
 typedef std::variant<std::string, int, double, const char*> RightValue;
 
+enum AGGREGATEFUNCTIONTYPE { COUNT, AVG, SUM, MAX, MIN };
+
+/**
+ * IDEA
+ #include <iostream>
+#include <set>
+#include <string>
+
+struct LoF;
+
+enum TP {R = 23};
+enum HTP {E = 99};
+
+struct IProp {
+    IProp(TP type) : type(type) {};
+    TP type;
+};
+
+
+struct HoF : public IProp {
+    HoF(LoF* l) :  IProp(R), l(l) {}
+
+    HTP e{E};
+    LoF* l;
+};
+
+struct LoF : public IProp {
+    LoF(TP type) : IProp(type) {};
+
+    TP getType() { return IProp::type; };
+
+    HoF getH() { return HoF(this); }
+};
+
+void f(const IProp& l) {
+    if (l.type == R) {
+        auto c = (const HoF&) l;
+        std::cout << c.e << std::endl;
+        std::cout << c.l->getType() << std::endl;
+    }
+}
+
+int main()
+{
+    LoF l(R);
+    //HoF h(l);
+    f(l.getH());
+
+}
+
+ *
+ */
+
+struct AggregateFunction {
+    AggregateFunction(PropertyRep* pProp, const char* pAlias,
+                      AGGREGATEFUNCTIONTYPE pType)
+        : prop(pProp), alias(pAlias), type(pType) {}
+    const char* alias;
+    AGGREGATEFUNCTIONTYPE type;
+    PropertyRep* prop;
+};
+
 class PropertyRep : public ISqlStatement {
    public:
     PropertyRep(const std::string& pName, int id, PropertyType type);
@@ -43,6 +105,13 @@ class PropertyRep : public ISqlStatement {
 
     static std::optional<PropertyRep> find(IDB* ctx, int collectionID,
                                            const std::string& name);
+
+   public:  // aggregate functions
+    AggregateFunction count(const char* alias);
+    AggregateFunction average(const char* alias);
+    AggregateFunction min(const char* alias);
+    AggregateFunction max(const char* alias);
+    AggregateFunction sum(const char* alias);
 
    public:
     SqlLogicExpression operator<(PropertyRep& rt);

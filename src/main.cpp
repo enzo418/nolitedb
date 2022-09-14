@@ -17,23 +17,6 @@
 using namespace nlohmann;
 
 int main() {
-    Logger::setPrefixLevel(Logger::PrefixLevel::NONE);
-
-    json ex3 = {
-        {"happy", true},
-        {"pi", 3.141},
-        {"array", {1, 2, 3}},
-        {"object", {{"a", 1}}},
-    };
-
-    std::cout << ex3 << std::endl;
-
-    // even easier with structured bindings (C++17)
-    for (auto& [key, value] : ex3.items()) {
-        std::cout << key << " : " << value << " [" << value.type_name()
-                  << "]\n";
-    }
-
     auto md = PropertyRep("md", -1, PropertyType::STRING);
     auto yy = PropertyRep("yy", -1, PropertyType::STRING);
 
@@ -75,23 +58,8 @@ int main() {
     auto res = collQuery.select(model, maker, year)
                    .where(year > 2000 || model == "impreza")
                    .page(1, 10)
+                   .sort(Query::Asc(model), maker.COUNT())
                    .execute();
 
     std::cout << "\n\nRES: " << res << std::endl;
-
-    // std::cout << year.getName() << std::endl;
-
-    // std::vector<PropertyCondition> ps = {model<year, model <= year, model>
-    // year,
-    //                                      model >= year, model >= year};
-
-    // auto s = std::ref("asd");
-
-    // auto p = model < "123123";
-
-    // auto res =
-    //      q.select(model, maker, year, /*count(*)*/)
-    //      .where(model % "%ford%", year > 2000)
-    //      .where(model = "focus")
-    //      .execute();
 }
