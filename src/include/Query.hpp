@@ -69,11 +69,12 @@ class SelectQuery : public ExecutableQuery<json> {
                 std::vector<PropertyRep>&& properties);
 
    public:
-    SelectQuery& where(const SqlStatement<std::string>&);
+    SelectQuery& where(const SqlLogicExpression&);
 
    protected:
     void addFromClause();
     void addJoinClauses(std::vector<PropertyRep>&);
+    void addJoinClauses(const std::vector<PropertyRep*>&);
 
    private:
     std::vector<PropertyRep> properties;

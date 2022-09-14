@@ -1,39 +1,30 @@
 #include "SqlExpression.hpp"
 
-#include <tuple>
+SqlLogicExpression::SqlLogicExpression(std::string st,
+                                       std::vector<PropertyRep*> pPr)
+    : st(std::move(st)), actingProps(std::move(pPr)) {}
 
-// SqlExpression::SqlExpression(ISqlStatement* lf, Operator ct, ISqlStatement*
-// rt)
-//     : left(lf), op(ct), right(rt) {}
+std::string SqlLogicExpression::getStatement() const { return std::move(st); }
 
-// SqlExpression SqlExpression::operator&&(SqlExpression& re) {
-//     return SqlExpression(this, Operator::AND, &re);
-// }
+std::vector<PropertyRep*> SqlLogicExpression::getActingProps() const {
+    return std::move(actingProps);
+}
 
-// SqlExpression SqlExpression::operator||(SqlExpression& re) {
-//     return SqlExpression(this, Operator::OR, &re);
-// }
+SqlLogicExpression SqlLogicExpression::operator&&(const SqlLogicExpression& q) {
+    actingProps.insert(actingProps.end(), q.actingProps.begin(),
+                       q.actingProps.end());
+    return SqlLogicExpression(st + " " + OperatorToString(AND) + " " + q.st,
+                              std::move(actingProps));
+}
 
-// SqlExpression SqlExpression::operator~() {
-//     return SqlExpression(this, Operator::NOT, nullptr);
-// }
+SqlLogicExpression SqlLogicExpression::operator||(const SqlLogicExpression& q) {
+    actingProps.insert(actingProps.end(), q.actingProps.begin(),
+                       q.actingProps.end());
+    return SqlLogicExpression(st + " " + OperatorToString(OR) + " " + q.st,
+                              std::move(actingProps));
+}
 
-// std::string SqlExpression::getStatement() const {
-//     if (this->op == Operator::NOT) {
-//         return "NOT " + this->left->getStatement();
-//     }
-
-//     return this->left->getStatement() + OperatorToString(this->op) +
-//            this->right->getStatement();
-// }
-
-// std::tuple<PropertyRep*, Condition, RightValue> SqlExpression::get()
-//     const {
-//     return std::make_tuple(left, condition, right);
-// }
-
-// PropertyRep* SqlExpression::getLeftExp() { return left; }
-
-// Condition SqlExpression::getCondition() { return condition; }
-
-// RightValue SqlExpression::getRightExp() { return right; }
+SqlLogicExpression SqlLogicExpression::operator~() {
+    return SqlLogicExpression(OperatorToString(NOT) + std::string(" ") + st,
+                              std::move(actingProps));
+}

@@ -8,6 +8,7 @@
 #include "Concepts.hpp"
 #include "Enums.hpp"
 #include "ISqlStatement.hpp"
+#include "SqlExpression.hpp"
 #include "SqlStatement.hpp"
 #include "dbwrapper/IDB.hpp"
 
@@ -26,10 +27,7 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
 SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
                                        const char* rt);
 
-class PropertyRep;
-
-typedef std::variant<PropertyRep, std::string, int, double, const char*>
-    RightValue;
+typedef std::variant<std::string, int, double, const char*> RightValue;
 
 class PropertyRep : public ISqlStatement {
    public:
@@ -47,25 +45,50 @@ class PropertyRep : public ISqlStatement {
                                            const std::string& name);
 
    public:
-    SqlStatement<std::string> operator<(RightValue rt);
+    SqlLogicExpression operator<(PropertyRep& rt);
 
-    SqlStatement<std::string> operator<=(RightValue rt);
+    SqlLogicExpression operator<=(PropertyRep& rt);
 
-    SqlStatement<std::string> operator>(RightValue rt);
+    SqlLogicExpression operator>(PropertyRep& rt);
 
-    SqlStatement<std::string> operator>=(RightValue rt);
+    SqlLogicExpression operator>=(PropertyRep& rt);
 
     // EQUAL
-    SqlStatement<std::string> operator==(RightValue rt);
+    SqlLogicExpression operator==(PropertyRep& rt);
 
     // NOT EQUAL
-    SqlStatement<std::string> operator!=(RightValue rt);
+    SqlLogicExpression operator!=(PropertyRep& rt);
 
     // LIKE
-    SqlStatement<std::string> operator%(RightValue rt);
+    SqlLogicExpression operator%(PropertyRep& rt);
 
     // NOT LIKE
-    SqlStatement<std::string> operator^(RightValue rt);
+    SqlLogicExpression operator^(PropertyRep& rt);
+
+    // -- Same operator but for other types
+    SqlLogicExpression operator<(RightValue rt);
+
+    SqlLogicExpression operator<=(RightValue rt);
+
+    SqlLogicExpression operator>(RightValue rt);
+
+    SqlLogicExpression operator>=(RightValue rt);
+
+    // EQUAL
+    SqlLogicExpression operator==(RightValue rt);
+
+    // NOT EQUAL
+    SqlLogicExpression operator!=(RightValue rt);
+
+    // LIKE
+    SqlLogicExpression operator%(RightValue rt);
+
+    // NOT LIKE
+    SqlLogicExpression operator^(RightValue rt);
+
+   private:
+    std::string generateConditionStatement(Operator, PropertyRep& rt);
+    std::string generateConditionStatement(Operator, RightValue rt);
 
    protected:
     std::string name;

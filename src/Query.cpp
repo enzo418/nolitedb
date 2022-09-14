@@ -176,7 +176,21 @@ void SelectQuery::addJoinClauses(std::vector<PropertyRep>& props) {
     }
 }
 
-SelectQuery& SelectQuery::where(const SqlStatement<std::string>& st) {
+void SelectQuery::addJoinClauses(const std::vector<PropertyRep*>& props) {
+    for (auto& prop : props) {
+        this->qctx->sql << utils::paramsbind::parseSQL(
+            " left join @value_table as @p_a on (@doc_alias.id = "
+            "@p_a.doc_id and @p_a.prop_id = @p_id)",
+            {{"@value_table", prop->getTableNameForTypeValue(prop->getType())},
+             {"@p_a", prop->getStatement()},
+             {"@p_id", prop->getId()},
+             {"@doc_alias", this->documentTableAlias}});
+    }
+}
+
+SelectQuery& SelectQuery::where(const SqlLogicExpression& st) {
+    this->addJoinClauses(st.getActingProps());
+
     this->qctx->sql << " where " << st.getStatement();
     return *this;
 }

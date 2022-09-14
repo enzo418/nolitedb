@@ -95,61 +95,108 @@ std::string getValAsString(const RightValue& val) {
     } else if (std::holds_alternative<const char*>(val)) {
         return utils::paramsbind::encloseQuotesConst(
             std::get<const char*>(val));
-    } else if (std::holds_alternative<PropertyRep>(val)) {
-        return std::get<PropertyRep>(val).getStatement() + ".value";
     } else {
         throw std::runtime_error("Type not supported");
     }
 }
 
-SqlStatement<std::string> PropertyRep::operator<(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" +
-                                     OperatorToString(Operator::LT) +
-                                     getValAsString(rt));
+std::string PropertyRep::generateConditionStatement(Operator op,
+                                                    PropertyRep& rt) {
+    return this->getStatement() + ".value " + OperatorToString(op) + " " +
+           rt.getStatement() + ".value";
+}
+std::string PropertyRep::generateConditionStatement(Operator op,
+                                                    RightValue rt) {
+    return this->getStatement() + ".value " + OperatorToString(op) + " " +
+           getValAsString(rt);
 }
 
-SqlStatement<std::string> PropertyRep::operator<=(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" +
-                                     OperatorToString(Operator::LTE) +
-                                     getValAsString(rt));
+SqlLogicExpression PropertyRep::operator<(PropertyRep& rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::LT, rt),
+                              {this, &rt});
 }
 
-SqlStatement<std::string> PropertyRep::operator>(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" +
-                                     OperatorToString(Operator::GT) +
-                                     getValAsString(rt));
+SqlLogicExpression PropertyRep::operator<=(PropertyRep& rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::LTE, rt),
+                              {this, &rt});
 }
 
-SqlStatement<std::string> PropertyRep::operator>=(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" +
-                                     OperatorToString(Operator::GTE) +
-                                     getValAsString(rt));
+SqlLogicExpression PropertyRep::operator>(PropertyRep& rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::GT, rt),
+                              {this, &rt});
+}
+
+SqlLogicExpression PropertyRep::operator>=(PropertyRep& rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::GTE, rt),
+                              {this, &rt});
 }
 
 // EQUAL
-SqlStatement<std::string> PropertyRep::operator==(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" +
-                                     OperatorToString(Operator::EQ) +
-                                     getValAsString(rt));
+SqlLogicExpression PropertyRep::operator==(PropertyRep& rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::EQ, rt),
+                              {this, &rt});
 }
 
 // NOT EQUAL
-SqlStatement<std::string> PropertyRep::operator!=(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" +
-                                     OperatorToString(Operator::NEQ) +
-                                     getValAsString(rt));
+SqlLogicExpression PropertyRep::operator!=(PropertyRep& rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::NEQ, rt),
+                              {this, &rt});
 }
 
 // LIKE
-SqlStatement<std::string> PropertyRep::operator%(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" + " " +
-                                     OperatorToString(Operator::LIKE) + " " +
-                                     getValAsString(rt));
+SqlLogicExpression PropertyRep::operator%(PropertyRep& rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::LIKE, rt),
+                              {this, &rt});
 }
 
 // NOT LIKE
-SqlStatement<std::string> PropertyRep::operator^(RightValue rt) {
-    return SqlStatement<std::string>(this->getStatement() + ".value" + " " +
-                                     OperatorToString(Operator::NLIKE) + " " +
-                                     getValAsString(rt));
+SqlLogicExpression PropertyRep::operator^(PropertyRep& rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::NLIKE, rt),
+                              {this, &rt});
+}
+
+// ---- Right value
+
+SqlLogicExpression PropertyRep::operator<(RightValue rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::LT, rt),
+                              {this});
+}
+
+SqlLogicExpression PropertyRep::operator<=(RightValue rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::LTE, rt),
+                              {this});
+}
+
+SqlLogicExpression PropertyRep::operator>(RightValue rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::GT, rt),
+                              {this});
+}
+
+SqlLogicExpression PropertyRep::operator>=(RightValue rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::GTE, rt),
+                              {this});
+}
+
+// EQUAL
+SqlLogicExpression PropertyRep::operator==(RightValue rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::EQ, rt),
+                              {this});
+}
+
+// NOT EQUAL
+SqlLogicExpression PropertyRep::operator!=(RightValue rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::NEQ, rt),
+                              {this});
+}
+
+// LIKE
+SqlLogicExpression PropertyRep::operator%(RightValue rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::LIKE, rt),
+                              {this});
+}
+
+// NOT LIKE
+SqlLogicExpression PropertyRep::operator^(RightValue rt) {
+    return SqlLogicExpression(generateConditionStatement(Operator::NLIKE, rt),
+                              {this});
 }

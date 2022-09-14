@@ -12,7 +12,7 @@ TEST(PropertyExpression, BothAreProperty) {
     auto model = PropertyRep("model", -1, PropertyType::STRING);
     auto year = PropertyRep("year", -1, PropertyType::INTEGER);
 
-    std::vector<SqlStatement<std::string>> criterias = {
+    std::vector<SqlLogicExpression> criterias = {
         model<year, model <= year, model> year,
         model >= year,
         model == year,
@@ -34,7 +34,7 @@ TEST(PropertyExpression, BothAreProperty) {
 TEST(PropertyExpression, RightIsConstant) {
     auto year = PropertyRep("year", -1, PropertyType::INTEGER);
 
-    std::vector<SqlStatement<std::string>> criterias = {
+    std::vector<SqlLogicExpression> criterias = {
         year<418.42, year <= 418.42, year> 418.42,
         year >= 418.42,
         year == 418.42,
