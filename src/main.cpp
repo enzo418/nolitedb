@@ -66,8 +66,15 @@ int main() {
     auto [model, maker, year] =
         collQuery.prepareProperties("model", "maker", "year");
 
+    // maybe auto [car_id, ...] = collection("cars").prepare(...)
+    //       auto [race_winner, ...] = collection("races").prepare(...)
+    //       query.select(car_id, c2, ..., cn, race_winner, ..., r2, ..., rn)
+    //            .from("cars", "races")
+    //            .where(car_id == race_winner).execute()
+
     auto res = collQuery.select(model, maker, year)
-                   .where(maker == "ford" && year > 2000 || model == "subaru")
+                   .where(maker == "ford" && year > 2000 ||
+                          model == "impreza" && year > 2002)
                    .execute();
 
     std::cout << "\n\nRES: " << res << std::endl;

@@ -12,6 +12,15 @@
             "args": [],
             "preLaunchTask": "build",
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug tests",
+            "program": "${workspaceFolder}/build/tests",
+            "args": [],
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

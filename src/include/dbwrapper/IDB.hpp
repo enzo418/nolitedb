@@ -53,11 +53,12 @@ class IDB {
 
     /**
      * @brief Same as above but assures that all the statements
-     * will be executed. This is because some db engines doesn't support
+     * will be executed. This is because some db engines do not support
      * multiple create, insert statements in a single query.
      *
-     * have in mind that the parameters will be inserted in the query without
-     * major modifications so it can be insecure.
+     * Raw because it probably won't use the database api to clean the
+     * parameters, but still will perform a basic cleanup of them to avoid a sql
+     * injection.
      *
      * @param query
      * @param params
