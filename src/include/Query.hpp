@@ -138,6 +138,7 @@ class SelectQuery : public ExecutableQuery<json> {
 
    public:
     SelectQuery& where(const SqlLogicExpression&);
+    SelectQuery& page(int pageNumber, int elementsPerPage);
 
    private:
     std::vector<PropertyRep> properties;

@@ -72,8 +72,9 @@ int main() {
     //            .from("cars", "races")
     //            .where(car_id == race_winner).execute()
 
-    auto res = collQuery.select(maker)
+    auto res = collQuery.select(model, maker, year)
                    .where(year > 2000 || model == "impreza")
+                   .page(1, 10)
                    .execute();
 
     std::cout << "\n\nRES: " << res << std::endl;

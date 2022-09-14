@@ -209,3 +209,10 @@ SelectQuery& SelectQuery::where(const SqlLogicExpression& st) {
     this->qctx->selectCtx->where << " where " << st.getStatement();
     return *this;
 }
+
+SelectQuery& SelectQuery::page(int pageNumber, int elementsPerPage) {
+    this->qctx->selectCtx->limit_offset << " limit " << elementsPerPage
+                                        << " offset "
+                                        << (pageNumber - 1) * elementsPerPage;
+    return *this;
+}
