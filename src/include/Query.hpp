@@ -5,9 +5,11 @@
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
+#include <variant>
 
 #include "Collection.hpp"
 #include "Concepts.hpp"
+#include "Enums.hpp"
 #include "MoveOnlyFunction.h"
 #include "PropertyRep.hpp"
 #include "SqlExpression.hpp"
@@ -20,6 +22,12 @@ using namespace nlohmann;
 
 template <typename Q>
 concept IsPropertyRep = std::is_same<Q, PropertyRep>::value;
+
+template <typename Q>
+concept IsSelectProperty =
+    IsPropertyRep<Q> || std::is_same<Q, AggregateFunction>::value;
+
+typedef std::variant<PropertyRep, AggregateFunction> SelectProperty;
 
 /**
  * @brief Holds data to build a SQL Select query with all the possible clauses
@@ -45,7 +53,9 @@ struct SelectQueryData {
     friend class QueryCtx;
 
     void addFromClause();
-    void addJoinClause(PropertyRep&);
+    // adds a join clausure for a property if it wasn't added.
+    void addJoinClauseIfNotExists(PropertyRep&);
+    void addJoinClauses(std::vector<SelectProperty>&);
     void addJoinClauses(std::vector<PropertyRep>&);
     void addJoinClauses(const std::set<PropertyRep*>&);
 
@@ -134,14 +144,32 @@ class ExecutableQuery : public BaseQuery {
 class SelectQuery : public ExecutableQuery<json> {
    public:
     SelectQuery(const std::shared_ptr<QueryCtx>& qctx,
-                std::vector<PropertyRep>&& properties);
+                std::vector<SelectProperty>&& properties);
 
    public:
     SelectQuery& where(const SqlLogicExpression&);
     SelectQuery& page(int pageNumber, int elementsPerPage);
 
+    template <IsPropertyRep... PR>
+    SelectQuery& groupBy(PR&... cols) {
+        this->qctx->selectCtx->groupBy << " GROUP BY ";
+
+        std::vector<PropertyRep> props = {cols...};
+
+        for (int i = 0; i < props.size(); i++) {
+            this->qctx->selectCtx->groupBy << props[i].getStatement()
+                                           << ".value";
+
+            if (i != props.size() - 1) {
+                this->qctx->selectCtx->groupBy << ", ";
+            }
+        }
+
+        return *this;
+    }
+
    private:
-    std::vector<PropertyRep> properties;
+    std::vector<SelectProperty> properties;
 };
 
 class Query : public BaseQuery {
@@ -167,8 +195,8 @@ class Query : public BaseQuery {
 
     // TODO: lets suppose that all are PropertyRep for now but we could have
     // sum(prop), ...
-    template <IsPropertyRep... Q>
-    SelectQuery select(Q&... props) {
+    template <IsSelectProperty... Q>
+    SelectQuery select(const Q&... props) {
         if (!this->qctx->selectCtx) {
             this->qctx->selectCtx = std::make_unique<SelectQueryData>();
         }
@@ -177,16 +205,31 @@ class Query : public BaseQuery {
 
         this->qctx->selectCtx->select << "select ";
 
-        std::vector<PropertyRep> unpackedProps = {props...};
+        // to variant
+        std::vector<SelectProperty> unpackedProps = {props...};
 
         if (sizeof...(props) > 0) {
             for (int i = 0; i < unpackedProps.size(); i++) {
-                const auto& prop = unpackedProps[i];
+                const auto& v_prop = unpackedProps[i];
 
-                this->qctx->selectCtx->select << utils::paramsbind::parseSQL(
-                    "@table.value as @prop_name",
-                    {{"@table", prop.getStatement()},
-                     {"@prop_name", std::string(prop.getName())}});
+                if (std::holds_alternative<PropertyRep>(v_prop)) {
+                    const auto& prop = std::get<PropertyRep>(v_prop);
+
+                    this->qctx->selectCtx->select
+                        << utils::paramsbind::parseSQL(
+                               "@table.value as @prop_name",
+                               {{"@table", prop.getStatement()},
+                                {"@prop_name", std::string(prop.getName())}});
+                } else {
+                    const auto& prop = std::get<AggregateFunction>(v_prop);
+
+                    this->qctx->selectCtx->select
+                        << AggregatefunctionTypeToString(prop.type) << "("
+                        << utils::paramsbind::parseSQL(
+                               "@table.value) as @agg_alias",
+                               {{"@table", prop.prop->getStatement()},
+                                {"@agg_alias", prop.alias}});
+                }
 
                 if (i != unpackedProps.size() - 1) {
                     this->qctx->selectCtx->select << ",";

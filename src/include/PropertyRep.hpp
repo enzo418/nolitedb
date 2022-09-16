@@ -29,59 +29,6 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
 
 typedef std::variant<std::string, int, double, const char*> RightValue;
 
-enum AGGREGATEFUNCTIONTYPE { COUNT, AVG, SUM, MAX, MIN };
-
-/**
- * IDEA
- #include <iostream>
-#include <set>
-#include <string>
-
-struct LoF;
-
-enum TP {R = 23};
-enum HTP {E = 99};
-
-struct IProp {
-    IProp(TP type) : type(type) {};
-    TP type;
-};
-
-
-struct HoF : public IProp {
-    HoF(LoF* l) :  IProp(R), l(l) {}
-
-    HTP e{E};
-    LoF* l;
-};
-
-struct LoF : public IProp {
-    LoF(TP type) : IProp(type) {};
-
-    TP getType() { return IProp::type; };
-
-    HoF getH() { return HoF(this); }
-};
-
-void f(const IProp& l) {
-    if (l.type == R) {
-        auto c = (const HoF&) l;
-        std::cout << c.e << std::endl;
-        std::cout << c.l->getType() << std::endl;
-    }
-}
-
-int main()
-{
-    LoF l(R);
-    //HoF h(l);
-    f(l.getH());
-
-}
-
- *
- */
-
 struct AggregateFunction {
     AggregateFunction(PropertyRep* pProp, const char* pAlias,
                       AGGREGATEFUNCTIONTYPE pType)
@@ -96,8 +43,24 @@ class PropertyRep : public ISqlStatement {
     PropertyRep(const std::string& pName, int id, PropertyType type);
 
    public:
+    /**
+     * @brief Get the internal id of the property
+     * @return int
+     */
     int getId() const;
+
+    /**
+     * @brief Get its type
+     *
+     * @return PropertyType
+     */
     PropertyType getType() const;
+
+    /**
+     * @brief Get the property name or alias
+     *
+     * @return std::string_view
+     */
     std::string_view getName() const;
     std::string getStatement() const override;
 
@@ -107,11 +70,11 @@ class PropertyRep : public ISqlStatement {
                                            const std::string& name);
 
    public:  // aggregate functions
-    AggregateFunction count(const char* alias);
-    AggregateFunction average(const char* alias);
-    AggregateFunction min(const char* alias);
-    AggregateFunction max(const char* alias);
-    AggregateFunction sum(const char* alias);
+    AggregateFunction countAs(const char* alias);
+    AggregateFunction averageAs(const char* alias);
+    AggregateFunction minAs(const char* alias);
+    AggregateFunction maxAs(const char* alias);
+    AggregateFunction sumAs(const char* alias);
 
    public:
     SqlLogicExpression operator<(PropertyRep& rt);

@@ -42,6 +42,7 @@ int main() {
     auto collQuery = factory.create(&db, "cars");
 
     json cars = {{{"maker", "ford"}, {"model", "focus"}, {"year", 2011}},
+                 {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
                  {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
 
     collQuery.insert(cars).execute();
@@ -55,10 +56,11 @@ int main() {
     //            .from("cars", "races")
     //            .where(car_id == race_winner).execute()
 
-    auto res = collQuery.select(model, maker, year)
-                   .where(year > 2000 || model == "impreza")
+    auto res = collQuery.select(model, maker, year.maxAs("year_newest_model"))
+                   .where(year > 1990)
                    .page(1, 10)
-                   .sort(Query::Asc(model), maker.COUNT())
+                   .groupBy(model, maker)
+                   //    .sort(Query::Asc(model), maker.COUNT())
                    .execute();
 
     std::cout << "\n\nRES: " << res << std::endl;

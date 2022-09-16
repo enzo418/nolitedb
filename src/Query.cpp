@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <variant>
 
 #include "Document.hpp"
 #include "Enums.hpp"
@@ -116,7 +117,7 @@ Query QueryFactory::create(IDB* ctx, const std::string& collName) {
 }
 
 SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
-                         std::vector<PropertyRep>&& pProperties)
+                         std::vector<SelectProperty>&& pProperties)
     : ExecutableQuery<json>(pCtx, nullptr), properties(pProperties) {
     qctx->selectCtx->addFromClause();
 
@@ -139,20 +140,29 @@ SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
             // each row will have exactly props.size() columns, and each one
             // will have the same type as the property in its index.
             for (int i = 0; i < props.size(); i++) {
-                const auto& prop = props[i];
-                switch (prop.getType()) {
-                    case PropertyType::INTEGER:
-                        jrow[prop.getName()] = row->readInt64(i);
-                        break;
-                    case PropertyType::DOUBLE:
-                        jrow[prop.getName()] = row->readDouble(i);
-                        break;
-                    case PropertyType::STRING:
-                        jrow[prop.getName()] = row->readString(i);
-                        break;
-                    case PropertyType::RESERVED:
-                        throw std::runtime_error("Not implemented");
-                        break;
+                auto& v_prop = props[i];
+
+                if (std::holds_alternative<PropertyRep>(v_prop)) {
+                    const auto& prop = std::get<PropertyRep>(v_prop);
+                    switch (prop.getType()) {
+                        case PropertyType::INTEGER:
+                            jrow[prop.getName()] = row->readInt64(i);
+                            break;
+                        case PropertyType::DOUBLE:
+                            jrow[prop.getName()] = row->readDouble(i);
+                            break;
+                        case PropertyType::STRING:
+                            jrow[prop.getName()] = row->readString(i);
+                            break;
+                        case PropertyType::RESERVED:
+                            throw std::runtime_error(
+                                "Select properties should not hold a reserved "
+                                "property directly!");
+                            break;
+                    }
+                } else {
+                    auto& prop = std::get<AggregateFunction>(v_prop);
+                    jrow[prop.alias] = row->readInt64(i);
                 }
             }
 
@@ -175,30 +185,37 @@ bool SelectQueryData::propAlreadyHasJoin(PropertyRep& prop) {
                         }) != propsWithJoin.end();
 }
 
-void SelectQueryData::addJoinClause(PropertyRep& prop) {
-    from_join << utils::paramsbind::parseSQL(
-        " left join @value_table as @p_a on (@doc_alias.id = "
-        "@p_a.doc_id and @p_a.prop_id = @p_id)",
-        {{"@value_table", prop.getTableNameForTypeValue(prop.getType())},
-         {"@p_a", prop.getStatement()},
-         {"@p_id", prop.getId()},
-         {"@doc_alias", documentTableAlias}});
+void SelectQueryData::addJoinClauseIfNotExists(PropertyRep& prop) {
+    if (!this->propAlreadyHasJoin(prop)) {
+        from_join << utils::paramsbind::parseSQL(
+            " left join @value_table as @p_a on (@doc_alias.id = "
+            "@p_a.doc_id and @p_a.prop_id = @p_id)",
+            {{"@value_table", prop.getTableNameForTypeValue(prop.getType())},
+             {"@p_a", prop.getStatement()},
+             {"@p_id", prop.getId()},
+             {"@doc_alias", documentTableAlias}});
+        this->propsWithJoin.push_back(prop);  // yes, copy it
+    }
 }
 
 void SelectQueryData::addJoinClauses(std::vector<PropertyRep>& props) {
     for (auto& prop : props) {
-        if (!this->propAlreadyHasJoin(prop)) {
-            this->addJoinClause(prop);
-            this->propsWithJoin.push_back(prop);  // yes, copy it
-        }
+        this->addJoinClauseIfNotExists(prop);
     }
 }
 
 void SelectQueryData::addJoinClauses(const std::set<PropertyRep*>& props) {
     for (const auto& prop : props) {
-        if (!this->propAlreadyHasJoin(*prop)) {
-            this->addJoinClause(*prop);
-            this->propsWithJoin.push_back(*prop);
+        this->addJoinClauseIfNotExists(*prop);
+    }
+}
+
+void SelectQueryData::addJoinClauses(std::vector<SelectProperty>& props) {
+    for (auto& v_prop : props) {
+        if (std::holds_alternative<PropertyRep>(v_prop)) {
+            addJoinClauseIfNotExists(std::get<PropertyRep>(v_prop));
+        } else {
+            addJoinClauseIfNotExists(*std::get<AggregateFunction>(v_prop).prop);
         }
     }
 }

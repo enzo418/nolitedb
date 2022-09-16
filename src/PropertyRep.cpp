@@ -111,23 +111,23 @@ std::string PropertyRep::generateConditionStatement(Operator op,
            getValAsString(rt);
 }
 
-AggregateFunction PropertyRep::count(const char* alias) {
+AggregateFunction PropertyRep::countAs(const char* alias) {
     return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::COUNT);
 }
 
-AggregateFunction PropertyRep::average(const char* alias) {
+AggregateFunction PropertyRep::averageAs(const char* alias) {
     return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::AVG);
 }
 
-AggregateFunction PropertyRep::min(const char* alias) {
+AggregateFunction PropertyRep::minAs(const char* alias) {
     return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::MIN);
 }
 
-AggregateFunction PropertyRep::max(const char* alias) {
+AggregateFunction PropertyRep::maxAs(const char* alias) {
     return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::MAX);
 }
 
-AggregateFunction PropertyRep::sum(const char* alias) {
+AggregateFunction PropertyRep::sumAs(const char* alias) {
     return AggregateFunction(this, alias, AGGREGATEFUNCTIONTYPE::SUM);
 }
 
