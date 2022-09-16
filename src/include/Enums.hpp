@@ -5,7 +5,9 @@ enum Operator { EQ, NEQ, GT, GTE, LT, LTE, LIKE, NLIKE, AND, OR, NOT };
 
 enum PropertyType { INTEGER = 1, DOUBLE, STRING, RESERVED };
 
-enum AGGREGATEFUNCTIONTYPE { COUNT, AVG, SUM, MAX, MIN };
+enum AggregateType { COUNT, AVG, SUM, MAX, MIN };
+
+enum SortType { ASC, DESC };
 
 inline const char* OperatorToString(Operator v) {
     switch (v) {
@@ -36,7 +38,7 @@ inline const char* OperatorToString(Operator v) {
     }
 }
 
-inline const char* AggregatefunctionTypeToString(AGGREGATEFUNCTIONTYPE v) {
+inline const char* AggregatefunctionTypeToString(AggregateType v) {
     switch (v) {
         case AVG:
             return "AVG";
@@ -49,6 +51,17 @@ inline const char* AggregatefunctionTypeToString(AGGREGATEFUNCTIONTYPE v) {
         case SUM:
             return "SUM";
         default:
-            throw std::runtime_error("Uknown operator");
+            throw std::runtime_error("Uknown aggregate function");
+    }
+}
+
+inline const char* SortTypeToString(SortType v) {
+    switch (v) {
+        case ASC:
+            return "ASC";
+        case DESC:
+            return "DESC";
+        default:
+            throw std::runtime_error("Uknown sort type");
     }
 }

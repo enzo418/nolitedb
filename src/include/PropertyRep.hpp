@@ -29,12 +29,19 @@ SqlStatement<std::string> getStatement(PropertyRep* lf, Operator op,
 
 typedef std::variant<std::string, int, double, const char*> RightValue;
 
+struct SortProp {
+    SortProp(PropertyRep* pProp, SortType pType) : prop(pProp), type(pType) {}
+
+    SortType type;
+    PropertyRep* prop;
+};
+
 struct AggregateFunction {
     AggregateFunction(PropertyRep* pProp, const char* pAlias,
-                      AGGREGATEFUNCTIONTYPE pType)
+                      AggregateType pType)
         : prop(pProp), alias(pAlias), type(pType) {}
     const char* alias;
-    AGGREGATEFUNCTIONTYPE type;
+    AggregateType type;
     PropertyRep* prop;
 };
 
@@ -75,6 +82,10 @@ class PropertyRep : public ISqlStatement {
     AggregateFunction minAs(const char* alias);
     AggregateFunction maxAs(const char* alias);
     AggregateFunction sumAs(const char* alias);
+
+   public:  // sort order
+    SortProp asc();
+    SortProp desc();
 
    public:
     SqlLogicExpression operator<(PropertyRep& rt);

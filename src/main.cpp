@@ -56,12 +56,19 @@ int main() {
     //            .from("cars", "races")
     //            .where(car_id == race_winner).execute()
 
-    auto res = collQuery.select(model, maker, year.maxAs("year_newest_model"))
-                   .where(year > 1990)
-                   .page(1, 10)
-                   .groupBy(model, maker)
-                   //    .sort(Query::Asc(model), maker.COUNT())
-                   .execute();
+    auto res1 = collQuery.select(model, maker, year.maxAs("year_newest_model"))
+                    .where(year > 1990)
+                    .page(1, 10)
+                    .groupBy(model, maker)
+                    .execute();
 
-    std::cout << "\n\nRES: " << res << std::endl;
+    std::cout << "\n\nRES1: " << res1 << std::endl << std::endl;
+
+    auto res2 = collQuery.select(model, maker, year)
+                    .page(1, 10)
+                    .groupBy(model, maker)
+                    .sort(year.desc())
+                    .execute();
+
+    std::cout << "\n\nRES2: " << res2 << std::endl;
 }

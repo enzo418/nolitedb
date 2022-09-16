@@ -27,6 +27,9 @@ template <typename Q>
 concept IsSelectProperty =
     IsPropertyRep<Q> || std::is_same<Q, AggregateFunction>::value;
 
+template <typename Q>
+concept IsSorteableProp = std::is_same<Q, SortProp>::value;
+
 typedef std::variant<PropertyRep, AggregateFunction> SelectProperty;
 
 /**
@@ -41,6 +44,7 @@ struct SelectQueryData {
     std::stringstream from_join;
     std::stringstream where;
     std::stringstream groupBy;
+    std::stringstream orderBy;
     std::stringstream having;
     std::stringstream limit_offset;
 
@@ -106,7 +110,8 @@ struct QueryCtx {
 
         sql << selectCtx->select.str() << selectCtx->from_join.str()
             << selectCtx->where.str() << selectCtx->groupBy.str()
-            << selectCtx->having.str() << selectCtx->limit_offset.str();
+            << selectCtx->having.str() << selectCtx->orderBy.str()
+            << selectCtx->limit_offset.str();
     }
 };
 
@@ -154,14 +159,37 @@ class SelectQuery : public ExecutableQuery<json> {
     SelectQuery& groupBy(PR&... cols) {
         this->qctx->selectCtx->groupBy << " GROUP BY ";
 
-        std::vector<PropertyRep> props = {cols...};
+        std::set<PropertyRep*> props = {&cols...};
+
+        qctx->selectCtx->addJoinClauses(props);
+
+        for (auto it = props.begin(); it != props.end(); it++) {
+            this->qctx->selectCtx->groupBy
+                << utils::paramsbind::encloseQuotesConst((*it)->getStatement())
+                << ".value";
+
+            if (std::next(it) != props.end()) {
+                this->qctx->selectCtx->groupBy << ", ";
+            }
+        }
+
+        return *this;
+    }
+
+    template <IsSorteableProp... SR>
+    SelectQuery& sort(const SR&... colsSort) {
+        this->qctx->selectCtx->orderBy << " ORDER BY ";
+
+        std::vector<SortProp> props = {colsSort...};
 
         for (int i = 0; i < props.size(); i++) {
-            this->qctx->selectCtx->groupBy << props[i].getStatement()
-                                           << ".value";
+            this->qctx->selectCtx->orderBy
+                << utils::paramsbind::encloseQuotesConst(
+                       props[i].prop->getStatement())
+                << ".value " << SortTypeToString(props[i].type);
 
             if (i != props.size() - 1) {
-                this->qctx->selectCtx->groupBy << ", ";
+                this->qctx->selectCtx->orderBy << ", ";
             }
         }
 
