@@ -70,6 +70,7 @@ struct SelectQueryData {
         from_join.str("");
         where.str("");
         groupBy.str("");
+        orderBy.str("");
         having.str("");
         limit_offset.str("");
 
@@ -182,6 +183,16 @@ class SelectQuery : public ExecutableQuery<json> {
 
         std::vector<SortProp> props = {colsSort...};
 
+        {  // add joins
+            std::set<PropertyRep*> onlyPropsReps;
+
+            for (int i = 0; i < props.size(); i++) {
+                onlyPropsReps.insert(props[i].prop);
+            }
+
+            this->qctx->selectCtx->addJoinClauses(onlyPropsReps);
+        }
+
         for (int i = 0; i < props.size(); i++) {
             this->qctx->selectCtx->orderBy
                 << utils::paramsbind::encloseQuotesConst(
@@ -287,6 +298,9 @@ class Query : public BaseQuery {
 };
 
 class QueryFactory {
+   private:
+    QueryFactory();
+
    public:
     static Query create(IDB* ctx, const std::string& collName);
 };

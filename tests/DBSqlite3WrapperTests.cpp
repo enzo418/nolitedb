@@ -8,6 +8,10 @@
 #include "Query.hpp"
 #include "dbwrapper/sq3wrapper/DB.hpp"
 
+// TODO: Move the tests to individual files for each function
+// TODO: Create an abstract tests for IDB
+// TODO: Test them against different collections
+
 TEST(Sqlite3Wrapper, shouldOpenDB) {
     DBSL3 db;
 
@@ -81,8 +85,7 @@ TEST(Sqlite3Wrapper, shouldInsertADocument) {
 
     EXPECT_TRUE(db.open(":memory:"));
 
-    auto f = QueryFactory();
-    auto numbersCollection = f.create(&db, "numbers");
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
 
     json number = {
         {"number_name", "pi"}, {"double_rep", M_PI}, {"integer_rep", 3}};
@@ -114,8 +117,7 @@ TEST(Sqlite3Wrapper, shouldInsertMultipleDocuments) {
 
     EXPECT_TRUE(db.open(":memory:"));
 
-    auto f = QueryFactory();
-    auto numbersCollection = f.create(&db, "numbers");
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
 
     json numbers = {
         {{"number_name", "pi"}, {"double_rep", M_PI}, {"integer_rep", 3}},
@@ -138,14 +140,10 @@ TEST(Sqlite3Wrapper, shouldInsertMultipleDocuments) {
     auto [name, dr, ir] = numbersCollection.prepareProperties(
         "number_name", "double_rep", "integer_rep");
 
-    json result = numbersCollection.select(name, dr, ir).execute();
+    json result =
+        numbersCollection.select(name, dr, ir).sort(ir.desc()).execute();
 
     EXPECT_EQ(result.size(), numbers.size());
-
-    // TODO: Update tests after order by is added
-    std::sort(result.begin(), result.end(), [](auto a, auto b) {
-        return a["integer_rep"] > b["integer_rep"];
-    });
 
     for (int i = 0; i < numbers.size(); i++) {
         auto r = result[i];
@@ -157,14 +155,14 @@ TEST(Sqlite3Wrapper, shouldInsertMultipleDocuments) {
     }
 }
 
-class Sql3WrapperWhereTest : public ::testing::Test {
+class Sql3WrapperNumbersTest : public ::testing::Test {
    protected:
     void SetUp() override {
         EXPECT_TRUE(db.open(":memory:"));
 
-        f = QueryFactory();
-        auto numbersCollection = f.create(&db, "numbers");
+        auto numbersCollection = QueryFactory::create(&db, "numbers");
 
+        // just a simple collection of elements with the 3 data types
         json numbers = {
             {{"number_name", "pi"}, {"double_rep", M_PI}, {"integer_rep", 3}},
 
@@ -179,33 +177,49 @@ class Sql3WrapperWhereTest : public ::testing::Test {
 
     void TearDown() override { db.close(); }
 
-    QueryFactory f;
     DBSL3 db;
 };
 
-TEST_F(Sql3WrapperWhereTest, shouldQueryBasedOn_Like_Condition) {
-    auto numbersCollection = f.create(&db, "numbers");
+TEST_F(Sql3WrapperNumbersTest, shouldSortElements) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
 
     auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
         "number_name", "double_rep", "integer_rep");
 
-    json result = numbersCollection.select(name).where(name % "%e%").execute();
+    std::array<std::string, 3> expectedOrderNames = {"log2(e)", "e", "pi"};
 
-    // TODO: Update tests after order by is added
-    std::sort(result.begin(), result.end(), [](auto a, auto b) {
-        return a["integer_rep"] > b["integer_rep"];
-    });
+    json asc = numbersCollection.select(name).sort(integer_rep.asc()).execute();
+
+    json desc =
+        numbersCollection.select(name).sort(integer_rep.desc()).execute();
+
+    EXPECT_TRUE(asc.size() == 3);
+    EXPECT_TRUE(desc.size() == 3);
+
+    for (int i = 0; i < 3; i++) {
+        EXPECT_EQ(asc[i]["number_name"], expectedOrderNames[i]);
+        EXPECT_EQ(desc[i]["number_name"], expectedOrderNames[2 - i]);
+    }
+}
+
+TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_Like_Condition) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
+
+    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
+        "number_name", "double_rep", "integer_rep");
+
+    json result = numbersCollection.select(name)
+                      .sort(integer_rep.desc())
+                      .where(name % "%e%")
+                      .execute();
 
     EXPECT_EQ(result.size(), 2);
-    ASSERT_NE(result[0]["number_name"], result[1]["number_name"]);
     EXPECT_TRUE(result[0]["number_name"] == "e" ||
-                result[1]["number_name"] == "e");
-    EXPECT_TRUE(result[0]["number_name"] == "log2(e)" ||
                 result[1]["number_name"] == "log2(e)");
 }
 
-TEST_F(Sql3WrapperWhereTest, shouldQueryBasedOn_NotLike_Condition) {
-    auto numbersCollection = f.create(&db, "numbers");
+TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_NotLike_Condition) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
 
     auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
         "number_name", "double_rep", "integer_rep");
@@ -216,22 +230,21 @@ TEST_F(Sql3WrapperWhereTest, shouldQueryBasedOn_NotLike_Condition) {
     EXPECT_EQ(result[0]["number_name"], "pi");
 }
 
-TEST_F(Sql3WrapperWhereTest, shouldQueryBasedOn_Gt_Gte_Condition) {
-    auto numbersCollection = f.create(&db, "numbers");
+TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_Gt_Gte_Condition) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
 
     auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
         "number_name", "double_rep", "integer_rep");
 
-    json result1 =
-        numbersCollection.select(name).where(integer_rep > 1).execute();
+    json result1 = numbersCollection.select(name)
+                       .sort(integer_rep.desc())
+                       .where(integer_rep > 1)
+                       .execute();
 
-    json result2 =
-        numbersCollection.select(name).where(integer_rep >= 3).execute();
-
-    // TODO: Update tests after order by is added
-    std::sort(result1.begin(), result1.end(), [](auto a, auto b) {
-        return a["integer_rep"] > b["integer_rep"];
-    });
+    json result2 = numbersCollection.select(name)
+                       .sort(integer_rep.desc())
+                       .where(integer_rep >= 3)
+                       .execute();
 
     EXPECT_EQ(result1.size(), 2);
     EXPECT_EQ(result1[0]["number_name"], "pi");
@@ -239,4 +252,131 @@ TEST_F(Sql3WrapperWhereTest, shouldQueryBasedOn_Gt_Gte_Condition) {
 
     EXPECT_EQ(result2.size(), 1);
     EXPECT_EQ(result2[0]["number_name"], "pi");
+}
+
+TEST_F(Sql3WrapperNumbersTest, shouldLimitElementsPerPage) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
+
+    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
+        "number_name", "double_rep", "integer_rep");
+
+    json pi = numbersCollection.select(name)
+                  .sort(integer_rep.desc())
+                  .page(1, 1)
+                  .execute()
+                  .front();  // take first from the json array
+
+    json e = numbersCollection.select(name)
+                 .sort(integer_rep.desc())
+                 .page(2, 1)
+                 .execute()
+                 .front();
+
+    json log2e = numbersCollection.select(name)
+                     .sort(integer_rep.desc())
+                     .page(3, 1)
+                     .execute()
+                     .front();
+
+    json onlyFirstTwo = numbersCollection.select(name)
+                            .sort(integer_rep.desc())
+                            .page(1, 2)
+                            .execute();
+
+    EXPECT_EQ(pi["number_name"], "pi");
+    EXPECT_EQ(e["number_name"], "e");
+    EXPECT_EQ(log2e["number_name"], "log2(e)");
+
+    EXPECT_EQ(onlyFirstTwo.size(), 2);
+    EXPECT_EQ(onlyFirstTwo[0]["number_name"], "pi");
+    EXPECT_EQ(onlyFirstTwo[1]["number_name"], "e");
+}
+
+class Sql3WrapperCarsTest : public ::testing::Test {
+   protected:
+    void SetUp() override {
+        EXPECT_TRUE(db.open(":memory:"));
+
+        auto carsCollection = QueryFactory::create(&db, "cars");
+
+        // just a simple collection of elements with the 3 data types
+        json cars = {
+            {{"maker", "ford"}, {"model", "focus"}, {"year", 2011}},
+            {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
+            {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
+
+        carsCollection.insert(cars).execute();
+    }
+
+    void TearDown() override { db.close(); }
+
+    DBSL3 db;
+};
+
+TEST_F(Sql3WrapperCarsTest, shouldGroupElements) {
+    auto carsCollection = QueryFactory::create(&db, "cars");
+
+    auto [maker, model, year] =
+        carsCollection.prepareProperties("maker", "model", "year");
+
+    json result1 =
+        carsCollection.select(maker, model).groupBy(maker, model).execute();
+
+    json result2 = carsCollection.select(maker).groupBy(model).execute();
+
+    EXPECT_EQ(result1.size(), 2);
+    EXPECT_EQ(result2.size(), 2);
+}
+
+TEST_F(Sql3WrapperCarsTest, shouldSelectAggregateFunction) {
+    auto carsCollection = QueryFactory::create(&db, "cars");
+
+    auto [maker, model, year] =
+        carsCollection.prepareProperties("maker", "model", "year");
+
+    json newestModels = carsCollection.select(year.maxAs("year_newest"))
+                            .groupBy(model)
+                            .sort(year.desc())
+                            .execute();
+
+    json oldestModels = carsCollection.select(year.minAs("year_oldest"))
+                            .groupBy(model)
+                            .sort(year.asc())
+                            .execute();
+
+    json countPerModel = carsCollection.select(model.countAs("model_count"))
+                             .groupBy(maker, model)
+                             .sort(maker.asc())
+                             .execute();
+
+    json averageModelYear =
+        carsCollection.select(year.averageAs("average_model_year"))
+            .groupBy(maker, model)
+            .sort(year.desc())
+            .execute();
+
+    json sumAllModelsYear =
+        carsCollection.select(year.sumAs("total")).execute();
+
+    EXPECT_EQ(newestModels.size(), 2);
+    EXPECT_EQ(newestModels[0]["year_newest"], 2015);  // ford focus - 2015
+    EXPECT_EQ(newestModels[1]["year_newest"], 2003);  // subaru impreza - 2003
+
+    EXPECT_EQ(oldestModels.size(), 2);
+    EXPECT_EQ(oldestModels[0]["year_oldest"], 2003);
+    EXPECT_EQ(oldestModels[1]["year_oldest"], 2011);
+
+    EXPECT_EQ(countPerModel.size(), 2);
+    EXPECT_EQ(countPerModel[0]["model_count"], 2);
+    EXPECT_EQ(countPerModel[1]["model_count"], 1);
+
+    EXPECT_EQ(averageModelYear.size(), 2);
+    EXPECT_NEAR(averageModelYear[0]["average_model_year"],
+                (2011.0 + 2015.0) / 2.0, 1E-4);
+    EXPECT_EQ(averageModelYear[1]["average_model_year"], 2003);
+
+    EXPECT_EQ(sumAllModelsYear.size(), 1);
+    EXPECT_EQ(sumAllModelsYear[0]["total"], 2011 + 2015 + 2003);
+
+    // EXPECT_EQ(result2.size(), 2);
 }

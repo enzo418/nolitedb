@@ -38,8 +38,7 @@ int main() {
         db.throwLastError();
     }
 
-    auto factory = QueryFactory();
-    auto collQuery = factory.create(&db, "cars");
+    auto collQuery = QueryFactory::create(&db, "cars");
 
     json cars = {{{"maker", "ford"}, {"model", "focus"}, {"year", 2011}},
                  {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
