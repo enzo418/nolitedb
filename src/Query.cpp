@@ -118,15 +118,15 @@ ExecutableQuery<int> Query::remove(int documentID) {
 
     auto& tables = tables::getPropertyTables();
 
-    sql << "delete from document where id = " << documentID << "; ";
+    sql << "delete from document where id = @id; ";
 
     for (auto& [type, tab_name] : tables) {
-        sql << "delete from " << tab_name << " where doc_id = " << documentID
-            << ";";
+        sql << "delete from " << tab_name << " where doc_id = @id;";
     }
 
-    return ExecutableQuery<int>(qctx, [](QueryCtx& ctx) {
-        int affected = ctx.db->executeMultipleOnOneStepRaw(ctx.sql.str(), {});
+    return ExecutableQuery<int>(qctx, [documentID](QueryCtx& ctx) {
+        int affected = ctx.db->executeMultipleOnOneStepRaw(
+            ctx.sql.str(), {{"@id", documentID}});
 
         if (affected <= 0) {
             LogWarning("did not remove any items");

@@ -2,7 +2,11 @@
 
 #include <optional>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
+#include "Enums.hpp"
+#include "PropertyRep.hpp"
 #include "SqlExpression.hpp"
 #include "dbwrapper/IDB.hpp"
 #include "logger/Logger.h"
@@ -68,6 +72,22 @@ PropertyRep Collection::getProperty(const std::string& key) {
 
         throw std::runtime_error("Missing property");
     }
+}
+
+std::vector<PropertyRep> Collection::getAllTheProperties() {
+    const std::string sql =
+        "select id, name, type from property where coll_id = @id";
+
+    auto reader = ctx->executeReader(sql, {{"@id", this->id}});
+
+    std::vector<PropertyRep> props = {PropertyRep("id", -1, PropertyType::ID)};
+    std::shared_ptr<IDBRowReader> row;
+    while (reader->readRow(row)) {
+        props.push_back(PropertyRep(row->readString(1), row->readInt64(0),
+                                    (PropertyType)row->readInt64(2)));
+    }
+
+    return std::move(props);
 }
 
 Collection Collection::find(IDB* ctx, const std::string& name) {

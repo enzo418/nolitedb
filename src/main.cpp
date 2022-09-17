@@ -16,6 +16,31 @@
 
 using namespace nlohmann;
 
+void numbersExamples() {
+    DBSL3 db;
+    if (!db.open("./numbers.db")) {
+        std::cerr << "Could not open the database \n";
+        db.throwLastError();
+    }
+
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
+
+    json numbers_json = {
+        {{"number_name", "pi"}, {"double_rep", M_PI}, {"integer_rep", 3}},
+
+        {{"number_name", "e"}, {"double_rep", M_E}, {"integer_rep", 2}},
+
+        {{"number_name", "log2(e)"},
+         {"double_rep", M_LOG2E},
+         {"integer_rep", 1}}};
+
+    numbersCollection.insert(numbers_json).execute();
+
+    auto numbers = numbersCollection.select().execute();
+
+    std::cout << numbers << std::endl;
+}
+
 int main() {
     auto md = PropertyRep("md", -1, PropertyType::STRING);
     auto yy = PropertyRep("yy", -1, PropertyType::STRING);
@@ -30,6 +55,9 @@ int main() {
     auto c5 = ~c4;
 
     std::cout << "Result: " << c4.getStatement() << std::endl;
+
+    // numbersExamples();
+    // return 0;
 
     DBSL3 db;
 
@@ -64,7 +92,7 @@ int main() {
 
     std::cout << "\n\nRES1: " << res1 << std::endl << std::endl;
 
-    auto res2 = collQuery.select(model, maker, year)
+    auto res2 = collQuery.select()
                     .page(1, 10)
                     .groupBy(model, maker)
                     .sort(year.desc())

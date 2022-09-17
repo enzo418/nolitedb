@@ -1,4 +1,5 @@
 #pragma once
+#include <iterator>
 #include <memory>
 #include <set>
 #include <sstream>
@@ -241,9 +242,18 @@ class Query : public BaseQuery {
         this->qctx->selectCtx->select << "select ";
 
         // to variant
-        std::vector<SelectProperty> unpackedProps = {props...};
+        std::vector<SelectProperty> unpackedProps;
 
         if (sizeof...(props) > 0) {
+            unpackedProps = {props...};
+        } else {
+            auto all = this->qctx->cl.getAllTheProperties();
+            unpackedProps.insert(unpackedProps.begin(),
+                                 std::make_move_iterator(all.begin()),
+                                 std::make_move_iterator(all.end()));
+        }
+
+        if (unpackedProps.size() > 0) {
             for (int i = 0; i < unpackedProps.size(); i++) {
                 const auto& v_prop = unpackedProps[i];
 
@@ -277,9 +287,7 @@ class Query : public BaseQuery {
                 }
             }
         } else {
-            // get all properties from the collection and add it to the select
-            // and the unpacked props vector
-            std::runtime_error("Not implemented");
+            std::runtime_error("Collection has no props");
         }
 
         return SelectQuery(this->qctx, std::move(unpackedProps));

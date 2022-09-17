@@ -4,6 +4,7 @@
 
 #include "Enums.hpp"
 #include "PropertyRep.hpp"
+#include "SqlExpression.hpp"
 #include "dbwrapper/IDB.hpp"
 #include "lrucache11/LRUCache11.hpp"
 
@@ -19,6 +20,7 @@ class Collection {
 
     std::optional<PropertyRep> tryGetProperty(const std::string& key);
     PropertyRep getProperty(const std::string& key);
+    std::vector<PropertyRep> getAllTheProperties();
 
    public:
     static Collection find(IDB* ctx, const std::string& name);

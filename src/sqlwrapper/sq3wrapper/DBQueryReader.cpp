@@ -35,7 +35,7 @@ bool DBRowReaderSL3::isNull(uint16_t i) {
 bool DBQueryReaderSL3::readRow(std::shared_ptr<IDBRowReader>& row) {
     if (allReaded) return false;
 
-    if (row.get() == nullptr) {
+    if (!row) {
         row = std::make_shared<DBRowReaderSL3>(this->db, this->stmt);
     }
 
