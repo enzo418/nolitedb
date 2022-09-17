@@ -3,6 +3,7 @@
 #include <optional>
 #include <stdexcept>
 
+#include "SqlExpression.hpp"
 #include "dbwrapper/IDB.hpp"
 #include "logger/Logger.h"
 // max to 20 collections
@@ -55,6 +56,10 @@ std::optional<PropertyRep> Collection::tryGetProperty(const std::string& key) {
 }
 
 PropertyRep Collection::getProperty(const std::string& key) {
+    if (key == "id") {
+        return PropertyRep("id", -1, PropertyType::ID);
+    }
+
     auto prop = this->tryGetProperty(key);
     if (prop.has_value()) {
         return prop.value();

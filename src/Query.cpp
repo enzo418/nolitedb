@@ -154,7 +154,10 @@ SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
                         case PropertyType::STRING:
                             jrow[prop.getName()] = row->readString(i);
                             break;
-                        case PropertyType::RESERVED:
+                        case PropertyType::ID:
+                            jrow["id"] = row->readInt32(i);
+                            break;
+                        default:
                             throw std::runtime_error(
                                 "Select properties should not hold a reserved "
                                 "property directly!");
@@ -174,7 +177,7 @@ SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
 }
 
 void SelectQueryData::addFromClause() {
-    from_join << " from \"document\" as " << this->documentTableAlias << " ";
+    from_join << " from \"document\" as " << g_documentTableAlias << " ";
 }
 
 bool SelectQueryData::propAlreadyHasJoin(PropertyRep& prop) {
@@ -186,14 +189,14 @@ bool SelectQueryData::propAlreadyHasJoin(PropertyRep& prop) {
 }
 
 void SelectQueryData::addJoinClauseIfNotExists(PropertyRep& prop) {
-    if (!this->propAlreadyHasJoin(prop)) {
+    if (!this->propAlreadyHasJoin(prop) && prop.getType() != PropertyType::ID) {
         from_join << utils::paramsbind::parseSQL(
             " left join @value_table as @p_a on (@doc_alias.id = "
             "@p_a.doc_id and @p_a.prop_id = @p_id)",
             {{"@value_table", prop.getTableNameForTypeValue(prop.getType())},
              {"@p_a", prop.getStatement()},
              {"@p_id", prop.getId()},
-             {"@doc_alias", documentTableAlias}});
+             {"@doc_alias", g_documentTableAlias}});
         this->propsWithJoin.push_back(prop);  // yes, copy it
     }
 }

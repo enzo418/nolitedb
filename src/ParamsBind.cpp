@@ -31,13 +31,15 @@ namespace utils::paramsbind {
         return r;
     }
 
-    std::string parseSQL(const std::string& str, const Paramsbind& params) {
+    std::string parseSQL(const std::string& str, const Paramsbind& params,
+                         bool encloseQuotesInString) {
         std::string sql(str);
 
         for (auto& param : params) {
             utils::replaceAllOccurrences(
                 sql, param.first,
-                utils::paramsbind::getBindValueAsString(param.second, true));
+                utils::paramsbind::getBindValueAsString(param.second,
+                                                        encloseQuotesInString));
         }
 
         return sql;

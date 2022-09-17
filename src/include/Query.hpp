@@ -9,6 +9,7 @@
 
 #include "Collection.hpp"
 #include "Concepts.hpp"
+#include "Constants.hpp"
 #include "Enums.hpp"
 #include "MoveOnlyFunction.h"
 #include "PropertyRep.hpp"
@@ -38,8 +39,6 @@ typedef std::variant<PropertyRep, AggregateFunction> SelectProperty;
  *
  */
 struct SelectQueryData {
-    const char* documentTableAlias = "__doc";
-
     std::stringstream select;
     std::stringstream from_join;
     std::stringstream where;
@@ -165,9 +164,7 @@ class SelectQuery : public ExecutableQuery<json> {
         qctx->selectCtx->addJoinClauses(props);
 
         for (auto it = props.begin(); it != props.end(); it++) {
-            this->qctx->selectCtx->groupBy
-                << utils::paramsbind::encloseQuotesConst((*it)->getStatement())
-                << ".value";
+            this->qctx->selectCtx->groupBy << (*it)->getValueExpression();
 
             if (std::next(it) != props.end()) {
                 this->qctx->selectCtx->groupBy << ", ";
@@ -195,9 +192,8 @@ class SelectQuery : public ExecutableQuery<json> {
 
         for (int i = 0; i < props.size(); i++) {
             this->qctx->selectCtx->orderBy
-                << utils::paramsbind::encloseQuotesConst(
-                       props[i].prop->getStatement())
-                << ".value " << SortTypeToString(props[i].type);
+                << props[i].prop->getValueExpression() << " "
+                << SortTypeToString(props[i].type);
 
             if (i != props.size() - 1) {
                 this->qctx->selectCtx->orderBy << ", ";
@@ -256,18 +252,24 @@ class Query : public BaseQuery {
 
                     this->qctx->selectCtx->select
                         << utils::paramsbind::parseSQL(
-                               "@table.value as @prop_name",
-                               {{"@table", prop.getStatement()},
-                                {"@prop_name", std::string(prop.getName())}});
+                               "@val_expr as @prop_name",
+                               {{"@val_expr", prop.getValueExpression()},
+                                {"@prop_name",
+                                 utils::paramsbind::encloseQuotesConst(
+                                     std::string(prop.getName()))}},
+                               false);
                 } else {
                     const auto& prop = std::get<AggregateFunction>(v_prop);
 
                     this->qctx->selectCtx->select
                         << AggregatefunctionTypeToString(prop.type) << "("
                         << utils::paramsbind::parseSQL(
-                               "@table.value) as @agg_alias",
-                               {{"@table", prop.prop->getStatement()},
-                                {"@agg_alias", prop.alias}});
+                               "@val_expr) as @agg_alias",
+                               {{"@val_expr", prop.prop->getValueExpression()},
+                                {"@agg_alias",
+                                 utils::paramsbind::encloseQuotesConst(
+                                     prop.alias)}},
+                               false);
                 }
 
                 if (i != unpackedProps.size() - 1) {

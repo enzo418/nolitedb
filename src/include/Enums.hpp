@@ -3,7 +3,7 @@
 #include <stdexcept>
 enum Operator { EQ, NEQ, GT, GTE, LT, LTE, LIKE, NLIKE, AND, OR, NOT };
 
-enum PropertyType { INTEGER = 1, DOUBLE, STRING, RESERVED };
+enum PropertyType { INTEGER = 1, DOUBLE, STRING, ID };
 
 enum AggregateType { COUNT, AVG, SUM, MAX, MIN };
 

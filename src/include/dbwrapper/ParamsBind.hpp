@@ -28,5 +28,15 @@ namespace utils::paramsbind {
     // same as above
     std::string encloseQuotesConst(const std::string&);
 
-    std::string parseSQL(const std::string&, const Paramsbind&);
+    /**
+     * @brief Replaces all the parameters in the string.
+     *
+     * @param encloseQuotesInString should enclose/replace the quoutes of the
+     * parameters values? This is an option since you could have called
+     * `encloseQuotes` before.
+     *
+     * @return std::string
+     */
+    std::string parseSQL(const std::string&, const Paramsbind&,
+                         bool encloseQuotesInString = true);
 };  // namespace utils::paramsbind

@@ -46,8 +46,8 @@ int main() {
 
     collQuery.insert(cars).execute();
 
-    auto [model, maker, year] =
-        collQuery.prepareProperties("model", "maker", "year");
+    auto [id, model, maker, year] =
+        collQuery.prepareProperties("id", "model", "maker", "year");
 
     // maybe auto [car_id, ...] = collection("cars").prepare(...)
     //       auto [race_winner, ...] = collection("races").prepare(...)
@@ -55,11 +55,12 @@ int main() {
     //            .from("cars", "races")
     //            .where(car_id == race_winner).execute()
 
-    auto res1 = collQuery.select(model, maker, year.maxAs("year_newest_model"))
-                    .where(year > 1990)
-                    .page(1, 10)
-                    .groupBy(model, maker)
-                    .execute();
+    auto res1 =
+        collQuery.select(id, model, maker, year.maxAs("year_newest_model"))
+            .where(year > 1990)
+            .page(1, 10)
+            .groupBy(model, maker)
+            .execute();
 
     std::cout << "\n\nRES1: " << res1 << std::endl << std::endl;
 

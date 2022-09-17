@@ -71,6 +71,8 @@ class PropertyRep : public ISqlStatement {
     std::string_view getName() const;
     std::string getStatement() const override;
 
+    std::string getValueExpression() const;
+
     static std::string getTableNameForTypeValue(PropertyType type);
 
     static std::optional<PropertyRep> find(IDB* ctx, int collectionID,

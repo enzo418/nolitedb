@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <variant>
 
+#include "Constants.hpp"
 #include "Enums.hpp"
 #include "dbwrapper/ParamsBind.hpp"
 #include "logger/Logger.h"
@@ -43,6 +44,8 @@ std::string PropertyRep::getStatement() const {
             return this->name + "_vd";
         case PropertyType::STRING:
             return this->name + "_vs";
+        case PropertyType::ID:
+            return this->name;
         default:
             return this->name;
     }
@@ -100,14 +103,23 @@ std::string getValAsString(const RightValue& val) {
     }
 }
 
+std::string PropertyRep::getValueExpression() const {
+    if (this->type != PropertyType::ID) {
+        return utils::paramsbind::encloseQuotesConst(this->getStatement()) +
+               ".value";
+    } else {
+        return std::string(g_documentTableAlias) + ".id";
+    }
+}
+
 std::string PropertyRep::generateConditionStatement(Operator op,
                                                     PropertyRep& rt) {
-    return this->getStatement() + ".value " + OperatorToString(op) + " " +
-           rt.getStatement() + ".value";
+    return this->getValueExpression() + " " + OperatorToString(op) + " " +
+           rt.getValueExpression();
 }
 std::string PropertyRep::generateConditionStatement(Operator op,
                                                     RightValue rt) {
-    return this->getStatement() + ".value " + OperatorToString(op) + " " +
+    return this->getValueExpression() + " " + OperatorToString(op) + " " +
            getValAsString(rt);
 }
 
