@@ -380,3 +380,61 @@ TEST_F(Sql3WrapperCarsTest, shouldSelectAggregateFunction) {
 
     // EXPECT_EQ(result2.size(), 2);
 }
+
+TEST_F(Sql3WrapperCarsTest, should_select_ByID) {
+    auto carsCollection = QueryFactory::create(&db, "cars");
+
+    auto [id, model, year] =
+        carsCollection.prepareProperties("id", "model", "year");
+
+    json newestModel = carsCollection.select(id, year.maxAs("year"))
+                           .groupBy(model)
+                           .sort(year.desc())
+                           .page(1, 1)
+                           .execute()
+                           .front();
+
+    int yearNewest = newestModel["year"];
+
+    json newestAgain = carsCollection.select(id, year)
+                           .where(id == newestModel["id"].get<int>())
+                           .execute();
+
+    EXPECT_EQ(yearNewest, 2015);
+
+    EXPECT_EQ(newestAgain.size(), 1);
+    EXPECT_EQ(newestAgain[0]["id"], newestModel["id"]);
+    EXPECT_EQ(newestAgain[0]["year"], yearNewest);
+}
+
+TEST_F(Sql3WrapperCarsTest, should_selectAggregate_WithID) {
+    auto carsCollection = QueryFactory::create(&db, "cars");
+
+    auto [id, model] = carsCollection.prepareProperties("id", "model");
+
+    json totalPerModel =
+        carsCollection.select(id.countAs("id_count")).groupBy(model).execute();
+
+    json maxID = carsCollection.select(id.maxAs("max_id")).execute().front();
+
+    EXPECT_EQ(totalPerModel.size(), 2);
+    EXPECT_EQ(totalPerModel[0]["id_count"], 2);
+    EXPECT_EQ(totalPerModel[1]["id_count"], 1);
+
+    EXPECT_EQ(maxID["max_id"], 3);
+}
+
+TEST_F(Sql3WrapperCarsTest, should_sort_byID) {
+    auto carsCollection = QueryFactory::create(&db, "cars");
+
+    auto [id] = carsCollection.prepareProperties("id");
+
+    json sortedByID = carsCollection.select(id).sort(id.desc()).execute();
+
+    // we have no clue in which order the DB inserted the elements, so
+    // just compare the numbers
+    EXPECT_EQ(sortedByID.size(), 3);
+    EXPECT_EQ(sortedByID[0]["id"], 3);
+    EXPECT_EQ(sortedByID[1]["id"], 2);
+    EXPECT_EQ(sortedByID[2]["id"], 1);
+}
