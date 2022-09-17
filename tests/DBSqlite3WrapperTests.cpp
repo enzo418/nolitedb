@@ -180,6 +180,118 @@ class Sql3WrapperNumbersTest : public ::testing::Test {
     DBSL3 db;
 };
 
+TEST_F(Sql3WrapperNumbersTest, shouldSortElements) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
+
+    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
+        "number_name", "double_rep", "integer_rep");
+
+    std::array<std::string, 3> expectedOrderNames = {"log2(e)", "e", "pi"};
+
+    json asc = numbersCollection.select(name).sort(integer_rep.asc()).execute();
+
+    json desc =
+        numbersCollection.select(name).sort(integer_rep.desc()).execute();
+
+    EXPECT_TRUE(asc.size() == 3);
+    EXPECT_TRUE(desc.size() == 3);
+
+    for (int i = 0; i < 3; i++) {
+        EXPECT_EQ(asc[i]["number_name"], expectedOrderNames[i]);
+        EXPECT_EQ(desc[i]["number_name"], expectedOrderNames[2 - i]);
+    }
+}
+
+TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_Like_Condition) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
+
+    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
+        "number_name", "double_rep", "integer_rep");
+
+    json result = numbersCollection.select(name)
+                      .sort(integer_rep.desc())
+                      .where(name % "%e%")
+                      .execute();
+
+    EXPECT_EQ(result.size(), 2);
+    EXPECT_TRUE(result[0]["number_name"] == "e" ||
+                result[1]["number_name"] == "log2(e)");
+}
+
+TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_NotLike_Condition) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
+
+    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
+        "number_name", "double_rep", "integer_rep");
+
+    json result = numbersCollection.select(name).where(name ^ "%e%").execute();
+
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0]["number_name"], "pi");
+}
+
+TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_Gt_Gte_Condition) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
+
+    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
+        "number_name", "double_rep", "integer_rep");
+
+    json result1 = numbersCollection.select(name)
+                       .sort(integer_rep.desc())
+                       .where(integer_rep > 1)
+                       .execute();
+
+    json result2 = numbersCollection.select(name)
+                       .sort(integer_rep.desc())
+                       .where(integer_rep >= 3)
+                       .execute();
+
+    EXPECT_EQ(result1.size(), 2);
+    EXPECT_EQ(result1[0]["number_name"], "pi");
+    EXPECT_EQ(result1[1]["number_name"], "e");
+
+    EXPECT_EQ(result2.size(), 1);
+    EXPECT_EQ(result2[0]["number_name"], "pi");
+}
+
+TEST_F(Sql3WrapperNumbersTest, shouldLimitElementsPerPage) {
+    auto numbersCollection = QueryFactory::create(&db, "numbers");
+
+    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
+        "number_name", "double_rep", "integer_rep");
+
+    json pi = numbersCollection.select(name)
+                  .sort(integer_rep.desc())
+                  .page(1, 1)
+                  .execute()
+                  .front();  // take first from the json array
+
+    json e = numbersCollection.select(name)
+                 .sort(integer_rep.desc())
+                 .page(2, 1)
+                 .execute()
+                 .front();
+
+    json log2e = numbersCollection.select(name)
+                     .sort(integer_rep.desc())
+                     .page(3, 1)
+                     .execute()
+                     .front();
+
+    json onlyFirstTwo = numbersCollection.select(name)
+                            .sort(integer_rep.desc())
+                            .page(1, 2)
+                            .execute();
+
+    EXPECT_EQ(pi["number_name"], "pi");
+    EXPECT_EQ(e["number_name"], "e");
+    EXPECT_EQ(log2e["number_name"], "log2(e)");
+
+    EXPECT_EQ(onlyFirstTwo.size(), 2);
+    EXPECT_EQ(onlyFirstTwo[0]["number_name"], "pi");
+    EXPECT_EQ(onlyFirstTwo[1]["number_name"], "e");
+}
+
 class Sql3WrapperCarsTest : public ::testing::Test {
    protected:
     void SetUp() override {
