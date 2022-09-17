@@ -9,6 +9,17 @@
 #include "dbwrapper/ParamsBind.hpp"
 #include "logger/Logger.h"
 
+namespace tables {
+    std::unordered_map<PropertyType, std::string>& getPropertyTables() {
+        static std::unordered_map<PropertyType, std::string> propertyTypeTable =
+            {{PropertyType::STRING, "value_string"},
+             {PropertyType::INTEGER, "value_int"},
+             {PropertyType::DOUBLE, "value_double"}};
+
+        return propertyTypeTable;
+    }
+};  // namespace tables
+
 PropertyRep::PropertyRep(const std::string& pName, int pId, PropertyType pType)
     : name(pName), id(pId), type(pType) {}
 
@@ -52,16 +63,7 @@ std::string PropertyRep::getStatement() const {
 }
 
 std::string PropertyRep::getTableNameForTypeValue(PropertyType type) {
-    switch (type) {
-        case PropertyType::INTEGER:
-            return "value_int";
-        case PropertyType::DOUBLE:
-            return "value_double";
-        case PropertyType::STRING:
-            return "value_string";
-        default:
-            throw std::runtime_error("type not supported");
-    }
+    return tables::getPropertyTables().at(type);
 }
 
 std::optional<PropertyRep> PropertyRep::find(IDB* ctx, int collectionID,

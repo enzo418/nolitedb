@@ -9,6 +9,7 @@
 
 #include "Document.hpp"
 #include "Enums.hpp"
+#include "PropertyRep.hpp"
 #include "SqlExpression.hpp"
 #include "dbwrapper/ParamsBind.hpp"
 #include "logger/Logger.h"
@@ -105,6 +106,30 @@ ExecutableQuery<int> Query::insert(const json& obj) {
 
         if (affected <= 0) {
             LogWarning("Items might has not been added");
+        }
+
+        return affected;
+    });
+}
+
+ExecutableQuery<int> Query::remove(int documentID) {
+    qctx->resetQuery();
+    auto& sql = qctx->sql;
+
+    auto& tables = tables::getPropertyTables();
+
+    sql << "delete from document where id = " << documentID << "; ";
+
+    for (auto& [type, tab_name] : tables) {
+        sql << "delete from " << tab_name << " where doc_id = " << documentID
+            << ";";
+    }
+
+    return ExecutableQuery<int>(qctx, [](QueryCtx& ctx) {
+        int affected = ctx.db->executeMultipleOnOneStepRaw(ctx.sql.str(), {});
+
+        if (affected <= 0) {
+            LogWarning("did not remove any items");
         }
 
         return affected;

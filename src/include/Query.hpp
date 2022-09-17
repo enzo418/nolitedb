@@ -286,12 +286,23 @@ class Query : public BaseQuery {
     }
 
     /**
-     * @brief insert documents into the collection.
+     * @brief inserts documents into the collection.
      *
-     * @param obj Array of json objects or just a json object
-     * @return BaseQuery
+     * @param obj json, can be an array of json objects or just an json object
+     * @return ExecutableQuery<int> executable query with the number of affected
+     * rows
      */
     ExecutableQuery<int> insert(const json& obj);
+
+    /**
+     * @brief Removes/deletes a document from the collection
+     *
+     * @param documentID
+     * @return ExecutableQuery<int> executable query with the number of affected
+     * rows. This can be greater than 1 since the document is distributed across
+     * different tables
+     */
+    ExecutableQuery<int> remove(int documentID);
 
    protected:
     void buildPropertyInsert(

@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 
 #include "CommonTypes.hpp"
 #include "Concepts.hpp"
@@ -43,6 +44,10 @@ struct AggregateFunction {
     const char* alias;
     AggregateType type;
     PropertyRep* prop;
+};
+
+namespace tables {
+    std::unordered_map<PropertyType, std::string>& getPropertyTables();
 };
 
 class PropertyRep : public ISqlStatement {

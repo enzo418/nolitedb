@@ -438,3 +438,17 @@ TEST_F(Sql3WrapperCarsTest, should_sort_byID) {
     EXPECT_EQ(sortedByID[1]["id"], 2);
     EXPECT_EQ(sortedByID[2]["id"], 1);
 }
+
+TEST_F(Sql3WrapperNumbersTest, should_delete_byID) {
+    auto numbersColl = QueryFactory::create(&db, "numbers");
+
+    auto [id] = numbersColl.prepareProperties("id");
+
+    json allBefore = numbersColl.select(id).execute();
+
+    int affected = numbersColl.remove(1).execute();
+
+    json allAfter = numbersColl.select(id).execute();
+
+    EXPECT_EQ(allAfter.size(), allBefore.size() - 1);
+}

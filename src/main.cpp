@@ -71,4 +71,16 @@ int main() {
                     .execute();
 
     std::cout << "\n\nRES2: " << res2 << std::endl;
+
+    auto final = collQuery.select(model, maker, year).execute();
+
+    std::cout << "\n\nall before: " << final << std::endl;
+
+    auto affected = collQuery.remove(1).execute();
+
+    std::cout << "\n\naffected: " << affected << std::endl;
+
+    auto finalthen = collQuery.select(model, maker, year).execute();
+
+    std::cout << "\n\nall: " << finalthen << std::endl;
 }
