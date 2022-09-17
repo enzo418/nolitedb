@@ -169,6 +169,13 @@ SelectQuery::SelectQuery(const std::shared_ptr<QueryCtx>& pCtx,
 
                 if (std::holds_alternative<PropertyRep>(v_prop)) {
                     const auto& prop = std::get<PropertyRep>(v_prop);
+
+                    if (row->isNull(i)) {
+                        // Should we set the field to null?
+                        // jrow[prop.getName()] = nullptr;
+                        continue;
+                    }
+
                     switch (prop.getType()) {
                         case PropertyType::INTEGER:
                             jrow[prop.getName()] = row->readInt64(i);
