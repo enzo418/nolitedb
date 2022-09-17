@@ -180,118 +180,6 @@ class Sql3WrapperNumbersTest : public ::testing::Test {
     DBSL3 db;
 };
 
-TEST_F(Sql3WrapperNumbersTest, shouldSortElements) {
-    auto numbersCollection = QueryFactory::create(&db, "numbers");
-
-    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
-        "number_name", "double_rep", "integer_rep");
-
-    std::array<std::string, 3> expectedOrderNames = {"log2(e)", "e", "pi"};
-
-    json asc = numbersCollection.select(name).sort(integer_rep.asc()).execute();
-
-    json desc =
-        numbersCollection.select(name).sort(integer_rep.desc()).execute();
-
-    EXPECT_TRUE(asc.size() == 3);
-    EXPECT_TRUE(desc.size() == 3);
-
-    for (int i = 0; i < 3; i++) {
-        EXPECT_EQ(asc[i]["number_name"], expectedOrderNames[i]);
-        EXPECT_EQ(desc[i]["number_name"], expectedOrderNames[2 - i]);
-    }
-}
-
-TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_Like_Condition) {
-    auto numbersCollection = QueryFactory::create(&db, "numbers");
-
-    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
-        "number_name", "double_rep", "integer_rep");
-
-    json result = numbersCollection.select(name)
-                      .sort(integer_rep.desc())
-                      .where(name % "%e%")
-                      .execute();
-
-    EXPECT_EQ(result.size(), 2);
-    EXPECT_TRUE(result[0]["number_name"] == "e" ||
-                result[1]["number_name"] == "log2(e)");
-}
-
-TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_NotLike_Condition) {
-    auto numbersCollection = QueryFactory::create(&db, "numbers");
-
-    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
-        "number_name", "double_rep", "integer_rep");
-
-    json result = numbersCollection.select(name).where(name ^ "%e%").execute();
-
-    EXPECT_EQ(result.size(), 1);
-    EXPECT_EQ(result[0]["number_name"], "pi");
-}
-
-TEST_F(Sql3WrapperNumbersTest, shouldQueryBasedOn_Gt_Gte_Condition) {
-    auto numbersCollection = QueryFactory::create(&db, "numbers");
-
-    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
-        "number_name", "double_rep", "integer_rep");
-
-    json result1 = numbersCollection.select(name)
-                       .sort(integer_rep.desc())
-                       .where(integer_rep > 1)
-                       .execute();
-
-    json result2 = numbersCollection.select(name)
-                       .sort(integer_rep.desc())
-                       .where(integer_rep >= 3)
-                       .execute();
-
-    EXPECT_EQ(result1.size(), 2);
-    EXPECT_EQ(result1[0]["number_name"], "pi");
-    EXPECT_EQ(result1[1]["number_name"], "e");
-
-    EXPECT_EQ(result2.size(), 1);
-    EXPECT_EQ(result2[0]["number_name"], "pi");
-}
-
-TEST_F(Sql3WrapperNumbersTest, shouldLimitElementsPerPage) {
-    auto numbersCollection = QueryFactory::create(&db, "numbers");
-
-    auto [name, double_rep, integer_rep] = numbersCollection.prepareProperties(
-        "number_name", "double_rep", "integer_rep");
-
-    json pi = numbersCollection.select(name)
-                  .sort(integer_rep.desc())
-                  .page(1, 1)
-                  .execute()
-                  .front();  // take first from the json array
-
-    json e = numbersCollection.select(name)
-                 .sort(integer_rep.desc())
-                 .page(2, 1)
-                 .execute()
-                 .front();
-
-    json log2e = numbersCollection.select(name)
-                     .sort(integer_rep.desc())
-                     .page(3, 1)
-                     .execute()
-                     .front();
-
-    json onlyFirstTwo = numbersCollection.select(name)
-                            .sort(integer_rep.desc())
-                            .page(1, 2)
-                            .execute();
-
-    EXPECT_EQ(pi["number_name"], "pi");
-    EXPECT_EQ(e["number_name"], "e");
-    EXPECT_EQ(log2e["number_name"], "log2(e)");
-
-    EXPECT_EQ(onlyFirstTwo.size(), 2);
-    EXPECT_EQ(onlyFirstTwo[0]["number_name"], "pi");
-    EXPECT_EQ(onlyFirstTwo[1]["number_name"], "e");
-}
-
 class Sql3WrapperCarsTest : public ::testing::Test {
    protected:
     void SetUp() override {
@@ -439,16 +327,46 @@ TEST_F(Sql3WrapperCarsTest, should_sort_byID) {
     EXPECT_EQ(sortedByID[2]["id"], 1);
 }
 
-TEST_F(Sql3WrapperNumbersTest, should_delete_byID) {
+TEST_F(Sql3WrapperNumbersTest, should_selectAllPropertiesByDefault) {
+    /**
+     * Note: This test won't since the collection-property "cache layer" is just
+     * a static variable inside the collection class, so it's shared across all
+     * test cases.
+     * That cache uses the collection id, which normally is equal to 1 across
+     * all tests, including for different ones, so it keeps returning that
+     * cached data and no property gets created in the DB. That results in
+     * problems when we try to query the database for all the properties from
+     * that collection.
+     * So i won't fixed it until the next release, v2, because a lot will
+     * change.
+     */
+
+    GTEST_SKIP() << "this tests won't work until major reworks";
+
     auto numbersColl = QueryFactory::create(&db, "numbers");
 
-    auto [id] = numbersColl.prepareProperties("id");
+    auto [name, double_rep, integer_rep] = numbersColl.prepareProperties(
+        "number_name", "double_rep", "integer_rep");
 
-    json allBefore = numbersColl.select(id).execute();
+    const std::string sql = "select id, name, type from property";
 
-    int affected = numbersColl.remove(1).execute();
+    auto reader = db.executeReader(sql, {{"@id", 1}});
 
-    json allAfter = numbersColl.select(id).execute();
+    std::vector<PropertyRep> props = {PropertyRep("id", -1, PropertyType::ID)};
+    std::shared_ptr<IDBRowReader> row;
+    while (reader->readRow(row)) {
+        props.push_back(PropertyRep(row->readString(1), row->readInt64(0),
+                                    (PropertyType)row->readInt64(2)));
+    }
 
-    EXPECT_EQ(allAfter.size(), allBefore.size() - 1);
+    json all = numbersColl.select().execute();
+
+    EXPECT_EQ(all.size(), 3);
+
+    for (auto& number : all) {
+        EXPECT_TRUE(number.is_object());
+        EXPECT_TRUE(number.contains("number_name"));
+        EXPECT_TRUE(number.contains("double_rep"));
+        EXPECT_TRUE(number.contains("integer_rep"));
+    }
 }
