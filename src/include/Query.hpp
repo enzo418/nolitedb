@@ -112,7 +112,7 @@ struct QueryCtx {
         sql << selectCtx->select.str() << selectCtx->from_join.str()
             << selectCtx->where.str() << selectCtx->groupBy.str()
             << selectCtx->having.str() << selectCtx->orderBy.str()
-            << selectCtx->limit_offset.str();
+            << selectCtx->limit_offset.str() << ";";
     }
 };
 
@@ -311,6 +311,16 @@ class Query : public BaseQuery {
      * different tables
      */
     ExecutableQuery<int> remove(int documentID);
+
+    /**
+     * @brief Updates a document with new properties values, you can also add
+     * new ones to the document.
+     *
+     * @param documentID
+     * @param updatedProperties properties to update/add
+     * @return ExecutableQuery<int>
+     */
+    ExecutableQuery<int> update(int documentID, json updatedProperties);
 
    protected:
     void buildPropertyInsert(

@@ -26,7 +26,7 @@ bool Collection::hasProperty(const std::string& key) {
 bool Collection::addProperty(const std::string& key, PropertyType type) {
     const std::string sql =
         "insert into property (coll_id, name, type) values (@colid, @name, "
-        "@type)";
+        "@type);";
 
     (void)ctx->executeOneStep(
         sql, {{"@colid", this->id}, {"@name", key}, {"@type", (int)type}});
@@ -76,7 +76,7 @@ PropertyRep Collection::getProperty(const std::string& key) {
 
 std::vector<PropertyRep> Collection::getAllTheProperties() {
     const std::string sql =
-        "select id, name, type from property where coll_id = @id";
+        "select id, name, type from property where coll_id = @id;";
 
     auto reader = ctx->executeReader(sql, {{"@id", this->id}});
 
@@ -91,7 +91,7 @@ std::vector<PropertyRep> Collection::getAllTheProperties() {
 }
 
 Collection Collection::find(IDB* ctx, const std::string& name) {
-    const std::string sql = "SELECT id FROM collection where name = @name";
+    const std::string sql = "SELECT id FROM collection where name = @name;";
 
     auto id = ctx->executeAndGetFirstInt(sql, {{"@name", name}});
 
@@ -110,6 +110,16 @@ int Collection::create(IDB& ctx, const std::string& name) {
     (void)ctx.executeOneStep(sql, {{"@name", name}});
 
     return ctx.getLastInsertedRowId();
+}
+
+int Collection::documentExists(int doc_id) {
+    const auto sql =
+        "select d.id from document as d where coll_id=@coll_id and d.id = @id;";
+
+    auto id = ctx->executeAndGetFirstInt(
+        sql, {{"@coll_id", this->id}, {"@id", doc_id}});
+
+    return id.has_value();
 }
 
 void Collection::updatePropCache(const std::string& key, PropertyRep prop) {

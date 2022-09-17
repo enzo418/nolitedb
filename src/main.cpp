@@ -92,11 +92,11 @@ int main() {
 
     std::cout << "\n\nRES1: " << res1 << std::endl << std::endl;
 
-    auto res2 = collQuery.select()
-                    .page(1, 10)
-                    .groupBy(model, maker)
-                    .sort(year.desc())
-                    .execute();
+    int affected_update =
+        collQuery.update(res1[0]["id"], {{"year", 2100}, {"price", 50000}})
+            .execute();
+
+    auto res2 = collQuery.select().page(1, 10).sort(year.desc()).execute();
 
     std::cout << "\n\nRES2: " << res2 << std::endl;
 
@@ -104,7 +104,7 @@ int main() {
 
     std::cout << "\n\nall before: " << final << std::endl;
 
-    auto affected = collQuery.remove(1).execute();
+    int affected = collQuery.remove(1).execute();
 
     std::cout << "\n\naffected: " << affected << std::endl;
 

@@ -130,7 +130,7 @@ std::optional<int> DBSL3::executeAndGetFirstInt(const std::string& query,
 }
 
 std::optional<int> DBSL3::getChangesCount() {
-    return this->executeAndGetFirstInt("SELECT changes()", {});
+    return this->executeAndGetFirstInt("SELECT changes();", {});
 }
 
 int DBSL3::getLastInsertedRowId() { return sqlite3_last_insert_rowid(db); }

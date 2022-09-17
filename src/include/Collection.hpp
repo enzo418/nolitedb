@@ -22,6 +22,8 @@ class Collection {
     PropertyRep getProperty(const std::string& key);
     std::vector<PropertyRep> getAllTheProperties();
 
+    int documentExists(int doc_id);
+
    public:
     static Collection find(IDB* ctx, const std::string& name);
     static int create(IDB& ctx, const std::string& name);

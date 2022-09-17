@@ -71,6 +71,61 @@ void Query::buildPropertyInsert(
     }
 }
 
+ExecutableQuery<int> Query::update(int documentID, json updatedProperties) {
+    qctx->resetQuery();
+
+    auto& cl = this->qctx->cl;
+    auto& sql = this->qctx->sql;
+    auto& binds = this->qctx->bind;
+
+    if (!cl.documentExists(documentID))
+        throw std::runtime_error("Document doesn't exists");
+
+    if (!updatedProperties.is_object())
+        throw std::runtime_error("JSON object is not an object");
+
+    for (auto& [propName, value] : updatedProperties.items()) {
+        PropertyType propType = mapJsonType(value.type());
+        bool isNewProperty = false;
+
+        if (!cl.hasProperty(propName)) {
+            cl.addProperty(propName, propType);
+            isNewProperty = true;
+        }
+
+        int propertyID = cl.getProperty(propName).getId();
+
+        binds = {
+            {"@table_name", PropertyRep::getTableNameForTypeValue(propType)},
+            {"@doc_id", documentID},
+            {"@prop_id", propertyID}};
+
+        if (propType == PropertyType::INTEGER) {
+            binds.insert({"@prop_value", value.get<int>()});
+        } else if (propType == PropertyType::DOUBLE) {
+            binds.insert({"@prop_value", value.get<double>()});
+        } else if (propType == PropertyType::STRING) {
+            binds.insert({"@prop_value", value.get<std::string>()});
+        }
+
+        if (isNewProperty) {
+            sql << utils::paramsbind::parseSQL(
+                "insert into @table_name (doc_id, prop_id, value) values "
+                "(@doc_id, @prop_id, @prop_value);",
+                binds);
+        } else {
+            sql << utils::paramsbind::parseSQL(
+                "update @table_name as pr set value = @prop_value where "
+                "doc_id = @doc_id and prop_id = @prop_id;",
+                binds);
+        }
+    }
+
+    return ExecutableQuery<int>(qctx, [](QueryCtx& ctx) {
+        return ctx.db->executeMultipleOnOneStepRaw(ctx.sql.str(), ctx.bind);
+    });
+}
+
 ExecutableQuery<int> Query::insert(const json& obj) {
     qctx->resetQuery();
 
