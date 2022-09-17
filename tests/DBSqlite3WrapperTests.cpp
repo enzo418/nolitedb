@@ -482,3 +482,53 @@ TEST_F(Sql3WrapperNumbersTest, should_selectAllPropertiesByDefault) {
         EXPECT_TRUE(number.contains("integer_rep"));
     }
 }
+
+TEST_F(Sql3WrapperCarsTest, should_update_document) {
+    auto carsCollection = QueryFactory::create(&db, "cars");
+
+    auto [id, year] = carsCollection.prepareProperties("id", "year");
+
+    json oldestModel = carsCollection.select(id, year)
+                           .page(1, 1)
+                           .sort(year.asc())
+                           .execute()
+                           .front();
+
+    // make the oldest model the newest model
+    carsCollection.update(oldestModel["id"], {{"year", 2418}}).execute();
+
+    // search again but from high to low
+    json newestModel = carsCollection.select(id, year)
+                           .page(1, 1)
+                           .sort(year.desc())
+                           .execute()
+                           .front();
+
+    EXPECT_EQ(oldestModel["id"], newestModel["id"]);
+    EXPECT_EQ(newestModel["year"], 2418);
+}
+
+TEST_F(Sql3WrapperCarsTest, should_update_new_property_document) {
+    auto carsCollection = QueryFactory::create(&db, "cars");
+
+    auto [id, year] = carsCollection.prepareProperties("id", "year");
+
+    json first = carsCollection.select(id, year).page(1, 1).execute().front();
+
+    // make the oldest model the newest model
+    carsCollection.update(first["id"], {{"year", 100}, {"price", 50000}})
+        .execute();
+
+    auto [price] = carsCollection.prepareProperties("price");
+
+    // search again but from high to low
+    json updated = carsCollection.select(id, year, price)
+                       .page(1, 1)
+                       .where(id == first["id"].get<int>())
+                       .execute()
+                       .front();
+
+    EXPECT_EQ(first["id"], updated["id"]);
+    EXPECT_EQ(updated["year"], 100);
+    EXPECT_EQ(updated["price"], 50000);
+}
