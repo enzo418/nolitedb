@@ -90,7 +90,7 @@ TEST(Sqlite3Wrapper, shouldInsertADocument) {
     json number = {
         {"number_name", "pi"}, {"double_rep", M_PI}, {"integer_rep", 3}};
 
-    numbersCollection.insert(number).execute();
+    numbersCollection.insert(number);
 
     // check if the properties were inserted
     auto valinserted = db.executeAndGetFirstInt(
@@ -128,7 +128,7 @@ TEST(Sqlite3Wrapper, shouldInsertMultipleDocuments) {
          {"double_rep", M_LOG2E},
          {"integer_rep", 1}}};
 
-    numbersCollection.insert(numbers).execute();
+    numbersCollection.insert(numbers);
 
     // check if the properties were inserted
     auto valinserted = db.executeAndGetFirstInt(
@@ -172,7 +172,7 @@ class Sql3WrapperNumbersTest : public ::testing::Test {
              {"double_rep", M_LOG2E},
              {"integer_rep", 1}}};
 
-        numbersCollection.insert(numbers).execute();
+        numbersCollection.insert(numbers);
     }
 
     void TearDown() override { db.close(); }
@@ -305,7 +305,7 @@ class Sql3WrapperCarsTest : public ::testing::Test {
             {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
             {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
 
-        carsCollection.insert(cars).execute();
+        carsCollection.insert(cars);
     }
 
     void TearDown() override { db.close(); }
@@ -495,7 +495,7 @@ TEST_F(Sql3WrapperCarsTest, should_update_document) {
                            .front();
 
     // make the oldest model the newest model
-    carsCollection.update(oldestModel["id"], {{"year", 2418}}).execute();
+    carsCollection.update(oldestModel["id"], {{"year", 2418}});
 
     // search again but from high to low
     json newestModel = carsCollection.select(id, year)
@@ -516,8 +516,7 @@ TEST_F(Sql3WrapperCarsTest, should_update_new_property_document) {
     json first = carsCollection.select(id, year).page(1, 1).execute().front();
 
     // make the oldest model the newest model
-    carsCollection.update(first["id"], {{"year", 100}, {"price", 50000}})
-        .execute();
+    carsCollection.update(first["id"], {{"year", 100}, {"price", 50000}});
 
     auto [price] = carsCollection.prepareProperties("price");
 

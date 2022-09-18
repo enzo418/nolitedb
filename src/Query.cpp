@@ -71,7 +71,7 @@ void Query::buildPropertyInsert(
     }
 }
 
-ExecutableQuery<int> Query::update(int documentID, json updatedProperties) {
+int Query::update(int documentID, json updatedProperties) {
     qctx->resetQuery();
 
     auto& cl = this->qctx->cl;
@@ -121,12 +121,10 @@ ExecutableQuery<int> Query::update(int documentID, json updatedProperties) {
         }
     }
 
-    return ExecutableQuery<int>(qctx, [](QueryCtx& ctx) {
-        return ctx.db->executeMultipleOnOneStepRaw(ctx.sql.str(), ctx.bind);
-    });
+    return qctx->db->executeMultipleOnOneStepRaw(sql.str(), binds);
 }
 
-ExecutableQuery<int> Query::insert(const json& obj) {
+int Query::insert(const json& obj) {
     qctx->resetQuery();
 
     auto& sql = qctx->sql;
@@ -155,19 +153,10 @@ ExecutableQuery<int> Query::insert(const json& obj) {
         sql << ";";
     }
 
-    return ExecutableQuery<int>(qctx, [](QueryCtx& ctx) {
-        int affected =
-            ctx.db->executeMultipleOnOneStepRaw(ctx.sql.str(), ctx.bind);
-
-        if (affected <= 0) {
-            LogWarning("Items might has not been added");
-        }
-
-        return affected;
-    });
+    return qctx->db->executeMultipleOnOneStepRaw(sql.str(), qctx->bind);
 }
 
-ExecutableQuery<int> Query::remove(int documentID) {
+int Query::remove(int documentID) {
     qctx->resetQuery();
     auto& sql = qctx->sql;
 
@@ -179,16 +168,8 @@ ExecutableQuery<int> Query::remove(int documentID) {
         sql << "delete from " << tab_name << " where doc_id = @id;";
     }
 
-    return ExecutableQuery<int>(qctx, [documentID](QueryCtx& ctx) {
-        int affected = ctx.db->executeMultipleOnOneStepRaw(
-            ctx.sql.str(), {{"@id", documentID}});
-
-        if (affected <= 0) {
-            LogWarning("did not remove any items");
-        }
-
-        return affected;
-    });
+    return qctx->db->executeMultipleOnOneStepRaw(sql.str(),
+                                                 {{"@id", documentID}});
 }
 
 Query QueryFactory::create(IDB* ctx, const std::string& collName) {

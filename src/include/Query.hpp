@@ -297,20 +297,19 @@ class Query : public BaseQuery {
      * @brief inserts documents into the collection.
      *
      * @param obj json, can be an array of json objects or just an json object
-     * @return ExecutableQuery<int> executable query with the number of affected
+     * @return int number of affected
      * rows
      */
-    ExecutableQuery<int> insert(const json& obj);
+    int insert(const json& obj);
 
     /**
      * @brief Removes/deletes a document from the collection
      *
      * @param documentID
-     * @return ExecutableQuery<int> executable query with the number of affected
-     * rows. This can be greater than 1 since the document is distributed across
-     * different tables
+     * @return int the number of affected rows. This can be greater than 1 since
+     * the document is distributed across different tables
      */
-    ExecutableQuery<int> remove(int documentID);
+    int remove(int documentID);
 
     /**
      * @brief Updates a document with new properties values, you can also add
@@ -318,9 +317,9 @@ class Query : public BaseQuery {
      *
      * @param documentID
      * @param updatedProperties properties to update/add
-     * @return ExecutableQuery<int>
+     * @return int
      */
-    ExecutableQuery<int> update(int documentID, json updatedProperties);
+    int update(int documentID, json updatedProperties);
 
    protected:
     void buildPropertyInsert(

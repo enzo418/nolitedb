@@ -34,7 +34,7 @@ void numbersExamples() {
          {"double_rep", M_LOG2E},
          {"integer_rep", 1}}};
 
-    numbersCollection.insert(numbers_json).execute();
+    numbersCollection.insert(numbers_json);
 
     auto numbers = numbersCollection.select().execute();
 
@@ -72,7 +72,7 @@ int main() {
                  {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
                  {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
 
-    collQuery.insert(cars).execute();
+    collQuery.insert(cars);
 
     auto [id, model, maker, year] =
         collQuery.prepareProperties("id", "model", "maker", "year");
@@ -93,8 +93,7 @@ int main() {
     std::cout << "\n\nRES1: " << res1 << std::endl << std::endl;
 
     int affected_update =
-        collQuery.update(res1[0]["id"], {{"year", 2100}, {"price", 50000}})
-            .execute();
+        collQuery.update(res1[0]["id"], {{"year", 2100}, {"price", 50000}});
 
     auto res2 = collQuery.select().page(1, 10).sort(year.desc()).execute();
 
@@ -104,7 +103,7 @@ int main() {
 
     std::cout << "\n\nall before: " << final << std::endl;
 
-    int affected = collQuery.remove(1).execute();
+    int affected = collQuery.remove(1);
 
     std::cout << "\n\naffected: " << affected << std::endl;
 
