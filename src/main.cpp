@@ -83,6 +83,7 @@ int main() {
     //            .from("cars", "races")
     //            .where(car_id == race_winner).execute()
 
+    // select id, model, maker and max year from each model
     auto res1 =
         collQuery.select(id, model, maker, year.maxAs("year_newest_model"))
             .where(year > 1990)
@@ -92,6 +93,7 @@ int main() {
 
     std::cout << "\n\nRES1: " << res1 << std::endl << std::endl;
 
+    // update first car, set year to 2100 and add a new property called price
     int affected_update =
         collQuery.update(res1[0]["id"], {{"year", 2100}, {"price", 50000}});
 
