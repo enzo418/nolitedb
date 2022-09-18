@@ -72,4 +72,4 @@ It was intended to serve as a fast development tool for a backend server where I
 # Next
 Since this version (1.0) was just to explore how to make it work, it has some problems. For example **working across different databases and collections can fail** due to the way in which we cache the properties. 
 
-So in version 2.0, I expect to solve all the pending problems and actually think about the design. Also, it might work with the SOCI library.
+So in version 2.0, I expect to solve all the pending problems and actually think about the design. Also, it might work with the SOCI library. All of this without changing the query API, so it's an internal reowork.
