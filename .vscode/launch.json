@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/noLiteDb",
             "args": [],
             "preLaunchTask": "build",
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}/build"
         },
         {
             "type": "lldb",
@@ -20,7 +20,7 @@
             "program": "${workspaceFolder}/build/tests",
             "args": [],
             "preLaunchTask": "build",
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}/build"
         }
     ]
 }

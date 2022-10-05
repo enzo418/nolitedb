@@ -14,10 +14,17 @@
 !*.h
 !README.md
 !CMakeLists.txt
+!*.cmake
 
 !vendor/
+!vendor/*
 !vendor/**/
 !LICENSE*
 
 !queries/
 !queries/*.sql
+
+!*.plantuml
+!docs/
+!docs/**/
+!docs/**/*.svg
