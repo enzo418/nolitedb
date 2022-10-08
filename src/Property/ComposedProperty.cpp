@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "nldb/Property/Property.hpp"
 #include "nldb/Utils/ComposedPropertyParser.hpp"
 
 namespace nldb {
@@ -51,8 +52,10 @@ namespace nldb {
                                            collID, repos);
     }
 
-    ComposedProperty ComposedProperty::empty(Property prop) {
-        return ComposedProperty(std::move(prop), prop.getCollectionId(), -1,
-                                {});
+    bool ComposedProperty::isEmpty() { return properties.empty(); }
+
+    ComposedProperty ComposedProperty::empty() {
+        return ComposedProperty(Property(-1, "", PropertyType::OBJECT, -1), -1,
+                                -1, {});
     }
 }  // namespace nldb

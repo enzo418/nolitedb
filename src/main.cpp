@@ -88,11 +88,11 @@ int main() {
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
     auto [id, name, contact] =
-        collQuery.collection("persona").get("id", "name", "contact"_obj);
+        collQuery.collection("persona").get("id", "name", "contact{test}"_obj);
 
     json result = collQuery.from("persona").select(id, name, contact).execute();
 
-    // std::cout << result;
+    std::cout << result;
 
     // auto [contact] =
     //     collQuery.collection("persona").collection("contact").only("address",

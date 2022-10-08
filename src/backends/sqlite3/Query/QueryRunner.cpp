@@ -113,6 +113,23 @@ namespace nldb {
 
     int QueryRunnerCtx::getRootCollId() { return rootCollectionID; }
 
+    /* -------------- FILTER OUT EMPTY OBJECTS -------------- */
+    void filterOutEmptyObjects(std::forward_list<SelectableProperty>& data) {
+        auto cb = overloaded {
+            [](ComposedProperty& composed) { return composed.isEmpty(); },
+            [](const auto&) { return false; }};
+
+        for (auto prev_it = data.before_begin(); prev_it != data.end();
+             prev_it++) {
+            auto it = std::next(prev_it);
+            if (it != data.end()) {
+                if (std::visit(cb, *it)) {
+                    data.erase_after(prev_it);
+                }
+            }
+        }
+    }
+
     /* -------------- EXPAND OBJECT PROPERTIES -------------- */
     /**
      * Property of type object and ComposedProperty with 0 sub-items gets
@@ -151,7 +168,7 @@ namespace nldb {
             repos->valuesDAO->findSubCollectionOfObjectProperty(prop.getId());
 
         if (!subColl) {
-            return ComposedProperty::empty(prop);
+            return ComposedProperty::empty();
             // throw std::runtime_error("Couldn't expand property with id " +
             //                          std::to_string(prop.getId()));
         }
@@ -171,7 +188,7 @@ namespace nldb {
 
     template <typename IT>
     requires std::output_iterator<IT, ComposedProperty>
-    void expandObjectProperties(const Property prop, IT& it,
+    void expandObjectProperties(const Property& prop, IT& it,
                                 Repositories* repos) {
         if (prop.getType() == PropertyType::OBJECT) {
             ComposedProperty composed = ObjectPropertyToComposed(prop, repos);
@@ -551,7 +568,9 @@ namespace nldb {
     json QueryRunnerSQ3::select(QueryPlannerContextSelect&& data) {
         std::stringstream sql;
 
+        // i can't do it before since composed properties come empty
         expandObjectProperties(&data.repos, data.select_value);
+        filterOutEmptyObjects(data.select_value);
 
         auto rootColl =
             data.repos.repositoryCollection->find(data.from.begin()->getName());

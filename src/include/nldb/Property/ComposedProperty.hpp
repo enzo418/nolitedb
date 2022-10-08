@@ -56,7 +56,8 @@ namespace nldb {
         void addProperty(SubProperty prop);
 
        public:
-        static ComposedProperty empty(Property prop);
+        bool isEmpty();
+        static ComposedProperty empty();
 
        public:
         /**

@@ -26,7 +26,8 @@ namespace nldb::utils {
             auto objProp = repos->repositoryProperty->find(collID, name);
 
             if (!objProp.has_value()) {
-                throw PropertyNotFound(name);
+                return ComposedProperty::empty();
+                // throw PropertyNotFound(name);
             }
 
             auto subCollId =
@@ -61,6 +62,8 @@ namespace nldb::utils {
                 if (*c == '{') {
                     ++c;  // skip {
                     auto composed = getComposed(word, collID, repos);
+
+                    if (composed.isEmpty()) return composed;
 
                     // read its properties
 
