@@ -21,6 +21,9 @@ namespace nldb {
 
     std::optional<Property> RepositoryProperty::find(
         int collectionID, const std::string& propName) {
+        if (propName == "id")
+            return Property(-1, "id", PropertyType::ID, collectionID);
+
         auto reader = conn->executeReader(
             "SELECT id, type FROM property where coll_id = @colid and name = "
             "@name",
@@ -29,7 +32,7 @@ namespace nldb {
         std::shared_ptr<IDBRowReader> row;
         if (reader->readRow(row)) {
             return Property(row->readInt32(0), propName,
-                            (PropertyType)row->readInt32(1));
+                            (PropertyType)row->readInt32(1), collectionID);
         } else {
             return std::nullopt;
         }
@@ -46,11 +49,13 @@ namespace nldb {
 
         auto reader = conn->executeReader(sql, {{"@id", collectionId}});
 
-        std::vector<Property> props = {Property(-1, "id", PropertyType::ID)};
+        std::vector<Property> props = {
+            Property(-1, "id", PropertyType::ID, collectionId)};
         std::shared_ptr<IDBRowReader> row;
         while (reader->readRow(row)) {
             props.push_back(Property(row->readInt64(0), row->readString(1),
-                                     (PropertyType)row->readInt64(2)));
+                                     (PropertyType)row->readInt64(2),
+                                     collectionId));
         }
 
         return std::move(props);

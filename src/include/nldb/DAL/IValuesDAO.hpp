@@ -81,6 +81,15 @@ namespace nldb {
                                                             int docID) = 0;
 
         /**
+         * @brief Find the related collection id to the property of type object.
+         *
+         * @param propID
+         * @return std::optional<int>
+         */
+        virtual std::optional<int> findSubCollectionOfObjectProperty(
+            int propID) = 0;
+
+        /**
          * @brief Removes all the values associated with a document.
          *
          * @param docID

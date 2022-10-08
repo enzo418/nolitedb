@@ -26,6 +26,9 @@ namespace nldb {
         std::optional<ValueObjectMapped> findObject(int propID,
                                                     int docID) override;
 
+        std::optional<int> findSubCollectionOfObjectProperty(
+            int propID) override;
+
         void removeAllFromDocument(int docID) override;
 
        private:

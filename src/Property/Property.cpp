@@ -6,8 +6,9 @@
 
 namespace nldb {
 
-    Property::Property(int pId, const std::string& pName, PropertyType pType)
-        : id(pId), name(pName), type(pType) {}
+    Property::Property(int pId, const std::string& pName, PropertyType pType,
+                       int collID)
+        : id(pId), name(pName), type(pType), collectionId(collID) {}
 
     // getters
     std::string Property::getName() const { return name; }

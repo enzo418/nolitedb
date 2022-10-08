@@ -16,6 +16,13 @@ namespace utils::paramsbind {
             } else {
                 return std::get<std::string>(val);
             }
+        } else if (std::holds_alternative<std::string_view>(val)) {
+            if (encloseQuotesInString) {
+                return encloseQuotesConst(
+                    std::string(std::get<std::string_view>(val)));
+            } else {
+                return std::string(std::get<std::string_view>(val));
+            }
         } else {
             throw std::runtime_error("Type not supported");
         }

@@ -6,6 +6,7 @@
 
 #include "nldb/DAL/Repositories.hpp"
 #include "nldb/Property/AggregatedProperty.hpp"
+#include "nldb/Property/ComposedProperty.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Property/PropertyExpression.hpp"
 #include "nldb/Property/SortedProperty.hpp"
@@ -16,7 +17,8 @@
 namespace nldb {
     // They are all here bc they are just DTO without any functionality.
 
-    typedef std::variant<Property, AggregatedProperty> SelectableProperty;
+    typedef std::variant<Property, AggregatedProperty, ComposedProperty>
+        SelectableProperty;
 
     // TODO: Rename to QueryContext
     struct QueryPlannerContext {
@@ -34,7 +36,7 @@ namespace nldb {
         QueryPlannerContextSelect(QueryPlannerContext&& ctx)
             : QueryPlannerContext(std::move(ctx)) {}
 
-        std::vector<SelectableProperty> select_value;
+        std::forward_list<SelectableProperty> select_value;
         std::optional<PropertyExpression> where_value;
         std::optional<QueryPagination> pagination_value;
         std::vector<Property> groupBy_value;

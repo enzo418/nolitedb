@@ -101,6 +101,13 @@ namespace nldb {
         return std::nullopt;
     }
 
+    std::optional<int> ValuesDAO::findSubCollectionOfObjectProperty(
+        int propID) {
+        const std::string sql =
+            "select sub_coll_id from value_object where prop_id = @id;";
+        return conn->executeAndGetFirstInt(sql, {{"@id", propID}});
+    }
+
     void ValuesDAO::removeAllFromDocument(int docID) {
         std::stringstream sql;
 

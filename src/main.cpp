@@ -1,6 +1,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <stdexcept>
 #include <string>
 #include <tuple>
 #include <variant>
@@ -14,6 +15,7 @@
 #include "nldb/Property/Property.hpp"
 #include "nldb/Query/Query.hpp"
 // #include "nlohmann/json.hpp"
+#include "nldb/Utils/Variant.hpp"
 #include "nldb/nldb_json.hpp"
 
 using namespace nldb;
@@ -46,8 +48,8 @@ using namespace nldb;
 int main() {
     nldb::LogManager::Initialize();
 
-    auto md = Property(-1, "mds", PropertyType::STRING);
-    auto yy = Property(-1, "yy", PropertyType::STRING);
+    auto md = Property(-1, "mds", PropertyType::STRING, -1);
+    auto yy = Property(-1, "yy", PropertyType::STRING, -1);
 
     auto c = (md > yy) && (yy != md);
 
@@ -81,13 +83,19 @@ int main() {
     // collQuery.from("persona").update(
     //     1, {{"contact", {{"email", "fake@fake.fake"}}}});
 
-    auto [name, contact] =
-        collQuery.collection("persona").get("name", "contact");
+    // auto t = "contact"_obj;
 
-    collQuery.from("persona").select(name, contact).execute();
+    // collQuery.from("persona").insert({{"name", "enzo"}});
 
-    // auto [address, email] =
-    //     collQuery.collection("persona").collection("contact").get("address",
+    auto [id, name, contact] =
+        collQuery.collection("persona").get("id", "name", "contact"_obj);
+
+    json result = collQuery.from("persona").select(id, name, contact).execute();
+
+    // std::cout << result;
+
+    // auto [contact] =
+    //     collQuery.collection("persona").collection("contact").only("address",
     //     "email");
 
     // auto [name, address, email] =

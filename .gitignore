@@ -28,3 +28,7 @@
 !docs/
 !docs/**/
 !docs/**/*.svg
+
+!examples/
+!examples/**/
+!examples/**/*.sql

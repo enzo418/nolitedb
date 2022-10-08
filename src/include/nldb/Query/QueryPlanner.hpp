@@ -3,13 +3,15 @@
 #include <type_traits>
 
 #include "QueryPlannerSelect.hpp"
+#include "nldb/Property/ComposedProperty.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/nldb_json.hpp"
 
 namespace nldb {
     template <typename T>
     concept IsSelectProperty =
-        IsProperty<T> || std::is_same<T, AggregatedProperty>::value;
+        IsProperty<T> || std::is_same<T, AggregatedProperty>::value ||
+        std::is_same<T, ComposedProperty>::value;
 
     class QueryPlanner {
        public:

@@ -14,7 +14,8 @@ namespace nldb {
 
     class Property {
        public:  // constructors
-        Property(int id, const std::string& name, PropertyType type);
+        Property(int id, const std::string& name, PropertyType type,
+                 int collID);
 
        public:  // getters
         std::string getName() const;
