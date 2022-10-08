@@ -72,13 +72,31 @@ int main() {
 
     auto collQuery = Query(&db);
 
-    json data = {{"name", "enzo"},
-                 {"contact",
-                  {{"phone", "12344"},
-                   {"address", "fake st 99"},
-                   {"email", "c.enzo@at.com"}}}};
+    json data = json::array({{// obj 1
+                              {"name", "enzo"},
+                              {"contact",
+                               {{"phone", "12344"},
+                                {"address", "fake st 99"},
+                                {"email", "c.enzo@at.com"}}}
 
-    // collQuery.from("persona").insert(data);
+                             },  // end obj1
+                             {
+                                 // obj 2
+                                 {"name", "pepe"},
+                                 {
+                                     "contact",
+                                     {// contact
+                                      {"phone", "999"},
+                                      {"location",
+                                       {{"city", "big city"},
+                                        {"address", "not a fake st 89"},
+                                        {"country", "argentina"}}},
+                                      {"email", "f@f.f"}}  // contact
+                                 }
+                                 //
+                             }});
+
+    collQuery.from("persona").insert(data);
     // collQuery.from("persona").update(1, {{"name", "enzo a."}});
     // collQuery.from("persona").update(
     //     1, {{"contact", {{"email", "fake@fake.fake"}}}});
@@ -87,8 +105,8 @@ int main() {
 
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
-    auto [id, name, contact] =
-        collQuery.collection("persona").get("id", "name", "contact{test}"_obj);
+    auto [id, name, contact] = collQuery.collection("persona").get(
+        "id", "name", "contact{location{city}}"_obj);
 
     json result = collQuery.from("persona").select(id, name, contact).execute();
 

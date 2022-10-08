@@ -1,5 +1,6 @@
 #include "nldb/Query/QueryRunner.hpp"
 
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <stdexcept>
@@ -11,6 +12,7 @@
 #include "nldb/Exceptions.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Property/Property.hpp"
+#include "nldb/Property/SortedProperty.hpp"
 #include "nldb/Query/QueryContext.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 #include "nldb/nldb_json.hpp"
@@ -65,6 +67,7 @@ namespace nldb {
 
         if (data.documents.is_array()) {
             for (auto& doc : data.documents) {
+                std::cout << doc << std::endl;
                 insertDocumentRecursive(doc, queryFrom.getName(), data.repos);
             }
         } else {
@@ -108,6 +111,13 @@ namespace nldb {
 
             if (auto prop =
                     repos.repositoryProperty->find(collID, propertyName)) {
+                if (prop->getType() != type) {
+                    throw WrongPropertyType(
+                        propertyName,
+                        std::string(magic_enum::enum_name(prop->getType())),
+                        std::string(magic_enum::enum_name(type)));
+                }
+
                 propID = prop->getId();
             } else {
                 propID =

@@ -21,26 +21,23 @@ namespace nldb::utils {
                                           Repositories* repos);
 
     namespace {
-        inline ComposedProperty getComposed(const std::string& name, int collID,
-                                            Repositories* repos) {
-            auto objProp = repos->repositoryProperty->find(collID, name);
+        /**
+         * this structures will be the placeholder for the actual
+         * properties/composed property while we parse the text.
+         * Its better to do it this way because is easier to test.
+         * The P_ stands for parser.
+         */
 
-            if (!objProp.has_value()) {
-                return ComposedProperty::empty();
-                // throw PropertyNotFound(name);
-            }
+        struct P_Prop {
+            std::string name;
+        };
 
-            auto subCollId =
-                repos->valuesDAO->findSubCollectionOfObjectProperty(
-                    objProp->getId());
+        typedef std::variant<class P_Composed, P_Prop> P_SubProperty;
 
-            if (!subCollId.has_value()) {
-                throw std::runtime_error("Couldn't find the sub-collection");
-            }
-
-            return ComposedProperty(objProp.value(), collID, subCollId.value(),
-                                    {});
-        }
+        struct P_Composed {
+            P_Prop prop;
+            std::vector<P_SubProperty> subProps;
+        };
 
         /**
          * @brief Recursively reads all the properties from a string.
@@ -49,21 +46,16 @@ namespace nldb::utils {
          * @tparam IsFirst
          * @param c iterable char
          * @param end end of the string
-         * @param collID curent parent collection id
-         * @param repos repositories
-         * @return SubProperty
+         * @return P_SubProperty
          */
         template <bool IsFirst = true>
-        SubProperty readNextPropertyRecursive(auto& c, const auto& end,
-                                              int collID, Repositories* repos) {
+        P_SubProperty readNextPropertyRecursive(auto& c, const auto& end) {
             std::string word;
 
             while (c != end) {
                 if (*c == '{') {
                     ++c;  // skip {
-                    auto composed = getComposed(word, collID, repos);
-
-                    if (composed.isEmpty()) return composed;
+                    auto composed = P_Composed {word, {}};
 
                     // read its properties
 
@@ -78,8 +70,8 @@ namespace nldb::utils {
                         if (*c == ',') c++;    // skip , to read the prop name
                         while (*c <= 32) c++;  // skip spaces
 
-                        composed.addProperty(readNextPropertyRecursive<false>(
-                            c, end, composed.getSubCollectionId(), repos));
+                        composed.subProps.push_back(
+                            readNextPropertyRecursive<false>(c, end));
                     } while (*c == ',');
 
                     if (*c == '}') {  // composed ended
@@ -100,9 +92,7 @@ namespace nldb::utils {
 
                     // found a } or a , outside a composed, that means that
                     // we are just a property.
-                    auto prop = repos->repositoryProperty->find(collID, word);
-                    if (!prop) throw PropertyNotFound(word);
-                    return prop.value();
+                    return P_Prop {word};
                 } else if (*c > 32) {
                     word += *c++;
                 } else {
@@ -114,15 +104,13 @@ namespace nldb::utils {
 
             if constexpr (IsFirst) {
                 if (word.length() != 0) {
-                    return getComposed(word, collID, repos);
+                    return P_Composed {word};
                 }
 
                 throw std::runtime_error(
                     "Unexpected end of string while reading a property");
             } else {
-                auto prop = repos->repositoryProperty->find(collID, word);
-                if (!prop) throw PropertyNotFound(word);
-                return prop.value();
+                return P_Prop {word};
             }
         }
     }  // namespace

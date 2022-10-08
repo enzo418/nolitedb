@@ -80,8 +80,6 @@ namespace nldb {
         /**
          * @brief Prepares properties to be used in queries.
          *
-         * REFEER TO THE DOCS
-         *
          * You can filter fields of a subcollection using "<coll>[A, B[t]]"_obj.
          * In this case, in a select you would retrieve the properties A and B
          * of the 'coll' collection, being B composed only by the field t and A

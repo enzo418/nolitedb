@@ -52,10 +52,12 @@ namespace nldb {
                                            collID, repos);
     }
 
-    bool ComposedProperty::isEmpty() { return properties.empty(); }
+    bool ComposedProperty::isEmpty() { return flag_empty; }
 
     ComposedProperty ComposedProperty::empty() {
-        return ComposedProperty(Property(-1, "", PropertyType::OBJECT, -1), -1,
-                                -1, {});
+        auto c = ComposedProperty(Property(-1, "", PropertyType::OBJECT, -1),
+                                  -1, -1, {});
+        c.flag_empty = true;
+        return c;
     }
 }  // namespace nldb

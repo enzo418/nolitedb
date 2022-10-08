@@ -49,14 +49,16 @@ namespace nldb {
 
         auto reader = conn->executeReader(sql, {{"@id", collectionId}});
 
-        std::vector<Property> props = {
-            Property(-1, "id", PropertyType::ID, collectionId)};
+        std::vector<Property> props = {};
         std::shared_ptr<IDBRowReader> row;
         while (reader->readRow(row)) {
             props.push_back(Property(row->readInt64(0), row->readString(1),
                                      (PropertyType)row->readInt64(2),
                                      collectionId));
         }
+
+        if (!props.empty())
+            props.push_back(Property(-1, "id", PropertyType::ID, collectionId));
 
         return std::move(props);
     }

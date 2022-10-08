@@ -77,5 +77,6 @@ namespace nldb {
         int parentCollectionID;  // id of the collection it belongs to
         int subCollectionID;     // id of the sub-collection that it holds
         std::vector<SubProperty> properties;
+        bool flag_empty {false};
     };
 }  // namespace nldb
