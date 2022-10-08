@@ -208,15 +208,16 @@ namespace nldb {
         if (props.empty()) {
             auto expanded =
                 repos->repositoryProperty->find(composed.getSubCollectionId());
+
             props.insert(props.begin(), expanded.begin(), expanded.end());
-        } else {
-            for (auto it = props.begin(); it != props.end(); it++) {
-                std::visit(
-                    [&it, repos](auto& prop) {
-                        expandObjectProperties(prop, it, repos);
-                    },
-                    *it);
-            }
+        }
+
+        for (auto it = props.begin(); it != props.end(); it++) {
+            std::visit(
+                [&it, repos](auto& prop) {
+                    expandObjectProperties(prop, it, repos);
+                },
+                *it);
         }
     }
 

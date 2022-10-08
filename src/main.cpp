@@ -105,8 +105,8 @@ int main() {
 
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
-    auto [id, name, contact] = collQuery.collection("persona").get(
-        "id", "name", "contact{location{city}}"_obj);
+    auto [id, name, contact] =
+        collQuery.collection("persona").get("id", "name", "contact"_obj);
 
     json result = collQuery.from("persona").select(id, name, contact).execute();
 
