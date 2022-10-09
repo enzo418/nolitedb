@@ -11,7 +11,7 @@ namespace nldb {
         if (this->context.where_value.has_value()) {
             this->context.where_value =
                 PropertyExpression(PropertyExpressionOperator::AND, val,
-                                   this->context.where_value);
+                                   this->context.where_value.value());
         } else {
             this->context.where_value = val;
         }

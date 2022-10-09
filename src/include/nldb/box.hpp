@@ -1,13 +1,12 @@
 // c++ implentation of Rust box
 // TL;DR; Recursive data structures requires heap allocations to compile
 // see https://www.foonathan.net/2022/05/recursive-variant-box/ for more details
+#include <iostream>
 #include <memory>
+#include <type_traits>
 
 template <typename T>
 class box {
-    // Wrapper over unique_ptr.
-    std::unique_ptr<T> _impl;
-
    public:
     // Automatic construction from a `T`, not a `T*`.
     box(T&& obj) : _impl(new T(std::move(obj))) {}
@@ -21,7 +20,7 @@ class box {
     }
 
     // unique_ptr destroys `T` for us.
-    ~box() = default;
+    ~box() { _impl.~unique_ptr(); }
 
     // Access propagates constness.
     T& operator*() { return *_impl; }
@@ -29,4 +28,10 @@ class box {
 
     T* operator->() { return _impl.get(); }
     const T* operator->() const { return _impl.get(); }
+
+    // T* release() { return _impl.release(); }
+
+   private:
+    // Wrapper over unique_ptr.
+    std::unique_ptr<T> _impl;
 };

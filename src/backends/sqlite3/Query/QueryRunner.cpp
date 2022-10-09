@@ -371,26 +371,26 @@ namespace nldb {
     }
 
     void addFromClause(std::stringstream& sql,
-                       const PropertyExpressionOperand& prop,
+                       PropertyExpressionOperand const& prop,
                        std::vector<int>& ids, QueryRunnerCtx& ctx) {
         auto cb = overloaded {
-            [&sql, &ctx, &ids](const LogicConstValue& prop) {
+            [&sql, &ctx, &ids](LogicConstValue const& prop) {
                 if (std::holds_alternative<Property>(prop)) {
-                    addFromClause(sql, prop, ids, ctx);
+                    addFromClause(sql, std::get<Property>(prop), ids, ctx);
                 }
             },
-            [&sql, &ctx, &ids](const box<struct PropertyExpression>& agProp) {
+            [&sql, &ctx, &ids](box<struct PropertyExpression> const& agProp) {
                 addFromClause(sql, agProp->left, ids, ctx);
                 addFromClause(sql, agProp->right, ids, ctx);
             },
-            [&sql, &ctx, &ids](const PropertyExpressionOperand& agProp) {
+            [&sql, &ctx, &ids](PropertyExpressionOperand const& agProp) {
                 addFromClause(sql, agProp, ids, ctx);
             }};
 
         std::visit(cb, prop);
     }
 
-    void addFromClause(std::stringstream& sql, const PropertyExpression& props,
+    void addFromClause(std::stringstream& sql, PropertyExpression& props,
                        std::vector<int>& ids, QueryRunnerCtx& ctx) {
         addFromClause(sql, props.left, ids, ctx);
         addFromClause(sql, props.right, ids, ctx);
@@ -412,11 +412,11 @@ namespace nldb {
     }
 
     /* ------------------ WHERE CLAUSE ------------------ */
-    void addWhereClause(std::stringstream& sql, const PropertyExpression& expr,
+    void addWhereClause(std::stringstream& sql, PropertyExpression const& expr,
                         QueryRunnerCtx& ctx);
 
     void addWhereExpression(std::stringstream& sql,
-                            const PropertyExpressionOperand& expr,
+                            PropertyExpressionOperand const& expr,
                             QueryRunnerCtx& ctx) {
         auto cbConstVal = overloaded {
             [&sql, &ctx](const Property& prop) {
@@ -430,20 +430,20 @@ namespace nldb {
             [&sql, &ctx](const char* str) { sql << encloseQuotesConst(str); }};
 
         auto cbOperand = overloaded {
-            [&sql, &ctx, &cbConstVal](const LogicConstValue& prop) {
+            [&sql, &ctx, &cbConstVal](LogicConstValue const& prop) {
                 std::visit(cbConstVal, prop);
             },
-            [&sql, &ctx](const box<struct PropertyExpression>& agProp) {
+            [&sql, &ctx](box<struct PropertyExpression> const& agProp) {
                 addWhereClause(sql, *agProp, ctx);
             },
-            [&sql, &ctx](const PropertyExpressionOperand& agProp) {
+            [&sql, &ctx](PropertyExpressionOperand const& agProp) {
                 addWhereExpression(sql, agProp, ctx);
             }};
 
         std::visit(cbOperand, expr);
     }
 
-    void addWhereClause(std::stringstream& sql, const PropertyExpression& expr,
+    void addWhereClause(std::stringstream& sql, PropertyExpression const& expr,
                         QueryRunnerCtx& ctx) {
         if (expr.type != PropertyExpressionOperator::NOT) {
             addWhereExpression(sql, expr.left, ctx);
@@ -455,8 +455,7 @@ namespace nldb {
         }
     }
 
-    void addWhereClause(std::stringstream& sql,
-                        const QueryPlannerContextSelect& data,
+    void addWhereClause(std::stringstream& sql, QueryPlannerContextSelect& data,
                         QueryRunnerCtx& ctx) {
         sql << " WHERE "
             << parseSQL("@doc.coll_id = @root_coll_id",
@@ -465,6 +464,8 @@ namespace nldb {
                         false);
 
         if (data.where_value) {
+            sql << " AND ";
+
             addWhereExpression(sql, data.where_value.value(), ctx);
         }
     }

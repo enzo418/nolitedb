@@ -27,9 +27,11 @@ namespace nldb {
         PropertyExpression();
 
         template <typename L, typename R>
-        PropertyExpression(PropertyExpressionOperator type, L left, R right) {
-            left = left;
-            right = right;
+        PropertyExpression(PropertyExpressionOperator pType, L pLeft,
+                           R pRight) {
+            type = pType;
+            left = pLeft;
+            right = pRight;
         }
 
         PropertyExpressionOperator type;
