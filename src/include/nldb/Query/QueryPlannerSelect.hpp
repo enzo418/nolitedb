@@ -39,7 +39,7 @@ namespace nldb {
         }
 
         template <IsSortedProperty... PR>
-        QueryPlannerSelect& sortBy(PR&... cols) {
+        QueryPlannerSelect& sortBy(const PR&... cols) {
             this->context.sortBy_value = {cols...};
 
             return *this;
