@@ -176,7 +176,7 @@ namespace nldb {
         auto expanded = repos->repositoryProperty->find(subColl.value());
 
         ComposedProperty composed(prop, prop.getCollectionId(), subColl.value(),
-                                  {});
+                                  {}, repos);
 
         // move expanded props into the composed property
         auto& props = composed.getPropertiesRef();

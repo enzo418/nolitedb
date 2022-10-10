@@ -15,34 +15,56 @@
 #include "nldb/Property/Property.hpp"
 #include "nldb/Query/Query.hpp"
 // #include "nlohmann/json.hpp"
+#include "nldb/Utils/Enums.hpp"
 #include "nldb/Utils/Variant.hpp"
 #include "nldb/nldb_json.hpp"
 
 using namespace nldb;
 
-// void numbersExamples() {
-//     DBSL3 db;
-//     if (!db.open("./numbers.db")) {
-//         std::cerr << "Could not open the database \n";
-//         db.throwLastError();
+void addWhereExpression(PropertyExpression const& expr);
+void addWhereExpression(PropertyExpression* expr);
+
+void addWhereExpression(PropertyExpressionOperand const& expr) {
+    auto cbConstVal =
+        overloaded {[](const Property& prop) { std::cout << prop.getName(); },
+                    [](const std::string& str) { std::cout << str; },
+                    [](int val) { std::cout << val; },  //
+                    [](double val) { std::cout << val; },
+                    [](const char* str) { std::cout << str; }};
+
+    auto cbOperand = overloaded {[&cbConstVal](const LogicConstValue& prop) {
+                                     std::visit(cbConstVal, prop);
+                                 },
+                                 [](box<PropertyExpression> const& agProp) {
+                                     addWhereExpression(*agProp);
+                                 },
+                                 [](PropertyExpressionOperand const& agProp) {
+                                     addWhereExpression(agProp);
+                                 }};
+
+    std::visit(cbOperand, expr);
+}
+
+void addWhereExpression(PropertyExpression const& expr) {
+    if (expr.type != PropertyExpressionOperator::NOT) {
+        addWhereExpression(expr.left);
+        std::cout << " " << utils::OperatorToString(expr.type) << " ";
+        addWhereExpression(expr.right);
+    } else {
+        std::cout << " " << utils::OperatorToString(expr.type) << " ";
+        addWhereExpression(expr.left);
+    }
+}
+
+// void addWhereExpression(PropertyExpression* expr) {
+//     if (expr->type != PropertyExpressionOperator::NOT) {
+//         addWhereExpression(expr->left);
+//         std::cout << " " << utils::OperatorToString(expr->type) << " ";
+//         addWhereExpression(expr->right);
+//     } else {
+//         std::cout << " " << utils::OperatorToString(expr->type) << " ";
+//         addWhereExpression(expr->left);
 //     }
-
-//     auto numbersCollection = QueryFactory::create(&db, "numbers");
-
-//     json numbers_json = {
-//         {{"number_name", "pi"}, {"double_rep", M_PI}, {"integer_rep", 3}},
-
-//         {{"number_name", "e"}, {"double_rep", M_E}, {"integer_rep", 2}},
-
-//         {{"number_name", "log2(e)"},
-//          {"double_rep", M_LOG2E},
-//          {"integer_rep", 1}}};
-
-//     numbersCollection.insert(numbers_json);
-
-//     auto numbers = numbersCollection.select().execute();
-
-//     std::cout << numbers << std::endl;
 // }
 
 int main() {
@@ -53,12 +75,34 @@ int main() {
 
     auto c = (md > yy) && (yy != md);
 
-    auto c1 = md < yy;
+    auto c1 = md < 2;
     auto c2 = md < 200;
 
     auto c3 = c1 && c2;
     auto c4 = c1 || c3;
     auto c5 = ~c4;
+
+    typedef std::variant<std::string, box<class S>> XX;
+
+    class S {
+       public:
+        XX op1 {""};
+    };
+
+    XX a = S {S {"test"}};
+
+    std::cout << "*a: " << std::get<std::string>(std::get<box<S>>(a)->op1)
+              << std::endl;
+    // PUEDE LO Q ESTE PASANDO ES Q NO LE ESTE PASANDO EL OWNERSHIP, TOMARLO
+    // COMO REF O VALOR
+    try {
+        addWhereExpression(c1);
+    } catch (std::runtime_error& e) {
+        std::cout << "\n";
+        std::cout << e.what() << std::endl;
+    }
+
+    // return 0;
 
     // numbersExamples();
     // return 0;
@@ -108,7 +152,20 @@ int main() {
     auto [id, name, contact] =
         collQuery.collection("persona").get("id", "name", "contact"_obj);
 
-    json result = collQuery.from("persona").select(id, name, contact).execute();
+    // auto cond = id > 2;
+
+    // std::stringstream ot;
+    // addWhereExpression(ot, cond);
+
+    // std::cout << ot.str() << std::endl;
+
+    // NLDB_ASSERT("id" == std::visit(getstr, cond.left), "is not id");
+
+    json result = collQuery.from("persona")
+                      .select(id, name, contact)
+                      .where(id > 2)
+                      .where(name == "pepcar" || contact["id"] == 4)
+                      .execute();
 
     std::cout << result;
 

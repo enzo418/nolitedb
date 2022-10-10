@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 
+#include "nldb/CommonConcepts.hpp"
 #include "nldb/DAL/Repositories.hpp"
 #include "nldb/Exceptions.hpp"
 #include "nldb/Property/ComposedProperty.hpp"
@@ -19,6 +20,21 @@ namespace nldb::utils {
      */
     ComposedProperty readComposedProperty(const std::string& expr, int collID,
                                           Repositories* repos);
+
+    /**
+     * @brief Reads a property from an expression.
+     * Example:
+     *      - population.current_year
+     *         with collID = 1, which is the country collection, represents this
+     *         year's population of a country
+     *
+     * @param expr
+     * @param collID
+     * @param repos
+     * @return Property
+     */
+    Property readProperty(const std::string& expr, int collID,
+                          Repositories* repos);
 
     namespace {
         /**
@@ -112,6 +128,38 @@ namespace nldb::utils {
             } else {
                 return P_Prop {word};
             }
+        }
+    }  // namespace
+
+    namespace {
+        template <typename IT>
+        requires std::input_iterator<IT>  //
+            Property covertInner(IT& it, int collID, Repositories* repos) {
+            std::optional<Property> found =
+                repos->repositoryProperty->find(collID, it->name);
+            if (found) {
+                if (found->getType() == PropertyType::OBJECT) {
+                    auto subCollId =
+                        repos->valuesDAO->findSubCollectionOfObjectProperty(
+                            found->getId());
+                    if (subCollId) {
+                        return covertInner(++it, subCollId.value(), repos);
+                    } else {
+                        throw CollectionNotFound(it->name);
+                    }
+                } else {
+                    return found.value();
+                }
+            } else {
+                // instead of throwing, we could use a Property::zombie or empty
+                throw PropertyNotFound(it->name);
+            }
+        }
+
+        inline Property covertInner(std::vector<P_Prop>&& props, int collID,
+                                    Repositories* repos) {
+            auto it = props.begin();
+            return covertInner(it, collID, repos);
         }
     }  // namespace
 }  // namespace nldb::utils
