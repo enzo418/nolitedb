@@ -7,6 +7,7 @@ namespace nldb {
     PropertyType JsonTypeToPropertyType(int type) {
         auto t = (json::value_t)type;
         switch (t) {
+            case json::value_t::number_unsigned:
             case json::value_t::number_integer:
                 return PropertyType::INTEGER;
             case json::value_t::number_float:
