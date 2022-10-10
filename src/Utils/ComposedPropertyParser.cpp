@@ -36,8 +36,8 @@ namespace nldb::utils {
                 // throw std::runtime_error("Couldn't find the sub-collection");
             }
 
-            auto composed = ComposedProperty(root.value(), collID,
-                                             subCollId.value(), {}, repos);
+            auto composed =
+                ComposedProperty(root.value(), subCollId.value(), {}, repos);
 
             auto cb = overloaded {
                 [&repos, &composed](const P_Prop& p) {

@@ -11,30 +11,23 @@
 #include "nldb/Utils/ComposedPropertyParser.hpp"
 
 namespace nldb {
-    ComposedProperty::ComposedProperty(Property prop, int pParentCollID,
-                                       int pSubCollID,
+    ComposedProperty::ComposedProperty(Property prop, int pSubCollID,
                                        std::vector<SubProperty>&& pProperties,
                                        Repositories* pRepos)
         : prop(std::move(prop)),
-          parentCollectionID(pParentCollID),
           subCollectionID(pSubCollID),
           properties(std::move(pProperties)),
           repos(pRepos) {}
 
     ComposedProperty::ComposedProperty(
-        Property prop, int pParentCollID, int pSubCollID,
+        Property prop, int pSubCollID,
         const std::vector<SubProperty>& pProperties, Repositories* pRepos)
         : prop(std::move(prop)),
-          parentCollectionID(pParentCollID),
           subCollectionID(pSubCollID),
           properties(pProperties),
           repos(pRepos) {}
 
     Property ComposedProperty::getProperty() const { return prop; }
-
-    int ComposedProperty::getParentCollectionId() const {
-        return parentCollectionID;
-    }
 
     int ComposedProperty::getSubCollectionId() const { return subCollectionID; }
 
@@ -73,7 +66,7 @@ namespace nldb {
 
     ComposedProperty ComposedProperty::empty() {
         auto c = ComposedProperty(Property(-1, "", PropertyType::OBJECT, -1),
-                                  -1, -1, {}, nullptr);
+                                  -1, {}, nullptr);
         c.flag_empty = true;
         return c;
     }

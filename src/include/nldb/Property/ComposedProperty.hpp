@@ -35,22 +35,20 @@ namespace nldb {
          *
          * @param prop is the property 'contact' object from the collection
          * 'user'
-         * @param parentCollID 'user' collection id
          * @param subCollID 'contact' collection id
          * @param properties 'email' and 'phone'
          * @param repos repositories, needed by operator[]
          */
-        ComposedProperty(Property prop, int parentCollID, int subCollID,
+        ComposedProperty(Property prop, int subCollID,
                          std::vector<SubProperty>&& properties,
                          Repositories* repos);
 
-        ComposedProperty(Property prop, int parentCollID, int subCollID,
+        ComposedProperty(Property prop, int subCollID,
                          const std::vector<SubProperty>& properties,
                          Repositories* repos);
 
        public:
         Property getProperty() const;  // the property of type object
-        int getParentCollectionId() const;
         int getSubCollectionId() const;
         std::vector<SubProperty> getProperties() const;
         std::vector<SubProperty>& getPropertiesRef();
@@ -87,8 +85,7 @@ namespace nldb {
 
        private:
         Property prop;
-        int parentCollectionID;  // id of the collection it belongs to
-        int subCollectionID;     // id of the sub-collection that it holds
+        int subCollectionID;  // id of the sub-collection that it holds
         std::vector<SubProperty> properties;
         bool flag_empty {false};
         Repositories* repos;
