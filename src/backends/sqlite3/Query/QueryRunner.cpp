@@ -466,6 +466,9 @@ namespace nldb {
             case PropertyType::ID:
                 out["id"] = row->readInt32(i);
                 break;
+            case PropertyType::ARRAY:
+                out[prop.getName()] = json::parse(row->readString(i));
+                break;
             default:
                 throw std::runtime_error(
                     "Select properties should not hold a reserved "

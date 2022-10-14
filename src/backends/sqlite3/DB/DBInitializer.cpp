@@ -70,6 +70,15 @@ namespace nldb {
             "`value` varchar(255),"
             "FOREIGN KEY (obj_id) REFERENCES object(id),"
             "FOREIGN KEY (prop_id) REFERENCES property(id)"
+            ");"
+            // array
+            "CREATE TABLE `value_array` ("
+            "`id` INTEGER PRIMARY KEY,"
+            "`obj_id` int NOT NULL,"
+            "`prop_id` int NOT NULL,"
+            "`value` TEXT,"
+            "FOREIGN KEY (obj_id) REFERENCES object(id),"
+            "FOREIGN KEY (prop_id) REFERENCES property(id)"
             ");";
 
         db->execute(sql, {});

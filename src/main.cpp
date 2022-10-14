@@ -163,6 +163,7 @@ int main() {
 
     json data = json::array({{// obj 1
                               {"name", "enzo"},
+                              {"aliases", {"x", "p", "r"}},
                               {"contact",
                                {{"phone", "12344"},
                                 {"address", "fake st 99"},
@@ -172,6 +173,7 @@ int main() {
                              {
                                  // obj 2
                                  {"name", "pepe"},
+                                 {"aliases", {"pepe", "mr pepe"}},
                                  {
                                      "contact",
                                      {// contact
@@ -194,8 +196,8 @@ int main() {
 
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
-    auto [id, name, contact] =
-        collQuery.collection("persona").get("id", "name", "contact{email}"_obj);
+    auto [id, name, aliases, contact] = collQuery.collection("persona").get(
+        "id", "name", "aliases", "contact{email}"_obj);
 
     // auto cond = id > 2;
 
@@ -207,7 +209,7 @@ int main() {
     // NLDB_ASSERT("id" == std::visit(getstr, cond.left), "is not id");
 
     json result = collQuery.from("persona")
-                      .select(id, name, contact)
+                      .select(id, name, aliases, contact)
                       .where(id != 9)
                       .sortBy(contact["email"].desc())
                       .execute();
