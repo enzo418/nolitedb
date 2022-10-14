@@ -8,18 +8,22 @@ namespace nldb {
         const auto sql =
             "CREATE TABLE `collection` ("
             "`id` INTEGER PRIMARY KEY,"
-            "`name` varchar(255)"
+            "`name` varchar(255) NOT NULL,"
+            "`owner_id` INTEGER NOT NULL,"
+            "FOREIGN KEY (owner_id) REFERENCES property(id)"
             ");";
 
         db->execute(sql, {});
     }
 
-    void createDocumentTable(IDB* db) {
+    void createObjectTable(IDB* db) {
         const auto sql =
-            "CREATE TABLE `document` ("
+            "CREATE TABLE `object` ("
             "`id` INTEGER PRIMARY KEY,"
-            "`coll_id` int,"
-            "FOREIGN KEY (coll_id) REFERENCES collection(id)"
+            "`prop_id` INTEGER NOT NULL,"
+            "`obj_id` INTEGER,"
+            "FOREIGN KEY (prop_id) REFERENCES property(id),"
+            "FOREIGN KEY (obj_id) REFERENCES object(id)"
             ");";
 
         db->execute(sql, {});
@@ -29,9 +33,9 @@ namespace nldb {
         const auto sql =
             "CREATE TABLE `property` ("
             "`id` INTEGER PRIMARY KEY,"
-            "`coll_id` int,"
-            "`name` varchar(255),"
-            "`type` int,"
+            "`coll_id` int,"  // nullable!
+            "`name` varchar(255) NOT NULL,"
+            "`type` int NOT NULL,"
             "FOREIGN KEY (coll_id) REFERENCES collection(id)"
             ");";
 
@@ -43,41 +47,29 @@ namespace nldb {
             // int
             "CREATE TABLE `value_int` ("
             "`id` INTEGER PRIMARY KEY,"
-            "`doc_id` int,"
-            "`prop_id` int,"
+            "`obj_id` int NOT NULL,"
+            "`prop_id` int NOT NULL,"
             "`value` int,"
-            "FOREIGN KEY (doc_id) REFERENCES document(id),"
+            "FOREIGN KEY (obj_id) REFERENCES object(id),"
             "FOREIGN KEY (prop_id) REFERENCES property(id)"
             ");"
             // double
             "CREATE TABLE `value_double` ("
             "`id` INTEGER PRIMARY KEY,"
-            "`doc_id` int,"
-            "`prop_id` int,"
+            "`obj_id` int NOT NULL,"
+            "`prop_id` int NOT NULL,"
             "`value` DOUBLE,"
-            "FOREIGN KEY (doc_id) REFERENCES document(id),"
+            "FOREIGN KEY (obj_id) REFERENCES object(id),"
             "FOREIGN KEY (prop_id) REFERENCES property(id)"
             ");"
             // string
             "CREATE TABLE `value_string` ("
             "`id` INTEGER PRIMARY KEY,"
-            "`doc_id` int,"
-            "`prop_id` int,"
+            "`obj_id` int NOT NULL,"
+            "`prop_id` int NOT NULL,"
             "`value` varchar(255),"
-            "FOREIGN KEY (doc_id) REFERENCES document(id),"
+            "FOREIGN KEY (obj_id) REFERENCES object(id),"
             "FOREIGN KEY (prop_id) REFERENCES property(id)"
-            ");"
-            // object
-            "CREATE TABLE `value_object` ("
-            "`id` INTEGER PRIMARY KEY,"
-            "`doc_id` int,"
-            "`prop_id` int,"
-            "`sub_coll_id` int,"
-            "`sub_doc_id` int,"
-            "FOREIGN KEY (doc_id) REFERENCES document(id),"
-            "FOREIGN KEY (prop_id) REFERENCES property(id),"
-            "FOREIGN KEY (sub_coll_id) REFERENCES collection(id)"
-            "FOREIGN KEY (sub_doc_id) REFERENCES document(id)"
             ");";
 
         db->execute(sql, {});
@@ -86,7 +78,7 @@ namespace nldb {
     void DBInitializer::createTablesAndFKeys(IDB* db) {
         db->begin();
         createCollectionTable(db);
-        createDocumentTable(db);
+        createObjectTable(db);
         createPropertyTable(db);
         createValuesTable(db);
         db->commit();

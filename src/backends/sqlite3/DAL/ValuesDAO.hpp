@@ -9,27 +9,21 @@ namespace nldb {
         ValuesDAO(IDB* connection);
 
        public:
-        void addStringLike(int propID, int docID, PropertyType type,
+        void addStringLike(int propID, int objID, PropertyType type,
                            std::string value) override;
 
-        void addObject(int propID, int docID, int subCollID,
-                       int subDocId) override;
+        int addObject(int propID) override;
 
-        void updateStringLike(int propID, int docID, PropertyType type,
+        int addObject(int propID, int objID) override;
+
+        void updateStringLike(int propID, int objID, PropertyType type,
                               std::string value) override;
 
-        void updateObject(int propID, int docID, int subCollID = -1,
-                          int subDocId = -1) override;
+        bool exists(int propID, int objID, PropertyType type) override;
 
-        bool exists(int propID, int docID, PropertyType type) override;
+        std::optional<int> findObjectId(int propID, int objID) override;
 
-        std::optional<ValueObjectMapped> findObject(int propID,
-                                                    int docID) override;
-
-        std::optional<int> findSubCollectionOfObjectProperty(
-            int propID) override;
-
-        void removeAllFromDocument(int docID) override;
+        void removeAllObject(int objID) override;
 
        private:
         IDB* conn;

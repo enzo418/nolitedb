@@ -6,6 +6,10 @@
 
 namespace nldb {
 
+    Property::Property(const std::string& pName,
+                       std::optional<std::string> pCollName)
+        : name(pName), collName(pCollName) {}
+
     Property::Property(int pId, const std::string& pName, PropertyType pType,
                        int collID)
         : id(pId), name(pName), type(pType), collectionId(collID) {}
@@ -18,6 +22,16 @@ namespace nldb {
     int Property::getId() const { return id; }
 
     int Property::getCollectionId() const { return collectionId; }
+
+    std::optional<std::string> Property::getParentCollName() {
+        return collName;
+    }
+
+    bool Property::isParentNameAnExpression() {
+        if (!collName) return false;
+
+        return collName->find_first_of(".") != collName->npos;
+    }
 
     // aggregate functions
     AggregatedProperty Property::countAs(const char* alias) {

@@ -9,7 +9,7 @@ namespace nldb::definitions {
                 propertyTypeTable = {{PropertyType::STRING, "value_string"},
                                      {PropertyType::INTEGER, "value_int"},
                                      {PropertyType::DOUBLE, "value_double"},
-                                     {PropertyType::OBJECT, "value_object"}};
+                                     {PropertyType::OBJECT, "object"}};
 
             return propertyTypeTable;
         }

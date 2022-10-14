@@ -3,16 +3,15 @@
 #include <string>
 #include <vector>
 
-#include "Property.hpp"
-#include "nldb/DAL/Repositories.hpp"
+#include "nldb/Property/Property.hpp"
 
 namespace nldb {
 
-    typedef std::variant<class ComposedProperty, Property> SubProperty;
+    typedef std::variant<class Object, Property> SubProperty;
 
-    class ComposedPropertyExpression {
+    class ObjectExpression {
        public:
-        constexpr ComposedPropertyExpression(const char* n, std::size_t size)
+        constexpr ObjectExpression(const char* n, std::size_t size)
             : expr(n), size(size) {};
 
        public:
@@ -25,40 +24,36 @@ namespace nldb {
      * Example: if user is {name, contact{email, phone}}, a Composed
      * Property could be as contact{email}.
      */
-    class ComposedProperty {
+    class Object {
        public:
         /**
-         * @brief Construct a new Composed Property object
+         * @brief Construct a new Object
          *
          * e.g. if user is {name, contact{email, phone, smoke_signal}}, and
-         * Composed Property is contact{email, phone} then
+         * Object is "contact{email, phone}" then
          *
          * @param prop is the property 'contact' object from the collection
          * 'user'
-         * @param subCollID 'contact' collection id
          * @param properties 'email' and 'phone'
-         * @param repos repositories, needed by operator[]
+         * @param collId the id of the collection it represents, `contact`.id
          */
-        ComposedProperty(Property prop, int subCollID,
-                         std::vector<SubProperty>&& properties,
-                         Repositories* repos);
+        Object(Property prop, std::vector<SubProperty>&& properties,
+               int collId = -1);
 
-        ComposedProperty(Property prop, int subCollID,
-                         const std::vector<SubProperty>& properties,
-                         Repositories* repos);
+        Object(Property prop, const std::vector<SubProperty>& properties,
+               int collId = -1);
 
        public:
         Property getProperty() const;  // the property of type object
-        int getSubCollectionId() const;
+        Property& getPropertyRef();
         std::vector<SubProperty> getProperties() const;
         std::vector<SubProperty>& getPropertiesRef();
 
-       public:
-        void addProperty(SubProperty prop);
+        int getCollId() const;
 
        public:
-        bool isEmpty();
-        static ComposedProperty empty();
+        void addProperty(SubProperty prop);
+        void setCollId(int pCollId);
 
        public:
         /**
@@ -66,13 +61,12 @@ namespace nldb {
          * Filter object properties using
          * {prop1, prop2{prop21, prop22},...}
          *
-         * @param repos
          * @param expr
+         * @param collName parent collection name
          * @return ComposedProperty
          */
-        static ComposedProperty evaluateExpresion(
-            int collID, Repositories* repos,
-            const ComposedPropertyExpression& expr);
+        static Object evaluateExpresion(const ObjectExpression& expr,
+                                        const std::string& collName);
 
        public:
         /**
@@ -81,13 +75,11 @@ namespace nldb {
          * @param expr
          * @return Property
          */
-        Property operator[](const char* expr);
+        Property operator[](const std::string& expr);
 
        private:
         Property prop;
-        int subCollectionID;  // id of the sub-collection that it holds
         std::vector<SubProperty> properties;
-        bool flag_empty {false};
-        Repositories* repos;
+        int collID;  // the id of the collection it represents
     };
 }  // namespace nldb

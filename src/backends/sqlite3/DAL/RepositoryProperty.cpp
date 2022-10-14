@@ -6,6 +6,15 @@ namespace nldb {
     RepositoryProperty::RepositoryProperty(IDB* connection)
         : conn(connection) {}
 
+    int RepositoryProperty::add(const std::string& name) {
+        const std::string sql =
+            "insert into property (name, type) values (@name, @type);";
+
+        conn->execute(sql, {{"@name", name}, {"@type", PropertyType::OBJECT}});
+
+        return conn->getLastInsertedRowId();
+    }
+
     int RepositoryProperty::add(const std::string& name, int collectionID,
                                 PropertyType type) {
         const std::string sql =

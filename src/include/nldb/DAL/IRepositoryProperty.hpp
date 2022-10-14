@@ -9,6 +9,7 @@
 namespace nldb {
     class IRepositoryProperty {
        public:
+        virtual int add(const std::string& name) = 0;
         virtual int add(const std::string& name, int collectionID,
                         PropertyType type) = 0;
         virtual std::optional<Property> find(int collectionID,

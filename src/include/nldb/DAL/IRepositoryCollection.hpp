@@ -16,10 +16,12 @@ namespace nldb {
          * @param name
          * @return int
          */
-        virtual int add(const std::string& name) = 0;
+        virtual int add(const std::string& name, int ownerID) = 0;
         virtual std::optional<Collection> find(const std::string& name) = 0;
         virtual std::optional<Collection> find(int id) = 0;
         virtual bool exists(const std::string& name) = 0;
         virtual bool exists(int id) = 0;
+        virtual std::optional<Collection> findByOwner(int ownerID) = 0;
+        virtual std::optional<int> getOwnerId(int collID) = 0;
     };
 }  // namespace nldb

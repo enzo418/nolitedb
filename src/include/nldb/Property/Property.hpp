@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <string>
 #include <variant>
 
@@ -13,7 +14,16 @@ namespace nldb {
         LogicConstValue;
 
     class Property {
-       public:  // constructors
+       public:
+        /**
+         * @brief Constructor to use while building the query
+         *
+         * @param name
+         * @param collName parent collection name
+         */
+        Property(const std::string& name, std::optional<std::string> collName);
+
+        // to use while running the query
         Property(int id, const std::string& name, PropertyType type,
                  int collID);
 
@@ -22,6 +32,28 @@ namespace nldb {
         PropertyType getType() const;
         int getId() const;
         int getCollectionId() const;
+
+       public:
+        /**
+         * @brief Returns false iff the parent collection name is not an
+         * expression or it has no parent collection name.
+         *
+         * @return true
+         * @return false
+         */
+        bool isParentNameAnExpression();
+
+        /**
+         * @brief Get the name of the parent collection.
+         * It can be an identifier or an expression, check if before with
+         * `isParentNameAnExpression()`.
+         *
+         * expression: <coll_name1>.<coll_name2>.<coll_name3>
+         * expression example: users.phone
+         *
+         * @return std::string&
+         */
+        std::optional<std::string> getParentCollName();
 
        public:  // aggregate functions
         AggregatedProperty countAs(const char* alias);
@@ -46,6 +78,8 @@ namespace nldb {
         PropertyExpression operator^(const LogicConstValue& right);  // not like
 
        private:
+        std::optional<std::string> collName;
+
         std::string name;
         PropertyType type;
         int id;

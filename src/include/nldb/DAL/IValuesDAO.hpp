@@ -16,84 +16,71 @@ namespace nldb {
     class IValuesDAO {
        public:
         /**
-         * @brief Adds a new value to a document property.
+         * @brief Adds a new value to an object
          *
          * @param propID
-         * @param docID
+         * @param objID
          * @param type any type but OBJECT is allowed.
          * @param value
          */
-        virtual void addStringLike(int propID, int docID, PropertyType type,
+        virtual void addStringLike(int propID, int objID, PropertyType type,
                                    std::string value) = 0;
 
         /**
-         * @brief adds a new value object to a document property.
+         * @brief adds a new object to a property.
+         * This means that the object is not a value of another object, instead
+         * it's value of a collection (a document).
+         *
+         * @param propID
+         * @param objID
+         */
+        virtual int addObject(int propID) = 0;
+
+        /**
+         * @brief adds a new object to an object
          *
          * @param propID
          * @param docID
-         * @param subCollID
-         * @param subDocId
+         * @param objID
          */
-        virtual void addObject(int propID, int docID, int subCollID,
-                               int subDocId) = 0;
+        virtual int addObject(int propID, int objID) = 0;
 
         /**
          * @brief Updates a document property value.
          *
          * @param propID
-         * @param docID
+         * @param objID
          * @param type any type but OBJECT is allowed.
          * @param value
          */
-        virtual void updateStringLike(int propID, int docID, PropertyType type,
+        virtual void updateStringLike(int propID, int objID, PropertyType type,
                                       std::string value) = 0;
-
-        /**
-         * @brief updates a value of type object
-         *
-         * @param propID
-         * @param docID
-         * @param subCollID new sub collection id or -1 to not update
-         * @param subDocId new document id or -1 to not update
-         */
-        virtual void updateObject(int propID, int docID, int subCollID = -1,
-                                  int subDocId = -1) = 0;
 
         /**
          * @brief Check if a document property has value.
          *
          * @param propID
-         * @param docID
+         * @param objID
          * @param type
          * @return true
          * @return false
          */
-        virtual bool exists(int propID, int docID, PropertyType type) = 0;
+        virtual bool exists(int propID, int objID, PropertyType type) = 0;
 
         /**
-         * @brief finds a value of type object.
+         * @brief finds a value object given its prop id and the parent id
          *
          * @param propID
-         * @param docID
-         * @return ValueObjectMapped
+         * @param objID
+         * @return optional<int>
          */
-        virtual std::optional<ValueObjectMapped> findObject(int propID,
-                                                            int docID) = 0;
-
-        /**
-         * @brief Find the related collection id to the property of type object.
-         *
-         * @param propID
-         * @return std::optional<int>
-         */
-        virtual std::optional<int> findSubCollectionOfObjectProperty(
-            int propID) = 0;
+        virtual std::optional<int> findObjectId(int propID, int objID) = 0;
 
         /**
          * @brief Removes all the values associated with a document.
          *
-         * @param docID
+         * @param objID
          */
-        virtual void removeAllFromDocument(int docID) = 0;
+        virtual void removeAllObject(int objID) = 0;
     };
 }  // namespace nldb

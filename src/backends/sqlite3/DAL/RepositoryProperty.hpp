@@ -14,6 +14,7 @@ namespace nldb {
         RepositoryProperty(IDB* connection);
 
        public:
+        int add(const std::string& name) override;
         int add(const std::string& name, int collectionID,
                 PropertyType type) override;
         std::optional<Property> find(int collectionID,

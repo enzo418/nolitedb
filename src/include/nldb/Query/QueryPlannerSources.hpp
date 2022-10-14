@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nldb/Query/CollectionQuery.hpp"
+#include "nldb/Collection.hpp"
 #include "nldb/Query/QueryContext.hpp"
 #include "nldb/Query/QueryPlanner.hpp"
 
@@ -11,6 +11,6 @@ namespace nldb {
 
        public:
         QueryPlannerSources& with(const char* collection);
-        QueryPlannerSources& with(CollectionQuery collection);
+        QueryPlannerSources& with(Collection collection);
     };
 }  // namespace nldb

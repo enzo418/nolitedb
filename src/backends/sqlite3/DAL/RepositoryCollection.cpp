@@ -9,9 +9,10 @@ namespace nldb {
     RepositoryCollection::RepositoryCollection(IDB* connection)
         : conn(connection) {}
 
-    int RepositoryCollection::add(const std::string& name) {
-        const std::string sql = "insert into collection (name) values (@name);";
-        conn->execute(sql, {{"@name", name}});
+    int RepositoryCollection::add(const std::string& name, int ownerID) {
+        const std::string sql =
+            "insert into collection (name, owner_id) values (@name, @ow_id);";
+        conn->execute(sql, {{"@name", name}, {"@ow_id", ownerID}});
         return conn->getLastInsertedRowId();
     }
 
@@ -47,5 +48,26 @@ namespace nldb {
 
     bool RepositoryCollection::exists(int id) {
         return this->find(id).has_value();
+    }
+
+    std::optional<Collection> RepositoryCollection::findByOwner(int ownerID) {
+        const std::string sql =
+            "select id, name from collection where owner_id = @owner_id;";
+
+        auto reader = conn->executeReader(sql, {{"@owner_id", ownerID}});
+
+        std::shared_ptr<IDBRowReader> row;
+        if (reader->readRow(row)) {
+            return Collection(row->readInt32(0), row->readString(1));
+        } else {
+            return std::nullopt;
+        }
+    }
+
+    std::optional<int> RepositoryCollection::getOwnerId(int collID) {
+        const std::string sql =
+            "select owner_id from collection where id = @coll_id;";
+
+        return conn->executeAndGetFirstInt(sql, {{"@coll_id", collID}});
     }
 }  // namespace nldb

@@ -20,22 +20,20 @@
 namespace nldb {
     template <>
     struct RepositoriesImpl<DBSL3> {
-        static Repositories create(IDB* conn) {
-            return Repositories {
-                .repositoryCollection =
-                    std::make_unique<RepositoryCollection>(conn),
-                .repositoryDocument =
-                    std::make_unique<RepositoryDocument>(conn),
-                .repositoryProperty =
-                    std::make_unique<RepositoryProperty>(conn),
-                .valuesDAO = std::make_unique<ValuesDAO>(conn)};
+        static std::shared_ptr<Repositories> create(IDB* conn) {
+            return std::make_shared<Repositories>(
+                std::make_unique<RepositoryCollection>(conn),
+                std::make_unique<RepositoryDocument>(conn),
+                std::make_unique<RepositoryProperty>(conn),
+                std::make_unique<ValuesDAO>(conn));
         }
     };
 
     template <>
     struct QueryRunnerImpl<DBSL3> {
-        static std::unique_ptr<QueryRunner> create(IDB* conn) {
-            return std::make_unique<QueryRunnerSQ3>(conn);
+        static std::unique_ptr<QueryRunner> create(
+            IDB* conn, std::shared_ptr<Repositories>& repos) {
+            return std::make_unique<QueryRunnerSQ3>(conn, repos);
         }
     };
 }  // namespace nldb

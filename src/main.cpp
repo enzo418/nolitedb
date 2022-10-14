@@ -1,3 +1,5 @@
+#include <chrono>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <iterator>
@@ -21,51 +23,116 @@
 
 using namespace nldb;
 
-void addWhereExpression(PropertyExpression const& expr);
-void addWhereExpression(PropertyExpression* expr);
+// void tweetsTest(DBSL3* db) {
+//     std::ifstream f("twitter.json");
+//     json data = json::parse(f);
 
-void addWhereExpression(PropertyExpressionOperand const& expr) {
-    auto cbConstVal =
-        overloaded {[](const Property& prop) { std::cout << prop.getName(); },
-                    [](const std::string& str) { std::cout << str; },
-                    [](int val) { std::cout << val; },  //
-                    [](double val) { std::cout << val; },
-                    [](const char* str) { std::cout << str; }};
+//     auto collQuery = Query(db);
 
-    auto cbOperand = overloaded {[&cbConstVal](const LogicConstValue& prop) {
-                                     std::visit(cbConstVal, prop);
-                                 },
-                                 [](box<PropertyExpression> const& agProp) {
-                                     addWhereExpression(*agProp);
-                                 },
-                                 [](PropertyExpressionOperand const& agProp) {
-                                     addWhereExpression(agProp);
-                                 }};
+//     auto now = std::chrono::high_resolution_clock::now();
+//     collQuery.from("tweets").insert(data);
 
-    std::visit(cbOperand, expr);
-}
-
-void addWhereExpression(PropertyExpression const& expr) {
-    if (expr.type != PropertyExpressionOperator::NOT) {
-        addWhereExpression(expr.left);
-        std::cout << " " << utils::OperatorToString(expr.type) << " ";
-        addWhereExpression(expr.right);
-    } else {
-        std::cout << " " << utils::OperatorToString(expr.type) << " ";
-        addWhereExpression(expr.left);
-    }
-}
-
-// void addWhereExpression(PropertyExpression* expr) {
-//     if (expr->type != PropertyExpressionOperator::NOT) {
-//         addWhereExpression(expr->left);
-//         std::cout << " " << utils::OperatorToString(expr->type) << " ";
-//         addWhereExpression(expr->right);
-//     } else {
-//         std::cout << " " << utils::OperatorToString(expr->type) << " ";
-//         addWhereExpression(expr->left);
-//     }
+//     std::cout << "took "
+//               << (std::chrono::high_resolution_clock::now() - now) /
+//                      std::chrono::milliseconds(1)
+//               << " ms" << std::endl;
 // }
+
+void cars_example(Query<DBSL3>& collQuery) {
+    auto cars = collQuery.collection("cars");
+
+    json data_automaker = {{{"name", "ford"},
+                            {"founded", "June 16, 1903"},
+                            {"country", "United States"}},
+                           // -------------
+                           {{"name", "subaru"},
+                            {"founded", "July 15, 1953"},
+                            {"country", "Japan"}}};
+
+    collQuery.from("automaker").insert(data_automaker);
+    auto automakers = collQuery.collection("automaker");
+
+    json data_cars = {
+        {{"maker", "ford"}, {"model", "focus"}, {"year", 2011}},
+        {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
+        {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
+
+    collQuery.from("cars").insert(data_cars);
+
+    auto [id, model, maker, year] = cars.get("id", "model", "maker", "year");
+
+    auto automaker = automakers.group("id", "model", "maker", "year");
+
+    // select id, model, maker and max year from each model
+    auto res1 = collQuery.from("cars")
+                    .select(id, model, maker, year.maxAs("year_newest_model"),
+                            automaker)
+                    .where(year > 1990 && automaker["name"] == maker)
+                    .page(1, 10)
+                    .groupBy(model, maker)
+                    .execute();
+
+    std::cout << "\n\nRES1: " << res1.dump(2) << std::endl << std::endl;
+
+    // update first car, set year to 2100 and add a new property called
+    // price
+    collQuery.from("cars").update(res1[0]["id"],
+                                  {{"year", 2100}, {"price", 50000}});
+
+    auto res2 = collQuery.from("cars")
+                    .select()
+                    .page(1, 10)
+                    .sortBy(year.desc())
+                    .execute();
+
+    std::cout << "\n\nRES2: " << res2.dump(2) << std::endl;
+
+    auto final = collQuery.from("cars").select(model, maker, year).execute();
+
+    std::cout << "\n\nall before: " << final << std::endl;
+
+    collQuery.from("cars").remove(1);
+
+    auto finalThen =
+        collQuery.from("cars").select(model, maker, year).execute();
+
+    std::cout << "\n\nall: " << finalThen.dump(2) << std::endl;
+}
+
+void example_notion_object(Query<DBSL3>& collQuery) {
+    json data = json::array(
+        {{// obj 1
+          {"name", "carl"},
+          {"information", {{"city", "hh"}, {"mail", "mail@at.com"}}}}});
+
+    collQuery.from("persona").insert(data);
+    // collQuery.from("persona").update(1, {{"name", "enzo a."}});
+    // collQuery.from("persona").update(
+    //     1, {{"contact", {{"email", "fake@fake.fake"}}}});
+
+    // auto t = "contact"_obj;
+
+    // collQuery.from("persona").insert({{"name", "enzo"}});
+
+    auto [id, name, information] =
+        collQuery.collection("persona").get("id", "name", "information"_obj);
+
+    // auto cond = id > 2;
+
+    // std::stringstream ot;
+    // addWhereExpression(ot, cond);
+
+    // std::cout << ot.str() << std::endl;
+
+    // NLDB_ASSERT("id" == std::visit(getstr, cond.left), "is not id");
+
+    json result = collQuery.from("persona")
+                      .select(id, name, information)
+                      .where(id != 9)
+                      .execute();
+
+    std::cout << result.dump(2) << std::endl;
+}
 
 int main() {
     nldb::LogManager::Initialize();
@@ -82,31 +149,6 @@ int main() {
     auto c4 = c1 || c3;
     auto c5 = ~c4;
 
-    typedef std::variant<std::string, box<class S>> XX;
-
-    class S {
-       public:
-        XX op1 {""};
-    };
-
-    XX a = S {S {"test"}};
-
-    std::cout << "*a: " << std::get<std::string>(std::get<box<S>>(a)->op1)
-              << std::endl;
-    // PUEDE LO Q ESTE PASANDO ES Q NO LE ESTE PASANDO EL OWNERSHIP, TOMARLO
-    // COMO REF O VALOR
-    try {
-        addWhereExpression(c1);
-    } catch (std::runtime_error& e) {
-        std::cout << "\n";
-        std::cout << e.what() << std::endl;
-    }
-
-    // return 0;
-
-    // numbersExamples();
-    // return 0;
-
     DBSL3 db;
 
     if (!db.open("./tests.db")) {
@@ -115,6 +157,9 @@ int main() {
     }
 
     auto collQuery = Query(&db);
+
+    // example_notion_object(collQuery);
+    // return 0;
 
     json data = json::array({{// obj 1
                               {"name", "enzo"},
@@ -150,7 +195,7 @@ int main() {
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
     auto [id, name, contact] =
-        collQuery.collection("persona").get("id", "name", "contact"_obj);
+        collQuery.collection("persona").get("id", "name", "contact{email}"_obj);
 
     // auto cond = id > 2;
 
@@ -163,11 +208,11 @@ int main() {
 
     json result = collQuery.from("persona")
                       .select(id, name, contact)
-                      .where(id > 2)
-                      .where(name == "pepcar" || contact["id"] == 4)
+                      .where(id != 9)
+                      .sortBy(contact["email"].desc())
                       .execute();
 
-    std::cout << result;
+    std::cout << result.dump(4);
 
     // auto [contact] =
     //     collQuery.collection("persona").collection("contact").only("address",
@@ -177,58 +222,7 @@ int main() {
     //     collQuery.collection("persona").get("name", "contact.address",
     //     "contact.email");
 
-    // auto cars = collQuery.collection("cars");
-
-    // json data_cars = {
-    //     {{"maker", "ford"}, {"model", "focus"}, {"year", 2011}},
-    //     {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
-    //     {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
-
-    // collQuery.from("cars").insert(data_cars);
-
-    // auto [id, model, maker, year] = cars.get("id", "model", "maker",
-    // "year");
-
-    // coll
-
-    // maybe auto [car_id, ...] = collection("cars").prepare(...)
-    //       auto [race_winner, ...] = collection("races").prepare(...)
-    //       query.select(car_id, c2, ..., cn, race_winner, ..., r2, ...,
-    //       rn)
-    //            .from("cars", "races")
-    //            .where(car_id == race_winner).execute()
-
-    // select id, model, maker and max year from each model
-    // auto res1 = collQuery.from("cars")
-    //                 .select(id, model, maker,
-    //                 year.maxAs("year_newest_model")) .where(year > 1990)
-    //                 .page(1, 10)
-    //                 .groupBy(model, maker)
-    //                 .execute();
-
-    // std::cout << "\n\nRES1: " << res1 << std::endl << std::endl;
-
-    // update first car, set year to 2100 and add a new property called
-    // price int affected_update =
-    //     collQuery.update(res1[0]["id"], {{"year", 2100}, {"price",
-    //     50000}});
-
-    // auto res2 = collQuery.select().page(1,
-    // 10).sort(year.desc()).execute();
-
-    // std::cout << "\n\nRES2: " << res2 << std::endl;
-
-    // auto final = collQuery.select(model, maker, year).execute();
-
-    // std::cout << "\n\nall before: " << final << std::endl;
-
-    // int affected = collQuery.remove(1);
-
-    // std::cout << "\n\naffected: " << affected << std::endl;
-
-    // auto finalthen = collQuery.select(model, maker, year).execute();
-
-    // std::cout << "\n\nall: " << finalthen << std::endl;
+    // cars_example(collQuery);
 
     nldb::LogManager::Shutdown();
 }
