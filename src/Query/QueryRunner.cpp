@@ -135,9 +135,9 @@ namespace nldb {
         return std::array<int, 2> {newCollId, rootPropID};
     }
 
-    std::pair<int, int> QueryRunner::insertDocumentRecursive(
-        json& doc, const std::string& collName, std::optional<int> parentObjID,
-        std::optional<int> pRootPropID) {
+    void QueryRunner::insertDocumentRecursive(
+        json& doc, const std::string& collName,
+        std::optional<snowflake> parentObjID, std::optional<int> pRootPropID) {
         /**
          * rootPropID explanation: imagine we are inserting into persona the
          * object {name: "a", contact: {phone: 123}}, here we iterate
@@ -155,10 +155,11 @@ namespace nldb {
             GetCollIdOrCreateIt(collName, repos.get(), pRootPropID);
 
         //  - Create document/object
-        int objID =
-            parentObjID ?  //
-                repos->valuesDAO->addObject(rootPropID, parentObjID.value())
-                        : repos->valuesDAO->addObject(rootPropID);
+        snowflake objID = parentObjID
+                              ?  //
+                              repos->valuesDAO->deferAddObject(
+                                  rootPropID, parentObjID.value())
+                              : repos->valuesDAO->deferAddObject(rootPropID);
 
         for (auto& [propertyName, value] : doc.items()) {
             int propID = -1;
@@ -189,7 +190,7 @@ namespace nldb {
                 //      - create a sub-collection and add a document/object
                 //      - repeat the steps from the start
 
-                auto [sub_coll_id, sub_objID] = this->insertDocumentRecursive(
+                this->insertDocumentRecursive(
                     value, getSubCollectionName(collName, propertyName), objID,
                     propID);
             } else {
@@ -197,11 +198,9 @@ namespace nldb {
                                                      ValueToString(value));
             }
         }
-
-        return {collID, objID};
     }
 
-    void QueryRunner::updateDocumentRecursive(int objID,
+    void QueryRunner::updateDocumentRecursive(snowflake objID,
                                               const Collection& collection,
                                               json& object) {
         for (auto& [propName, valueJson] : object.items()) {
@@ -267,7 +266,8 @@ namespace nldb {
                     // if we find it, we will extend it with more properties
 
                     // add a new document/object
-                    int childObjID = repos->valuesDAO->addObject(p, objID);
+                    auto childObjID =
+                        repos->valuesDAO->deferAddObject(p, objID);
 
                     // add the new properties/values and update the existing
                     updateDocumentRecursive(childObjID,

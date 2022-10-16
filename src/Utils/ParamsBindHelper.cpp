@@ -10,6 +10,8 @@ namespace utils::paramsbind {
             return std::to_string(std::get<int>(val));
         } else if (std::holds_alternative<double>(val)) {
             return std::to_string(std::get<double>(val));
+        } else if (std::holds_alternative<snowflake>(val)) {
+            return std::to_string(std::get<snowflake>(val));
         } else if (std::holds_alternative<std::string>(val)) {
             if (encloseQuotesInString) {
                 return encloseQuotesConst(std::get<std::string>(val));

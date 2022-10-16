@@ -31,12 +31,10 @@ namespace nldb {
          * @param parentObjID parent object
          * @param rootPropID the parent property id for the new collection (if
          * missing).
-         *
-         * @return std::pair<int, int> inserted in (collection_id, document_id)
          */
-        virtual std::pair<int, int> insertDocumentRecursive(
+        virtual void insertDocumentRecursive(
             json& doc, const std::string& collName,
-            std::optional<int> parentObjID = std::nullopt,
+            std::optional<snowflake> parentObjID = std::nullopt,
             std::optional<int> rootPropID = std::nullopt);
 
         /**
@@ -46,7 +44,7 @@ namespace nldb {
          * @param object new/updated properties with their values
          * @param repos repositories/data access objects
          */
-        virtual void updateDocumentRecursive(int objID,
+        virtual void updateDocumentRecursive(snowflake objID,
                                              const Collection& collection,
                                              json& object);
 

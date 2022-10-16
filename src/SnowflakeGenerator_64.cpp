@@ -14,11 +14,11 @@ namespace nldb {
 
     static std::array<int, MAX_THREADS> counter_thread = {0};
 
-    snowflake_size SnowflakeGenerator::generate(uint16_t threadID) {
+    snowflake SnowflakeGenerator::generate(uint16_t threadID) {
         if (threadID > MAX_THREADS || threadID < 0)
             throw std::runtime_error("invalid thread id");
 
-        snowflake_size snowflake = getCurrentTimestampMs();
+        snowflake snowflake = getCurrentTimestampMs();
 
         snowflake <<= threadIdBits;
         snowflake <<= counterBits;

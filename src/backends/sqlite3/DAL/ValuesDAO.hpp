@@ -1,16 +1,30 @@
 #pragma once
 
+#include <cstdint>
+
 #include "nldb/DAL/IValuesDAO.hpp"
 #include "nldb/DB/IDB.hpp"
+#include "nldb/SnowflakeGenerator.hpp"
 #include "nldb/Utils/ValueBuffer.hpp"
 
 namespace nldb {
 
-    struct BufferValue {
+    struct BufferValueStringLike {
         int propID;
-        int objID;
+        snowflake objID;
         PropertyType type;
         std::string value {""};
+    };
+
+    struct BufferValueDependentObject {
+        snowflake id;
+        int prop_id;
+        snowflake obj_id;
+    };
+
+    struct BufferValueIndependentObject {
+        snowflake id;
+        int prop_id;
     };
 
     class ValuesDAO : public IValuesDAO {
@@ -18,25 +32,30 @@ namespace nldb {
         ValuesDAO(IDB* connection);
 
        public:
-        void addStringLike(int propID, int objID, PropertyType type,
+        void addStringLike(int propID, snowflake objID, PropertyType type,
                            std::string value) override;
 
-        int addObject(int propID) override;
+        snowflake addObject(int propID) override;
 
-        int addObject(int propID, int objID) override;
+        snowflake deferAddObject(int propID) override;
 
-        void updateStringLike(int propID, int objID, PropertyType type,
+        snowflake addObject(int propID, snowflake objID) override;
+
+        snowflake deferAddObject(int propID, snowflake objID) override;
+
+        void updateStringLike(int propID, snowflake objID, PropertyType type,
                               std::string value) override;
 
-        bool exists(int propID, int objID, PropertyType type) override;
+        bool exists(int propID, snowflake objID, PropertyType type) override;
 
-        bool existsObject(int objID) override;
+        bool existsObject(snowflake objID) override;
 
-        std::optional<int> findObjectId(int propID, int objID) override;
+        std::optional<snowflake> findObjectId(int propID,
+                                              snowflake objID) override;
 
-        void removeObject(int objID) override;
+        void removeObject(snowflake objID) override;
 
-        void deferAddStringLike(int propID, int objID, PropertyType type,
+        void deferAddStringLike(int propID, snowflake objID, PropertyType type,
                                 std::string value) override;
 
         void pushPendingData() override;
@@ -45,6 +64,9 @@ namespace nldb {
 
        private:
         IDB* conn;
-        Buffer<BufferValue> buffer;
+        Buffer<BufferValueStringLike> bufferStringLike;
+        Buffer<BufferValueDependentObject> bufferDependentObject;
+        Buffer<BufferValueIndependentObject> bufferIndependentObject;
+        NullLock lock;
     };
 }  // namespace nldb
