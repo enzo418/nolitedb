@@ -10,7 +10,8 @@ namespace nldb::definitions {
                                      {PropertyType::INTEGER, "value_int"},
                                      {PropertyType::DOUBLE, "value_double"},
                                      {PropertyType::ARRAY, "value_array"},
-                                     {PropertyType::OBJECT, "object"}};
+                                     {PropertyType::OBJECT, "object"},
+                                     {PropertyType::BOOLEAN, "value_int"}};
 
             return propertyTypeTable;
         }

@@ -71,7 +71,7 @@ namespace nldb {
 
         // check if doc exists
         int& docID = data.documentID;
-        if (!repos->repositoryDocument->exists(docID)) {
+        if (!repos->valuesDAO->existsObject(docID)) {
             throw DocumentNotFound("id: " + std::to_string(docID));
         }
 
@@ -104,14 +104,14 @@ namespace nldb {
         } else {
             insertDocumentRecursive(data.documents, from.getName());
         }
+
+        repos->valuesDAO->pushPendingData();
     }
 
     void QueryRunner::remove(QueryPlannerContextRemove&& data) {
         populateData(data);
 
-        repos->repositoryDocument->remove(data.documentID);
-
-        repos->valuesDAO->removeAllObject(data.documentID);
+        repos->valuesDAO->removeObject(data.documentID);
     }
 
     auto GetCollIdOrCreateIt(const std::string& collName, Repositories* repos,
@@ -164,6 +164,10 @@ namespace nldb {
             int propID = -1;
             PropertyType type = JsonTypeToPropertyType((int)value.type());
 
+            // skip null values, because if we set it to null then the cannot
+            // change it (we can but it makes more sense to do it like this)
+            if (type == PropertyType::_NULL) continue;
+
             //  - Create missing collection properties
             if (auto prop =
                     repos->repositoryProperty->find(collID, propertyName)) {
@@ -189,8 +193,8 @@ namespace nldb {
                     value, getSubCollectionName(collName, propertyName), objID,
                     propID);
             } else {
-                repos->valuesDAO->addStringLike(propID, objID, type,
-                                                ValueToString(value));
+                repos->valuesDAO->deferAddStringLike(propID, objID, type,
+                                                     ValueToString(value));
             }
         }
 
@@ -205,6 +209,9 @@ namespace nldb {
                 repos->repositoryProperty->find(collection.getId(), propName);
 
             auto type = JsonTypeToPropertyType((int)valueJson.type());
+
+            // maybe we should delete the value?
+            if (type == PropertyType::_NULL) continue;
 
             int propID;
 

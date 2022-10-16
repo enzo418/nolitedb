@@ -4,6 +4,7 @@
 #include <string>
 #include <tuple>
 
+#include "nldb/Common.hpp"
 #include "nldb/Object.hpp"
 
 namespace nldb {
@@ -20,6 +21,12 @@ namespace nldb {
         // a new class is needed because ComposedProperty can't have a constexpr
         // ctor.
         return ObjectExpression {s, size};
+    }
+
+    // mark a string as _id if you want the document id and not the property id
+    // (which might not exist)
+    constexpr const char* operator"" _id(const char* id, std::size_t size) {
+        return common::internal_id_string;
     }
 
     /**

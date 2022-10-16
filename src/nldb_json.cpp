@@ -18,6 +18,10 @@ namespace nldb {
                 return PropertyType::OBJECT;
             case json::value_t::array:
                 return PropertyType::ARRAY;
+            case json::value_t::null:
+                return PropertyType::_NULL;
+            case json::value_t::boolean:
+                return PropertyType::BOOLEAN;
             default:
                 auto msg = "Type is not supported: " +
                            std::string(magic_enum::enum_name((json::value_t)t));
@@ -41,6 +45,10 @@ namespace nldb {
                 break;
             case PropertyType::ARRAY:
                 str = value.dump();
+                break;
+            case PropertyType::BOOLEAN:
+                str =
+                    std::to_string(value.get<bool>() ? 1 : 0);  // we store ints
                 break;
             case PropertyType::OBJECT:
                 throw std::runtime_error(

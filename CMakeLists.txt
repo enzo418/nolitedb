@@ -10,7 +10,7 @@ list(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
 # Set std version 
 # Note: I do it this way because otherwise export compile commands doesn't export it
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++20")
 
 # clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -39,29 +39,29 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} noLitedb_lb)
 
 # ------------------------ TESTS ----------------------- #
-# add_subdirectory(vendor/googletest)
-# include_directories(vendor/googletest/googletest/include)
+add_subdirectory(vendor/googletest)
+include_directories(vendor/googletest/googletest/include)
 
-# enable_testing()
+enable_testing()
 
-# file(GLOB TESTS_SRC tests/*.cpp)
+file(GLOB TESTS_SRC tests/*.cpp)
 
-# add_executable(
-#   tests
-#   ${TESTS_SRC}
-# )
+add_executable(
+  tests
+  ${TESTS_SRC}
+)
 
-# target_link_libraries(
-#   tests
-#   noLitedb_lb
-#   GTest::gtest
-# )
+target_link_libraries(
+  tests
+  noLitedb_lb
+  GTest::gtest
+)
 
-# if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
-#   add_definitions( -D LOGGER_MAX_LOG_LEVEL_PRINTED=6 ) # trace
-# else ()
-#   add_definitions( -D LOGGER_MAX_LOG_LEVEL_PRINTED=1 ) # error
-# endif()
+if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
+  add_definitions( -D LOGGER_MAX_LOG_LEVEL_PRINTED=6 ) # trace
+else ()
+  add_definitions( -D LOGGER_MAX_LOG_LEVEL_PRINTED=1 ) # error
+endif()
 
-# include(GoogleTest)
-# gtest_discover_tests(tests)
+include(GoogleTest)
+gtest_discover_tests(tests)

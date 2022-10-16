@@ -23,20 +23,42 @@
 
 using namespace nldb;
 
-// void tweetsTest(DBSL3* db) {
-//     std::ifstream f("twitter.json");
-//     json data = json::parse(f);
+void tweetsTest(DBSL3* db) {
+    std::ifstream f("twitter.json");
+    json data = json::parse(f)["statuses"];
 
-//     auto collQuery = Query(db);
+    auto collQuery = Query(db);
 
-//     auto now = std::chrono::high_resolution_clock::now();
-//     collQuery.from("tweets").insert(data);
+    auto now = std::chrono::high_resolution_clock::now();
+    collQuery.from("tweets").insert(data);
 
-//     std::cout << "took "
-//               << (std::chrono::high_resolution_clock::now() - now) /
-//                      std::chrono::milliseconds(1)
-//               << " ms" << std::endl;
-// }
+    std::cout << "took "
+              << (std::chrono::high_resolution_clock::now() - now) /
+                     std::chrono::milliseconds(1)
+              << " ms" << std::endl;
+
+    // auto res = collQuery.from("tweets").select().limit(1, 10).execute();
+
+    // std::cout << res << std::endl;
+
+    /**
+     * Performance, statuses with 100 elements
+     * ---
+     * With cached property and collection I paused it at 20 min and it only had
+     * inserted a 10% +-, definitely I need to make the values insertion in a
+     * queue with some limit.
+     *
+     * With optimized insert values:
+     *      took 188875 ms (3.14791667 minutes ~~ PI minutes)
+     *      with the database as a file in a HDD
+     *      final file size: 732KB, size of the json file as one line: 456KB
+     *      difference: +60%
+     * the main threshold while adding values right now is inserting the
+     * "object" right away because we need its id.
+     *
+     * In memory database: took 1106 ms
+     */
+}
 
 void cars_example(Query<DBSL3>& collQuery) {
     auto cars = collQuery.collection("cars");
@@ -115,7 +137,7 @@ void example_notion_object(Query<DBSL3>& collQuery) {
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
     auto [id, name, information] =
-        collQuery.collection("persona").get("id", "name", "information"_obj);
+        collQuery.collection("persona").get("id"_id, "name", "information"_obj);
 
     // auto cond = id > 2;
 
@@ -151,7 +173,7 @@ int main() {
 
     DBSL3 db;
 
-    if (!db.open("./tests.db")) {
+    if (!db.open(/*"./tests.db"*/ ":memory:")) {
         std::cerr << "Could not open the database \n";
         db.throwLastError();
     }
@@ -159,7 +181,8 @@ int main() {
     auto collQuery = Query(&db);
 
     // example_notion_object(collQuery);
-    // return 0;
+    tweetsTest(&db);
+    return 0;
 
     json data = json::array({{// obj 1
                               {"name", "enzo"},
@@ -187,7 +210,14 @@ int main() {
                                  //
                              }});
 
+    auto now = std::chrono::high_resolution_clock::now();
     collQuery.from("persona").insert(data);
+
+    std::cout << "insert took "
+              << (std::chrono::high_resolution_clock::now() - now) /
+                     std::chrono::milliseconds(1)
+              << " ms" << std::endl;
+
     // collQuery.from("persona").update(1, {{"name", "enzo a."}});
     // collQuery.from("persona").update(
     //     1, {{"contact", {{"email", "fake@fake.fake"}}}});
@@ -197,7 +227,7 @@ int main() {
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
     auto [id, name, aliases, contact] = collQuery.collection("persona").get(
-        "id", "name", "aliases", "contact{email}"_obj);
+        "id"_id, "name", "aliases", "contact{email}"_obj);
 
     // auto cond = id > 2;
 
@@ -208,11 +238,46 @@ int main() {
 
     // NLDB_ASSERT("id" == std::visit(getstr, cond.left), "is not id");
 
-    json result = collQuery.from("persona")
+    now = std::chrono::high_resolution_clock::now();
+    auto result = collQuery.from("persona")
                       .select(id, name, aliases, contact)
                       .where(id != 9)
                       .sortBy(contact["email"].desc())
                       .execute();
+
+    /**
+    WITHOUT CACHE:
+            insert took 4903 ms
+            insert took 4500 ms
+            insert took 4147 ms
+            insert took 4755 ms
+            insert took 3807 ms
+
+            select took 2 ms
+            select took 59 ms
+            select took 3 ms
+
+    WITH CACHE:
+            insert took 4483 ms -- only property
+            insert took 4283 ms
+            insert took 3932 ms -- both
+            insert took 3857 ms
+
+
+    OPTIMIZED CODE:
+            insert took 4242 ms -- without cache
+            select took 5 ms
+
+    WITH DEFERRED INSERTS:
+            insert took 2734 ms
+            insert took 2791 ms
+            select took 1 ms -- cached props and coll
+     */
+
+    std::cout << "select took "
+              << (std::chrono::high_resolution_clock::now() - now) /
+                     std::chrono::milliseconds(1)
+              << " ms" << std::endl;
 
     std::cout << result.dump(4);
 

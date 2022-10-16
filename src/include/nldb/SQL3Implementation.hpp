@@ -6,11 +6,12 @@
 #include "DB/IDB.hpp"
 #include "Implementation.hpp"
 #include "backends/sqlite3/DAL/RepositoryCollection.hpp"
-#include "backends/sqlite3/DAL/RepositoryDocument.hpp"
 #include "backends/sqlite3/DAL/RepositoryProperty.hpp"
 #include "backends/sqlite3/DAL/ValuesDAO.hpp"
 #include "backends/sqlite3/DB/DB.hpp"
 #include "backends/sqlite3/Query/QueryRunner.hpp"
+#include "nldb/DAL/Cache/CachedRepositoryCollection.hpp"
+#include "nldb/DAL/Cache/CachedRepositoryPropertyCache.hpp"
 
 /**
  * This is the default implementation for the sqlite 3 backend.
@@ -22,9 +23,14 @@ namespace nldb {
     struct RepositoriesImpl<DBSL3> {
         static std::shared_ptr<Repositories> create(IDB* conn) {
             return std::make_shared<Repositories>(
-                std::make_unique<RepositoryCollection>(conn),
-                std::make_unique<RepositoryDocument>(conn),
-                std::make_unique<RepositoryProperty>(conn),
+                // std::make_unique<RepositoryCollection>(conn),
+                // std::make_unique<RepositoryProperty>(conn),
+
+                std::make_unique<CachedRepositoryCollection>(
+                    conn, std::make_unique<RepositoryCollection>(conn)),
+                std::make_unique<CachedRepositoryProperty>(
+                    conn, std::make_unique<RepositoryProperty>(conn)),
+
                 std::make_unique<ValuesDAO>(conn));
         }
     };

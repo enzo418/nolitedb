@@ -4,7 +4,16 @@
 #include <variant>
 
 namespace nldb {
-    enum PropertyType { ID, STRING, DOUBLE, INTEGER, OBJECT, ARRAY };
+    enum PropertyType {
+        ID,
+        STRING,
+        DOUBLE,
+        INTEGER,
+        OBJECT,
+        ARRAY,
+        _NULL,
+        BOOLEAN
+    };
 
     class AggregatedProperty;
     class SortedProperty;

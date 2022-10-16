@@ -30,12 +30,12 @@ namespace nldb {
 
     std::optional<Property> RepositoryProperty::find(
         int collectionID, const std::string& propName) {
-        if (propName == "id")
-            return Property(-1, "id", PropertyType::ID, collectionID);
+        if (propName == common::internal_id_string)
+            return Property(-1, "_id", PropertyType::ID, collectionID);
 
         auto reader = conn->executeReader(
             "SELECT id, type FROM property where coll_id = @colid and name = "
-            "@name",
+            "@name;",
             {{"@colid", collectionID}, {"@name", propName}});
 
         std::shared_ptr<IDBRowReader> row;

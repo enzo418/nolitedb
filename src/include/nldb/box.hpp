@@ -20,7 +20,7 @@ class box {
     }
 
     // unique_ptr destroys `T` for us.
-    ~box() { _impl.~unique_ptr(); }
+    ~box() {}
 
     // Access propagates constness.
     T& operator*() { return *_impl; }

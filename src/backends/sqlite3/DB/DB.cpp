@@ -126,7 +126,8 @@ namespace nldb {
         int rc = sqlite3_exec(db, sql.c_str(), 0, 0, &err);
 
         if (rc != SQLITE_OK) {
-            NLDB_ERROR("Could not execute query, error: {}", err);
+            NLDB_ERROR("Could not execute query, error: {}, with query: {}",
+                       err, sql);
             sqlite3_free(err);
             this->throwLastError();
         }

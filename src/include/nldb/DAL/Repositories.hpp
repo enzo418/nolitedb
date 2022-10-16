@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "IRepositoryCollection.hpp"
-#include "IRepositoryDocument.hpp"
 #include "IRepositoryProperty.hpp"
 #include "IValuesDAO.hpp"
 
@@ -13,7 +12,6 @@ namespace nldb {
      */
     struct Repositories {
         std::unique_ptr<IRepositoryCollection> repositoryCollection;
-        std::unique_ptr<IRepositoryDocument> repositoryDocument;
         std::unique_ptr<IRepositoryProperty> repositoryProperty;
         std::unique_ptr<IValuesDAO> valuesDAO;
     };

@@ -4,15 +4,18 @@
 #include <string>
 #include <vector>
 
+#include "lrucache11/LRUCache11.hpp"
 #include "nldb/Common.hpp"
 #include "nldb/DAL/IRepositoryProperty.hpp"
 #include "nldb/DB/IDB.hpp"
 #include "nldb/Property/Property.hpp"
+#include "nldb/Utils/Hash.hpp"
 
 namespace nldb {
-    class RepositoryProperty : public IRepositoryProperty {
+    class CachedRepositoryProperty : public IRepositoryProperty {
        public:
-        RepositoryProperty(IDB* connection);
+        CachedRepositoryProperty(IDB* connection,
+                                 std::unique_ptr<IRepositoryProperty> repo);
 
        public:
         int add(const std::string& name) override;
@@ -25,5 +28,7 @@ namespace nldb {
 
        private:
         IDB* conn;
+        std::unique_ptr<IRepositoryProperty> repo;
+        lru11::Cache<std::pair<int, std::string>, Property, pairhash> cache;
     };
 }  // namespace nldb

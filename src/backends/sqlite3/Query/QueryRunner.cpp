@@ -464,10 +464,13 @@ namespace nldb {
                 out[prop.getName()] = row->readString(i);
                 break;
             case PropertyType::ID:
-                out["id"] = row->readInt32(i);
+                out["_id"] = row->readInt32(i);
                 break;
             case PropertyType::ARRAY:
                 out[prop.getName()] = json::parse(row->readString(i));
+                break;
+            case PropertyType::BOOLEAN:
+                out[prop.getName()] = row->readInt32(i) == 1 ? true : false;
                 break;
             default:
                 throw std::runtime_error(
