@@ -64,6 +64,8 @@ namespace nldb {
         void add(const BufferValueDependentObject& val);
         void add(const BufferValueIndependentObject& val);
 
+        ~BufferData();
+
        protected:
         template <typename T>
         void inline _add(const T& val, Buffer<T>& buff) {

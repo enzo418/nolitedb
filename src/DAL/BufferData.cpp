@@ -1,5 +1,7 @@
 #include "nldb/DAL/BufferData.hpp"
 
+#include <iostream>
+
 #include "nldb/LOG/log.hpp"
 
 namespace nldb {
@@ -22,6 +24,8 @@ namespace nldb {
     void BufferData::pushPendingData() {
         NLDB_INFO("FLUSHING PENDING DATA");
         lock.lock();  // next push should wait
+
+        auto now = std::chrono::high_resolution_clock::now();
 
         if (bufferRootProperty.Size() > 0) {
             this->pushRootProperties();
@@ -46,6 +50,12 @@ namespace nldb {
         if (bufferStringLike.Size() > 0) {
             this->pushStringLikeValues();
         }
+
+        std::cout << "buffer insert took "
+                  << (std::chrono::high_resolution_clock::now() - now) /
+                         std::chrono::milliseconds(1)
+                  << " ms" << std::endl;
+
         lock.unlock();
     }
 
@@ -72,5 +82,7 @@ namespace nldb {
     void BufferData::add(const BufferValueIndependentObject& val) {
         _add(val, bufferIndependentObject);
     }
+
+    BufferData::~BufferData() { this->pushPendingData(); }
 
 }  // namespace nldb
