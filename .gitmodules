@@ -5,8 +5,8 @@
         path = vendor/lrucache11
         url = https://github.com/mohaps/lrucache11
 [submodule "vendor/spdlog"]
-        path = vendor/spdlog
-        url = https://github.com/gabime/spdlog
+	path = vendor/spdlog
+	url = https://github.com/gabime/spdlog
 [submodule "vendor/googletest"]
-        path = vendor/googletest
-        url = https://github.com/google/googletest
+	path = vendor/googletest
+	url = https://github.com/google/googletest
