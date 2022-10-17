@@ -10,8 +10,8 @@ namespace nldb {
                        std::optional<std::string> pCollName)
         : name(pName), collName(pCollName) {}
 
-    Property::Property(int pId, const std::string& pName, PropertyType pType,
-                       int collID)
+    Property::Property(snowflake pId, const std::string& pName,
+                       PropertyType pType, snowflake collID)
         : id(pId), name(pName), type(pType), collectionId(collID) {}
 
     // getters
@@ -19,9 +19,9 @@ namespace nldb {
 
     PropertyType Property::getType() const { return type; }
 
-    int Property::getId() const { return id; }
+    snowflake Property::getId() const { return id; }
 
-    int Property::getCollectionId() const { return collectionId; }
+    snowflake Property::getCollectionId() const { return collectionId; }
 
     std::optional<std::string> Property::getParentCollName() {
         return collName;

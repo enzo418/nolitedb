@@ -35,7 +35,7 @@ namespace nldb {
         virtual void insertDocumentRecursive(
             json& doc, const std::string& collName,
             std::optional<snowflake> parentObjID = std::nullopt,
-            std::optional<int> rootPropID = std::nullopt);
+            std::optional<snowflake> rootPropID = std::nullopt);
 
         /**
          * @brief updates a document that can contain more documents (objects)
@@ -49,7 +49,8 @@ namespace nldb {
                                              json& object);
 
        protected:  // helpers data
-        virtual int getLastCollectionIdFromExpression(const std::string& expr);
+        virtual snowflake getLastCollectionIdFromExpression(
+            const std::string& expr);
 
         // adds the id it has in the database
         virtual void populateData(Collection& coll);

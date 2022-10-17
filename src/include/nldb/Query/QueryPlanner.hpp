@@ -45,8 +45,8 @@ namespace nldb {
          * @param docId
          * @param newValue
          */
-        void update(int docId, json newValue);
-        void remove(int docId);
+        void update(snowflake docId, json newValue);
+        void remove(snowflake docId);
 
        protected:
         QueryPlannerContext context;

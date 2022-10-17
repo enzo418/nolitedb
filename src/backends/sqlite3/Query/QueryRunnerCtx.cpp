@@ -3,10 +3,12 @@
 #include "magic_enum.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
 
-    QueryRunnerCtx::QueryRunnerCtx(int rootCollectionID, int pRootPropID,
+    QueryRunnerCtx::QueryRunnerCtx(snowflake rootCollectionID,
+                                   snowflake pRootPropID,
                                    const std::string& pDocAlias)
         : rootCollectionID(rootCollectionID),
           rootPropId(pRootPropID),
@@ -28,7 +30,7 @@ namespace nldb {
 
     std::string QueryRunnerCtx::generateValueExpression(const Property& prop) {
         if (prop.getType() == PropertyType::ID) {
-            int parentColl = prop.getCollectionId();
+            snowflake parentColl = prop.getCollectionId();
 
             if (parentColl == rootCollectionID) {
                 return std::string(docAlias) + ".id";
@@ -44,8 +46,8 @@ namespace nldb {
     }
 
     std::string_view QueryRunnerCtx::getAlias(const Property& prop) {
-        int id = prop.getId();
-        int collID = prop.getCollectionId();
+        snowflake id = prop.getId();
+        snowflake collID = prop.getCollectionId();
 
         if (!props_aliases.contains({id, collID})) {
             props_aliases[{id, collID}] = this->generateAlias(prop);
@@ -56,8 +58,8 @@ namespace nldb {
 
     std::string_view QueryRunnerCtx::getAlias(
         const AggregatedProperty& agProp) {
-        int id = agProp.property.getId();
-        int collID = agProp.property.getCollectionId();
+        snowflake id = agProp.property.getId();
+        snowflake collID = agProp.property.getCollectionId();
 
         if (!props_aliases.contains({id, collID})) {
             props_aliases[{id, collID}] = this->generateAlias(agProp.property);
@@ -67,8 +69,8 @@ namespace nldb {
     }
 
     std::string QueryRunnerCtx::getValueExpression(const Property& prop) {
-        int id = prop.getId();
-        int collID = prop.getCollectionId();
+        snowflake id = prop.getId();
+        snowflake collID = prop.getCollectionId();
 
         if (!props_value_aliases.contains({id, collID})) {
             props_value_aliases[{id, collID}] =
@@ -85,8 +87,8 @@ namespace nldb {
         colls_aliases[composed.getCollId()] = alias;
     }
 
-    int QueryRunnerCtx::getRootCollId() { return rootCollectionID; }
+    snowflake QueryRunnerCtx::getRootCollId() { return rootCollectionID; }
 
-    int QueryRunnerCtx::getRootPropId() { return rootPropId; }
+    snowflake QueryRunnerCtx::getRootPropId() { return rootPropId; }
 
 }  // namespace nldb

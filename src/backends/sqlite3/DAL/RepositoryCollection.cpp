@@ -9,7 +9,8 @@ namespace nldb {
     RepositoryCollection::RepositoryCollection(IDB* connection)
         : conn(connection) {}
 
-    int RepositoryCollection::add(const std::string& name, int ownerID) {
+    snowflake RepositoryCollection::add(const std::string& name,
+                                        snowflake ownerID) {
         const std::string sql =
             "insert into collection (name, owner_id) values (@name, @ow_id);";
         conn->execute(sql, {{"@name", name}, {"@ow_id", ownerID}});
@@ -33,7 +34,7 @@ namespace nldb {
         return find(name).has_value();
     }
 
-    std::optional<Collection> RepositoryCollection::find(int id) {
+    std::optional<Collection> RepositoryCollection::find(snowflake id) {
         const std::string sql = "select name from collection where id = @id;";
 
         auto reader = conn->executeReader(sql, {{"@id", id}});
@@ -46,11 +47,12 @@ namespace nldb {
         }
     }
 
-    bool RepositoryCollection::exists(int id) {
+    bool RepositoryCollection::exists(snowflake id) {
         return this->find(id).has_value();
     }
 
-    std::optional<Collection> RepositoryCollection::findByOwner(int ownerID) {
+    std::optional<Collection> RepositoryCollection::findByOwner(
+        snowflake ownerID) {
         const std::string sql =
             "select id, name from collection where owner_id = @owner_id;";
 
@@ -58,13 +60,14 @@ namespace nldb {
 
         std::shared_ptr<IDBRowReader> row;
         if (reader->readRow(row)) {
-            return Collection(row->readInt32(0), row->readString(1));
+            return Collection(row->readInt64(0), row->readString(1));
         } else {
             return std::nullopt;
         }
     }
 
-    std::optional<int> RepositoryCollection::getOwnerId(int collID) {
+    std::optional<snowflake> RepositoryCollection::getOwnerId(
+        snowflake collID) {
         const std::string sql =
             "select owner_id from collection where id = @coll_id;";
 

@@ -20,6 +20,7 @@
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 #include "nldb/Utils/Variant.hpp"
 #include "nldb/nldb_json.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
     using namespace nldb::common;
@@ -41,7 +42,7 @@ namespace nldb {
             // how do i find it?
         } else {
             auto collName = prop.getParentCollName().value();
-            int parentID;
+            snowflake parentID;
 
             if (prop.isParentNameAnExpression()) {
                 // first parse the expression and get the parent coll id
@@ -70,7 +71,7 @@ namespace nldb {
         populateData(data);
 
         // check if doc exists
-        int& docID = data.documentID;
+        snowflake& docID = data.documentID;
         if (!repos->valuesDAO->existsObject(docID)) {
             throw DocumentNotFound("id: " + std::to_string(docID));
         }
@@ -79,6 +80,8 @@ namespace nldb {
         auto& from = *data.from.begin();
 
         updateDocumentRecursive(docID, from, data.object);
+
+        repos->buffered->pushPendingData();
     }
 
     void QueryRunner::insert(QueryPlannerContextInsert&& data) {
@@ -105,7 +108,7 @@ namespace nldb {
             insertDocumentRecursive(data.documents, from.getName());
         }
 
-        repos->valuesDAO->pushPendingData();
+        repos->buffered->pushPendingData();
     }
 
     void QueryRunner::remove(QueryPlannerContextRemove&& data) {
@@ -115,9 +118,9 @@ namespace nldb {
     }
 
     auto GetCollIdOrCreateIt(const std::string& collName, Repositories* repos,
-                             std::optional<int> pRootPropID) {
-        int newCollId = -1;
-        int rootPropID = pRootPropID.value_or(-1);
+                             std::optional<snowflake> pRootPropID) {
+        snowflake newCollId = -1;
+        snowflake rootPropID = pRootPropID.value_or(-1);
 
         if (auto val = repos->repositoryCollection->find(collName)) {
             newCollId = val->getId();
@@ -132,12 +135,13 @@ namespace nldb {
             newCollId = repos->repositoryCollection->add(collName, rootPropID);
         }
 
-        return std::array<int, 2> {newCollId, rootPropID};
+        return std::array<snowflake, 2> {newCollId, rootPropID};
     }
 
     void QueryRunner::insertDocumentRecursive(
         json& doc, const std::string& collName,
-        std::optional<snowflake> parentObjID, std::optional<int> pRootPropID) {
+        std::optional<snowflake> parentObjID,
+        std::optional<snowflake> pRootPropID) {
         /**
          * rootPropID explanation: imagine we are inserting into persona the
          * object {name: "a", contact: {phone: 123}}, here we iterate
@@ -155,14 +159,13 @@ namespace nldb {
             GetCollIdOrCreateIt(collName, repos.get(), pRootPropID);
 
         //  - Create document/object
-        snowflake objID = parentObjID
-                              ?  //
-                              repos->valuesDAO->deferAddObject(
-                                  rootPropID, parentObjID.value())
-                              : repos->valuesDAO->deferAddObject(rootPropID);
+        snowflake objID =
+            parentObjID ?  //
+                repos->valuesDAO->addObject(rootPropID, parentObjID.value())
+                        : repos->valuesDAO->addObject(rootPropID);
 
         for (auto& [propertyName, value] : doc.items()) {
-            int propID = -1;
+            snowflake propID = -1;
             PropertyType type = JsonTypeToPropertyType((int)value.type());
 
             // skip null values, because if we set it to null then the cannot
@@ -194,8 +197,8 @@ namespace nldb {
                     value, getSubCollectionName(collName, propertyName), objID,
                     propID);
             } else {
-                repos->valuesDAO->deferAddStringLike(propID, objID, type,
-                                                     ValueToString(value));
+                repos->valuesDAO->addStringLike(propID, objID, type,
+                                                ValueToString(value));
             }
         }
     }
@@ -212,7 +215,7 @@ namespace nldb {
             // maybe we should delete the value?
             if (type == PropertyType::_NULL) continue;
 
-            int propID;
+            snowflake propID;
 
             if (found.has_value()) {
                 if (found->getType() != type) {
@@ -266,8 +269,7 @@ namespace nldb {
                     // if we find it, we will extend it with more properties
 
                     // add a new document/object
-                    auto childObjID =
-                        repos->valuesDAO->deferAddObject(p, objID);
+                    auto childObjID = repos->valuesDAO->addObject(p, objID);
 
                     // add the new properties/values and update the existing
                     updateDocumentRecursive(childObjID,
@@ -278,10 +280,10 @@ namespace nldb {
         }
     }
 
-    int QueryRunner::getLastCollectionIdFromExpression(
+    snowflake QueryRunner::getLastCollectionIdFromExpression(
         const std::string& expr) {
         unsigned long last_pos = 0;
-        int id {-1};
+        snowflake id {-1};
         std::string name;
         auto len = expr.length();
 
@@ -308,7 +310,7 @@ namespace nldb {
                 // iteration is not the first, we cannot find the collection by
                 // its name but we can do it by first finding the parent node (a
                 // property) and then the collection owned by this node.
-                int parentPropId {-1};
+                snowflake parentPropId {-1};
                 auto propFound = repos->repositoryProperty->find(id, name);
 
                 if (propFound)

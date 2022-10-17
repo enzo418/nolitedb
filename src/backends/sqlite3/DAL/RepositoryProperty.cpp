@@ -6,7 +6,7 @@ namespace nldb {
     RepositoryProperty::RepositoryProperty(IDB* connection)
         : conn(connection) {}
 
-    int RepositoryProperty::add(const std::string& name) {
+    snowflake RepositoryProperty::add(const std::string& name) {
         const std::string sql =
             "insert into property (name, type) values (@name, @type);";
 
@@ -15,8 +15,9 @@ namespace nldb {
         return conn->getLastInsertedRowId();
     }
 
-    int RepositoryProperty::add(const std::string& name, int collectionID,
-                                PropertyType type) {
+    snowflake RepositoryProperty::add(const std::string& name,
+                                      snowflake collectionID,
+                                      PropertyType type) {
         const std::string sql =
             "insert into property (coll_id, name, type) values (@colid, @name, "
             "@type);";
@@ -29,7 +30,7 @@ namespace nldb {
     }
 
     std::optional<Property> RepositoryProperty::find(
-        int collectionID, const std::string& propName) {
+        snowflake collectionID, const std::string& propName) {
         if (propName == common::internal_id_string)
             return Property(-1, "_id", PropertyType::ID, collectionID);
 
@@ -40,19 +41,19 @@ namespace nldb {
 
         std::shared_ptr<IDBRowReader> row;
         if (reader->readRow(row)) {
-            return Property(row->readInt32(0), propName,
+            return Property(row->readInt64(0), propName,
                             (PropertyType)row->readInt32(1), collectionID);
         } else {
             return std::nullopt;
         }
     }
 
-    bool RepositoryProperty::exists(int collectionID,
+    bool RepositoryProperty::exists(snowflake collectionID,
                                     const std::string& propName) {
         return this->find(collectionID, propName).has_value();
     }
 
-    std::vector<Property> RepositoryProperty::find(int collectionId) {
+    std::vector<Property> RepositoryProperty::find(snowflake collectionId) {
         const std::string sql =
             "select id, name, type from property where coll_id = @id;";
 

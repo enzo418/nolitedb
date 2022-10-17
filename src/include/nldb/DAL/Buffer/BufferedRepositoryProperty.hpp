@@ -5,14 +5,18 @@
 #include <vector>
 
 #include "nldb/Common.hpp"
+#include "nldb/DAL/BufferData.hpp"
 #include "nldb/DAL/IRepositoryProperty.hpp"
 #include "nldb/DB/IDB.hpp"
 #include "nldb/Property/Property.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
-    class RepositoryProperty : public IRepositoryProperty {
+    class BufferedRepositoryProperty : public IRepositoryProperty {
        public:
-        RepositoryProperty(IDB* connection);
+        BufferedRepositoryProperty(
+            IDB* connection, std::unique_ptr<IRepositoryProperty> repo,
+            const std::shared_ptr<BufferData>& bufferData);
 
        public:
         snowflake add(const std::string& name) override;
@@ -26,5 +30,7 @@ namespace nldb {
 
        private:
         IDB* conn;
+        std::unique_ptr<IRepositoryProperty> repo;
+        std::shared_ptr<BufferData> bufferData;
     };
 }  // namespace nldb

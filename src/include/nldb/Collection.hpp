@@ -6,6 +6,7 @@
 
 #include "nldb/Common.hpp"
 #include "nldb/Object.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
 
@@ -36,10 +37,10 @@ namespace nldb {
     class Collection {
        public:
         Collection(const std::string& name);
-        Collection(int id, const std::string& name);
+        Collection(snowflake id, const std::string& name);
 
        public:
-        int getId() const;
+        snowflake getId() const;
         std::string getName() const;
 
        public:
@@ -85,7 +86,7 @@ namespace nldb {
         }
 
        protected:
-        int id;
+        snowflake id;
         std::string name;
         std::optional<std::string> alias;
     };

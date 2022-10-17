@@ -9,6 +9,7 @@
 #include "nldb/DB/IDBQueryReader.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
+#include "nldb/typedef.hpp"
 
 #define SQL3_EXEC_ERR_HNDL(db, SQL_STR, ERROR_MSG)  \
     char* err = 0;                                  \
@@ -22,6 +23,8 @@
 namespace nldb {
 
     bool DBSL3::open(const std::string& path) {
+        NLDB_INFO("OPENING DATABASE: {}", path);
+
         bool fileExists = std::filesystem::exists(path);
 
         int rc = sqlite3_open(path.c_str(), &this->db);
@@ -82,6 +85,9 @@ namespace nldb {
                     sqlite3_bind_text(stmt, idx,
                                       std::get<std::string>(it.second).c_str(),
                                       -1, SQLITE_STATIC);
+                } else if (std::holds_alternative<snowflake>(it.second)) {
+                    sqlite3_bind_int64(stmt, idx,
+                                       std::get<snowflake>(it.second));
                 } else {
                     // variant protects against this but anyway... in case we
                     // change it
@@ -133,13 +139,13 @@ namespace nldb {
         }
     }
 
-    std::optional<int> DBSL3::executeAndGetFirstInt(const std::string& query,
-                                                    const Paramsbind& params) {
+    std::optional<snowflake> DBSL3::executeAndGetFirstInt(
+        const std::string& query, const Paramsbind& params) {
         auto res = this->executeReader(query, params);
         std::shared_ptr<IDBRowReader> row;
         int first {-1};
         while (res->readRow(row)) {
-            return row->readInt32(0);
+            return row->readInt64(0);
         }
 
         return std::nullopt;
@@ -149,7 +155,9 @@ namespace nldb {
         return this->executeAndGetFirstInt("SELECT changes();", {});
     }
 
-    int DBSL3::getLastInsertedRowId() { return sqlite3_last_insert_rowid(db); }
+    snowflake DBSL3::getLastInsertedRowId() {
+        return sqlite3_last_insert_rowid(db);
+    }
 
     void DBSL3::throwLastError() {
         throw std::runtime_error(sqlite3_errmsg(this->db));

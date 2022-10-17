@@ -20,7 +20,7 @@ namespace nldb {
          * @param rootPropID is the owner of collection with id =
          * `rootCollectionID`
          */
-        QueryRunnerCtx(int rootCollectionID, int rootPropID,
+        QueryRunnerCtx(snowflake rootCollectionID, snowflake rootPropID,
                        const std::string& doc_alias);
 
        public:
@@ -32,26 +32,27 @@ namespace nldb {
 
         void set(Object& composed);
 
-        int getRootCollId();
-        int getRootPropId();
+        snowflake getRootCollId();
+        snowflake getRootPropId();
 
        private:
         // {prop_id, prop_coll_id} -> alias
         // this pair ^ is needed since properties of type ID doesn't have and id
         // because they are not really stored as properties in the database.
-        std::map<std::pair<int, int>, std::string> props_aliases;
+        std::map<std::pair<snowflake, snowflake>, std::string> props_aliases;
 
         // {prop_id, prop_coll_id} -> alias.value
-        std::map<std::pair<int, int>, std::string> props_value_aliases;
-        std::map<int, std::string> colls_aliases;
+        std::map<std::pair<snowflake, snowflake>, std::string>
+            props_value_aliases;
+        std::map<snowflake, std::string> colls_aliases;
 
        private:
         std::string generateAlias(const Property& prop);
         std::string generateAlias(const AggregatedProperty& agProp);
         std::string generateValueExpression(const Property& prop);
 
-        int rootCollectionID;
-        int rootPropId;
+        snowflake rootCollectionID;
+        snowflake rootPropId;
         std::string docAlias;
     };
 }  // namespace nldb

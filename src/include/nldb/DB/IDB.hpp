@@ -5,8 +5,8 @@
 #include <string>
 
 #include "ParameterBinder.hpp"
-#include "nldb/DAL/Repositories.hpp"
 #include "nldb/DB/IDBQueryReader.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
     class IDB {
@@ -67,17 +67,17 @@ namespace nldb {
          * Given for convenience since is a common task to do.
          * @param query
          * @param params same as above
-         * @return std::optional<int>
+         * @return std::optional<snowflake>
          */
-        virtual std::optional<int> executeAndGetFirstInt(
+        virtual std::optional<snowflake> executeAndGetFirstInt(
             const std::string& query, const Paramsbind& params) = 0;
 
         /**
          * @brief Get the Last Inserted Row Id.
          *
-         * @return int
+         * @return snowflake id
          */
-        virtual int getLastInsertedRowId() = 0;
+        virtual snowflake getLastInsertedRowId() = 0;
 
         /**
          * @brief Get the number of rows affected by the last query.

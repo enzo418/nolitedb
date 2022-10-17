@@ -173,7 +173,7 @@ int main() {
 
     DBSL3 db;
 
-    if (!db.open(/*"./tests.db"*/ ":memory:")) {
+    if (!db.open("./tests.db" /*":memory:"*/)) {
         std::cerr << "Could not open the database \n";
         db.throwLastError();
     }

@@ -3,6 +3,8 @@
 #include <string>
 #include <variant>
 
+#include "nldb/typedef.hpp"
+
 namespace nldb {
     enum PropertyType {
         ID,
@@ -33,14 +35,14 @@ namespace nldb {
         Property(const std::string& name, std::optional<std::string> collName);
 
         // to use while running the query
-        Property(int id, const std::string& name, PropertyType type,
-                 int collID);
+        Property(snowflake id, const std::string& name, PropertyType type,
+                 snowflake collID);
 
        public:  // getters
         std::string getName() const;
         PropertyType getType() const;
-        int getId() const;
-        int getCollectionId() const;
+        snowflake getId() const;
+        snowflake getCollectionId() const;
 
        public:
         /**
@@ -91,7 +93,7 @@ namespace nldb {
 
         std::string name;
         PropertyType type;
-        int id;
-        int collectionId;
+        snowflake id;
+        snowflake collectionId;
     };
 }  // namespace nldb

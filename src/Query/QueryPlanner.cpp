@@ -11,7 +11,7 @@ namespace nldb {
         ctx.queryRunner->insert(std::move(ctx));
     }
 
-    void QueryPlanner::update(int docId, json newValue) {
+    void QueryPlanner::update(snowflake docId, json newValue) {
         QueryPlannerContextUpdate ctx(std::move(this->context));
         ctx.documentID = docId;
         ctx.object = newValue;
@@ -19,7 +19,7 @@ namespace nldb {
         ctx.queryRunner->update(std::move(ctx));
     }
 
-    void QueryPlanner::remove(int docId) {
+    void QueryPlanner::remove(snowflake docId) {
         QueryPlannerContextRemove ctx(std::move(this->context));
         ctx.documentID = docId;
 

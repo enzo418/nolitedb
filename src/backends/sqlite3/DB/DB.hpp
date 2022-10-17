@@ -22,10 +22,10 @@ namespace nldb {
 
         void rollback() override;
 
-        std::optional<int> executeAndGetFirstInt(
+        std::optional<snowflake> executeAndGetFirstInt(
             const std::string& query, const Paramsbind& params) override;
 
-        int getLastInsertedRowId() override;
+        snowflake getLastInsertedRowId() override;
 
         std::optional<int> getChangesCount() override;
 

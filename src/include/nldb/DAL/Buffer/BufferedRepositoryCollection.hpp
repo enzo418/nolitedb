@@ -1,14 +1,21 @@
+#pragma once
+
+#include <memory>
+
 #include "lrucache11/LRUCache11.hpp"
 #include "nldb/Collection.hpp"
+#include "nldb/DAL/BufferData.hpp"
 #include "nldb/DAL/IRepositoryCollection.hpp"
 #include "nldb/DB/IDB.hpp"
+#include "nldb/SnowflakeGenerator.hpp"
 #include "nldb/Utils/Hash.hpp"
 
 namespace nldb {
-    class CachedRepositoryCollection : public IRepositoryCollection {
+    class BufferedRepositoryCollection : public IRepositoryCollection {
        public:
-        CachedRepositoryCollection(IDB* connection,
-                                   std::unique_ptr<IRepositoryCollection> repo);
+        BufferedRepositoryCollection(
+            IDB* connection, std::unique_ptr<IRepositoryCollection> repo,
+            const std::shared_ptr<BufferData>& bufferData);
 
        public:
         snowflake add(const std::string& name, snowflake ownerID) override;
@@ -22,9 +29,6 @@ namespace nldb {
        private:
         IDB* conn;
         std::unique_ptr<IRepositoryCollection> repo;
-        lru11::Cache<std::pair<snowflake, std::string>, Collection, pairhash>
-            cache_find;
-        lru11::Cache<snowflake, Collection> cache_by_owner;
-        lru11::Cache<snowflake, snowflake> cache_owner_id;
+        std::shared_ptr<BufferData> bufferData;
     };
 }  // namespace nldb

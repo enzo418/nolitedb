@@ -5,16 +5,18 @@
 #include <vector>
 
 #include "nldb/Property/Property.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
     class IRepositoryProperty {
        public:
-        virtual int add(const std::string& name) = 0;
-        virtual int add(const std::string& name, int collectionID,
-                        PropertyType type) = 0;
-        virtual std::optional<Property> find(int collectionID,
+        virtual snowflake add(const std::string& name) = 0;
+        virtual snowflake add(const std::string& name, snowflake collectionID,
+                              PropertyType type) = 0;
+        virtual std::optional<Property> find(snowflake collectionID,
                                              const std::string& propName) = 0;
-        virtual bool exists(int collectionID, const std::string& propName) = 0;
-        virtual std::vector<Property> find(int collectionId) = 0;
+        virtual bool exists(snowflake collectionID,
+                            const std::string& propName) = 0;
+        virtual std::vector<Property> find(snowflake collectionId) = 0;
     };
 }  // namespace nldb

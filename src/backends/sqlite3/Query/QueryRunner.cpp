@@ -227,7 +227,7 @@ namespace nldb {
      * @param ids list of ids used.
      */
     void addFromClause(std::stringstream& sql, const Property& prop,
-                       std::vector<int>& ids, QueryRunnerCtx& ctx,
+                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx,
                        std::string_view docAlias = doc_alias) {
         if (!IN_VEC(ids, prop.getId()) && prop.getType() != PropertyType::ID) {
             auto& tables = definitions::tables::getPropertyTypesTable();
@@ -246,7 +246,7 @@ namespace nldb {
     }
 
     void addFromClause(std::stringstream& sql, Object& composed,
-                       std::vector<int>& ids, QueryRunnerCtx& ctx,
+                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx,
                        std::string_view docAlias = doc_alias) {
         ctx.set(composed);
         addFromClause(sql, composed.getProperty(), ids, ctx, docAlias);
@@ -270,7 +270,7 @@ namespace nldb {
 
     void addFromClause(std::stringstream& sql,
                        std::forward_list<SelectableProperty>& props,
-                       std::vector<int>& ids, QueryRunnerCtx& ctx) {
+                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
         auto cb = overloaded {
             [&sql, &ctx, &ids](const Property& prop) {
                 addFromClause(sql, prop, ids, ctx);
@@ -289,7 +289,7 @@ namespace nldb {
     }
 
     void addFromClause(std::stringstream& sql, std::vector<Property>& props,
-                       std::vector<int>& ids, QueryRunnerCtx& ctx) {
+                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
         for (auto& p : props) {
             addFromClause(sql, p, ids, ctx);
         }
@@ -297,7 +297,7 @@ namespace nldb {
 
     void addFromClause(std::stringstream& sql,
                        std::vector<SortedProperty>& props,
-                       std::vector<int>& ids, QueryRunnerCtx& ctx) {
+                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
         for (auto& p : props) {
             addFromClause(sql, p.property, ids, ctx);
         }
@@ -305,7 +305,7 @@ namespace nldb {
 
     void addFromClause(std::stringstream& sql,
                        PropertyExpressionOperand const& prop,
-                       std::vector<int>& ids, QueryRunnerCtx& ctx) {
+                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
         auto cb = overloaded {
             [&sql, &ctx, &ids](LogicConstValue const& prop) {
                 if (std::holds_alternative<Property>(prop)) {
@@ -324,7 +324,7 @@ namespace nldb {
     }
 
     void addFromClause(std::stringstream& sql, PropertyExpression& props,
-                       std::vector<int>& ids, QueryRunnerCtx& ctx) {
+                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
         addFromClause(sql, props.left, ids, ctx);
         addFromClause(sql, props.right, ids, ctx);
     }
@@ -335,7 +335,7 @@ namespace nldb {
         sql << " from 'object' " << doc_alias << "\n";
 
         // add all properties that appear in the data
-        std::vector<int> ids;
+        std::vector<snowflake> ids;
         addFromClause(sql, data.select_value, ids, ctx);
         addFromClause(sql, data.groupBy_value, ids, ctx);
         addFromClause(sql, data.sortBy_value, ids, ctx);
@@ -464,7 +464,7 @@ namespace nldb {
                 out[prop.getName()] = row->readString(i);
                 break;
             case PropertyType::ID:
-                out["_id"] = row->readInt32(i);
+                out["_id"] = row->readInt64(i);
                 break;
             case PropertyType::ARRAY:
                 out[prop.getName()] = json::parse(row->readString(i));

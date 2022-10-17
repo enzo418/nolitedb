@@ -5,15 +5,16 @@
 namespace nldb {
     CachedRepositoryProperty::CachedRepositoryProperty(
         IDB* connection, std::unique_ptr<IRepositoryProperty> pRepo)
-        : conn(connection), repo(std::move(pRepo)), cache(150, 10) {}
+        : conn(connection), repo(std::move(pRepo)), cache(300, 200) {}
 
-    int CachedRepositoryProperty::add(const std::string& name) {
+    snowflake CachedRepositoryProperty::add(const std::string& name) {
         return repo->add(name);
     }
 
-    int CachedRepositoryProperty::add(const std::string& name, int collectionID,
-                                      PropertyType type) {
-        int id = repo->add(name, collectionID, type);
+    snowflake CachedRepositoryProperty::add(const std::string& name,
+                                            snowflake collectionID,
+                                            PropertyType type) {
+        snowflake id = repo->add(name, collectionID, type);
 
         cache.insert({collectionID, name},
                      Property(id, name, type, collectionID));
@@ -22,7 +23,7 @@ namespace nldb {
     }
 
     std::optional<Property> CachedRepositoryProperty::find(
-        int collectionID, const std::string& propName) {
+        snowflake collectionID, const std::string& propName) {
         if (propName == common::internal_id_string)
             return Property(-1, "_id", PropertyType::ID, collectionID);
 
@@ -37,7 +38,15 @@ namespace nldb {
             if (prop) {
                 NLDB_INFO("-- PROP -- cache MISS AND FOUND");
 
-                cache.insert({collectionID, propName}, prop.value());
+                // we missed a prop and probably will miss more so just cache
+                // all its props.
+
+                auto props = this->find(collectionID);
+
+                for (auto& pFound : props) {
+                    cache.insert({collectionID, pFound.getName()}, pFound);
+                }
+
             } else {
                 NLDB_INFO("-- PROP -- cache MISS [NOT FOUND]");
             }
@@ -46,12 +55,13 @@ namespace nldb {
         }
     }
 
-    bool CachedRepositoryProperty::exists(int collectionID,
+    bool CachedRepositoryProperty::exists(snowflake collectionID,
                                           const std::string& propName) {
         return this->find(collectionID, propName).has_value();
     }
 
-    std::vector<Property> CachedRepositoryProperty::find(int collectionId) {
+    std::vector<Property> CachedRepositoryProperty::find(
+        snowflake collectionId) {
         return repo->find(collectionId);
     }
 }  // namespace nldb

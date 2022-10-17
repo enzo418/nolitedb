@@ -12,10 +12,12 @@ namespace nldb {
         IDB* connection, std::unique_ptr<IRepositoryCollection> pRepo)
         : conn(connection), repo(std::move(pRepo)) {}
 
-    int CachedRepositoryCollection::add(const std::string& name, int ownerID) {
-        int id = repo->add(name, ownerID);
+    snowflake CachedRepositoryCollection::add(const std::string& name,
+                                              snowflake ownerID) {
+        snowflake id = repo->add(name, ownerID);
 
         cache_owner_id.insert(id, ownerID);
+        cache_find.insert({id, name}, Collection(id, name));
 
         return id;
     }
@@ -40,7 +42,7 @@ namespace nldb {
         return find(name).has_value();
     }
 
-    std::optional<Collection> CachedRepositoryCollection::find(int id) {
+    std::optional<Collection> CachedRepositoryCollection::find(snowflake id) {
         auto found =
             cache_find.findCopy([id](auto p) { return p.first.first == id; });
 
@@ -55,12 +57,12 @@ namespace nldb {
         return p;
     }
 
-    bool CachedRepositoryCollection::exists(int id) {
+    bool CachedRepositoryCollection::exists(snowflake id) {
         return this->find(id).has_value();
     }
 
     std::optional<Collection> CachedRepositoryCollection::findByOwner(
-        int ownerID) {
+        snowflake ownerID) {
         if (cache_by_owner.contains(ownerID)) {
             NLDB_INFO("-- BY OWNER -- cache HIT");
             return cache_by_owner.getCopy(ownerID);
@@ -72,7 +74,8 @@ namespace nldb {
         return found;
     }
 
-    std::optional<int> CachedRepositoryCollection::getOwnerId(int collID) {
+    std::optional<snowflake> CachedRepositoryCollection::getOwnerId(
+        snowflake collID) {
         if (cache_owner_id.contains(collID)) {
             NLDB_INFO("-- OWNER ID -- cache HIT");
             return cache_owner_id.getCopy(collID);

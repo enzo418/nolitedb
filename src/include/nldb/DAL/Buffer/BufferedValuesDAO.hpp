@@ -1,6 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
+#include <memory>
 
 #include "nldb/DAL/BufferData.hpp"
 #include "nldb/DAL/IValuesDAO.hpp"
@@ -9,9 +11,10 @@
 
 namespace nldb {
 
-    class ValuesDAO : public IValuesDAO {
+    class BufferedValuesDAO : public IValuesDAO {
        public:
-        ValuesDAO(IDB* connection);
+        BufferedValuesDAO(IDB* connection, std::unique_ptr<IValuesDAO>&& repo,
+                          std::shared_ptr<BufferData> bufferData);
 
        public:
         void addStringLike(snowflake propID, snowflake objID, PropertyType type,
@@ -36,5 +39,7 @@ namespace nldb {
 
        private:
         IDB* conn;
+        std::unique_ptr<IValuesDAO> repo;
+        std::shared_ptr<BufferData> bufferData;
     };
 }  // namespace nldb

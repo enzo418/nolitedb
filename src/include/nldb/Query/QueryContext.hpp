@@ -45,14 +45,14 @@ namespace nldb {
         QueryPlannerContextRemove(QueryPlannerContext&& ctx)
             : QueryPlannerContext(std::move(ctx)) {}
 
-        int documentID;
+        snowflake documentID;
     };
 
     struct QueryPlannerContextUpdate : public QueryPlannerContext {
         QueryPlannerContextUpdate(QueryPlannerContext&& ctx)
             : QueryPlannerContext(std::move(ctx)) {}
 
-        int documentID;
+        snowflake documentID;
         json object;
     };
 

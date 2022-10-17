@@ -6,6 +6,7 @@
 
 #include "nldb/Collection.hpp"
 #include "nldb/Property/Property.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
     class IRepositoryCollection {
@@ -14,14 +15,14 @@ namespace nldb {
          * @brief Adds a collection and return the id
          *
          * @param name
-         * @return int
+         * @return snowflake id
          */
-        virtual int add(const std::string& name, int ownerID) = 0;
+        virtual snowflake add(const std::string& name, snowflake ownerID) = 0;
         virtual std::optional<Collection> find(const std::string& name) = 0;
-        virtual std::optional<Collection> find(int id) = 0;
+        virtual std::optional<Collection> find(snowflake id) = 0;
         virtual bool exists(const std::string& name) = 0;
-        virtual bool exists(int id) = 0;
-        virtual std::optional<Collection> findByOwner(int ownerID) = 0;
-        virtual std::optional<int> getOwnerId(int collID) = 0;
+        virtual bool exists(snowflake id) = 0;
+        virtual std::optional<Collection> findByOwner(snowflake ownerID) = 0;
+        virtual std::optional<snowflake> getOwnerId(snowflake collID) = 0;
     };
 }  // namespace nldb
