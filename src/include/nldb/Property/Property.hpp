@@ -27,6 +27,16 @@ namespace nldb {
     class Property {
        public:
         /**
+         * @brief Construct a new property.
+         * Represents the root property of a root collection.
+         * You can't use this for subcollections as they don't have a
+         * human-readable name.
+         *
+         * @param coll_name
+         */
+        Property(const std::string& coll_name);
+
+        /**
          * @brief Constructor to use while building the query
          *
          * @param name

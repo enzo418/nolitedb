@@ -21,15 +21,23 @@ namespace nldb {
         snowflake add(const std::string& name) override;
         snowflake add(const std::string& name, snowflake collectionID,
                       PropertyType type) override;
+        std::optional<Property> find(snowflake propID) override;
         std::optional<Property> find(snowflake collectionID,
                                      const std::string& propName) override;
         bool exists(snowflake collectionID,
                     const std::string& propName) override;
-        std::vector<Property> find(snowflake collectionId) override;
+        std::vector<Property> findAll(snowflake collectionId) override;
 
        private:
         IDB* conn;
         std::unique_ptr<IRepositoryProperty> repo;
+
+        /**
+         * Stores [collection id, prop name] -> property object
+         *
+         * if a it's a root property (collection id == NULL), then insert it as
+         * [-1, prop name]
+         */
         lru11::Cache<std::pair<snowflake, std::string>, Property, pairhash>
             cache;
     };

@@ -39,7 +39,24 @@ namespace nldb {
 
     void QueryRunner::populateData(Property& prop) {
         if (!prop.getParentCollName().has_value()) {
-            // how do i find it?
+            // its a root property of a root collection, the name of the
+            // property is the same as the root collection name
+            auto coll = repos->repositoryCollection->find(prop.getName());
+            if (!coll) {
+                throw CollectionNotFound(prop.getName());
+            }
+
+            // all the collections have an owner id
+            auto ownerID =
+                repos->repositoryCollection->getOwnerId(coll->getId()).value();
+
+            auto found = repos->repositoryProperty->find(ownerID);
+
+            if (!found) {
+                throw PropertyNotFound(prop.getName());
+            }
+
+            prop = found.value();
         } else {
             auto collName = prop.getParentCollName().value();
             snowflake parentID;

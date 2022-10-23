@@ -30,10 +30,19 @@ namespace nldb {
         return id;
     }
 
+    std::optional<Property> BufferedRepositoryProperty::find(snowflake propID) {
+        if (bufferData) {
+            NLDB_PERF_FAIL("-- BUFFERED PROP -- cache MISBEHAVING");
+            // bufferData->pushPendingData();
+        }
+
+        return this->repo->find(propID);
+    }
+
     std::optional<Property> BufferedRepositoryProperty::find(
         snowflake collectionID, const std::string& propName) {
         if (bufferData) {
-            NLDB_WARN("-- BUFFERED PROP -- cache MISBEHAVING");
+            NLDB_PERF_FAIL("-- BUFFERED PROP -- cache MISBEHAVING");
             // bufferData->pushPendingData();
         }
 
@@ -43,20 +52,20 @@ namespace nldb {
     bool BufferedRepositoryProperty::exists(snowflake collectionID,
                                             const std::string& propName) {
         if (bufferData) {
-            NLDB_WARN("-- BUFFERED PROP -- cache MISBEHAVING");
+            NLDB_PERF_FAIL("-- BUFFERED PROP -- cache MISBEHAVING");
             // bufferData->pushPendingData();
         }
 
         return this->find(collectionID, propName).has_value();
     }
 
-    std::vector<Property> BufferedRepositoryProperty::find(
+    std::vector<Property> BufferedRepositoryProperty::findAll(
         snowflake collectionId) {
         if (bufferData) {
-            NLDB_WARN("-- BUFFERED PROP -- cache MISBEHAVING");
+            NLDB_PERF_FAIL("-- BUFFERED PROP -- cache MISBEHAVING");
             bufferData->pushPendingData();
         }
 
-        return repo->find(collectionId);
+        return repo->findAll(collectionId);
     }
 }  // namespace nldb

@@ -27,7 +27,7 @@ namespace nldb {
     std::optional<Collection> BufferedRepositoryCollection::find(
         const std::string& name) {
         if (bufferData) {
-            NLDB_WARN("-- BUFFERED COLL -- cache MISBEHAVING");
+            NLDB_PERF_FAIL("-- BUFFERED COLL -- cache MISBEHAVING");
             // bufferData->pushPendingData();
         }
 
@@ -40,7 +40,7 @@ namespace nldb {
 
     std::optional<Collection> BufferedRepositoryCollection::find(snowflake id) {
         if (bufferData) {
-            NLDB_WARN("-- BUFFERED COLL -- cache MISBEHAVING");
+            NLDB_PERF_FAIL("-- BUFFERED COLL -- cache MISBEHAVING");
             // bufferData->pushPendingData();
         }
 
@@ -54,7 +54,7 @@ namespace nldb {
     std::optional<Collection> BufferedRepositoryCollection::findByOwner(
         snowflake ownerID) {
         if (bufferData) {
-            NLDB_WARN("-- BUFFERED COLL -- cache MISBEHAVING");
+            NLDB_PERF_FAIL("-- BUFFERED COLL -- cache MISBEHAVING");
             // bufferData->pushPendingData();
         }
 
@@ -64,7 +64,7 @@ namespace nldb {
     std::optional<snowflake> BufferedRepositoryCollection::getOwnerId(
         snowflake collID) {
         if (bufferData) {
-            NLDB_WARN("-- BUFFERED COLL -- cache MISBEHAVING");
+            NLDB_PERF_FAIL("-- BUFFERED COLL -- cache MISBEHAVING");
             // bufferData->pushPendingData();
         }
 

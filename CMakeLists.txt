@@ -2,6 +2,18 @@ cmake_minimum_required(VERSION 3.22)
 
 project(noLiteDb)
 
+# -------------------- CONFIGURATION ------------------- #
+
+# A string used to differentiate between a user id and a document id.
+set(NLDB_INTERNAL_ID "_id")
+
+option(NLDB_SHOW_ID_WARNING "Prints a warning if the requested is not the internal identifier." ON)
+
+# ------------------ CONFIGURATION DEV ----------------- #
+option(NLDB_DEBUG_CACHE_BUFFER "Shows cache hit/miss and buffer warnings" OFF)
+
+
+# ----------------------- SOURCES ---------------------- #
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
 # REMOVE MAIN from sources
@@ -14,6 +26,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++20")
 
 # clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Compilation type
 set(CMAKE_BUILD_TYPE DEBUG)
 
 include(Dependecy.cmake)
@@ -29,8 +43,14 @@ include_directories(src)
 add_library(noLitedb_lb ${SOURCES})
 
 add_dependencies(noLitedb_lb ${DEPENDENCY_LIST})
-
 target_include_directories(noLitedb_lb PUBLIC ${DEPENDENCY_INCLUDE_DIR} ${DEPENDENCY_INCLUDE_LIST})
+target_compile_definitions(noLitedb_lb 
+    PUBLIC 
+    "NLDB_INTERNAL_ID=\"${NLDB_INTERNAL_ID}\"" 
+    NLDB_SHOW_ID_WARNING=${NLDB_SHOW_ID_WARNING}
+    NLDB_DEBUG_CACHE_BUFFER=${NLDB_DEBUG_CACHE_BUFFER}
+)
+
 target_link_libraries(noLitedb_lb PUBLIC ${DEPENDENCY_LIBS})
 target_link_directories(noLitedb_lb PUBLIC ${DEPENDENCY_LIB_DIR})
 

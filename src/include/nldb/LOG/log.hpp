@@ -26,6 +26,15 @@
                       __FILE__, __LINE__);                                  \
         NLDB_BREAK                                                          \
     }
+
+#if NLDB_DEBUG_CACHE_BUFFER
+#define NLDB_PERF_SUCCESS(...) NLDB_INFO(__VA_ARGS__)
+#define NLDB_PERF_FAIL(...) NLDB_WARN(__VA_ARGS__)
+#else
+#define NLDB_PERF_SUCCESS(...) (void)0
+#define NLDB_PERF_FAIL(...) (void)0
+#endif
+
 #else
 #define
 #define NLDB_TRACE(...) (void)0
@@ -35,4 +44,7 @@
 #define NLDB_CRITICAL(...) \
     Observer::LogManager::GetLogger()->critical(__VA_ARGS__)
 #define NLDB_ASSERT(x, msg) (void)0
+
+#define NLDB_PERF_SUCCESS(...) (void)0
+#define NLDB_PERF_FAIL(...) (void)0
 #endif

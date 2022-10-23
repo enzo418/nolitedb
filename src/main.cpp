@@ -37,9 +37,9 @@ void tweetsTest(DBSL3* db) {
                      std::chrono::milliseconds(1)
               << " ms" << std::endl;
 
-    // auto res = collQuery.from("tweets").select().limit(1, 10).execute();
+    auto res = collQuery.from("tweets").select().page(1, 10).execute();
 
-    // std::cout << res << std::endl;
+    std::cout << res << std::endl;
 
     /**
      * Performance, statuses with 100 elements
@@ -159,6 +159,8 @@ void example_notion_object(Query<DBSL3>& collQuery) {
 int main() {
     nldb::LogManager::Initialize();
 
+    std::string test = "hola";
+
     auto md = Property(-1, "mds", PropertyType::STRING, -1);
     auto yy = Property(-1, "yy", PropertyType::STRING, -1);
 
@@ -181,8 +183,8 @@ int main() {
     auto collQuery = Query(&db);
 
     // example_notion_object(collQuery);
-    tweetsTest(&db);
-    return 0;
+    // tweetsTest(&db);
+    // return 0;
 
     json data = json::array({{// obj 1
                               {"name", "enzo"},
@@ -229,6 +231,9 @@ int main() {
     auto [id, name, aliases, contact] = collQuery.collection("persona").get(
         "id"_id, "name", "aliases", "contact{email}"_obj);
 
+    auto [_id, _contact] = collQuery.collection("persona").get(
+        "id"_id, "contact{_id, email, location{_id}}"_obj);
+
     // auto cond = id > 2;
 
     // std::stringstream ot;
@@ -240,9 +245,9 @@ int main() {
 
     now = std::chrono::high_resolution_clock::now();
     auto result = collQuery.from("persona")
-                      .select(id, name, aliases, contact)
-                      .where(id != 9)
-                      .sortBy(contact["email"].desc())
+                      .select()
+                      //   .where(_id != 9)
+                      //   .sortBy(contact["email"].desc())
                       .execute();
 
     /**

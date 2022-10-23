@@ -29,6 +29,21 @@ namespace nldb {
         return conn->getLastInsertedRowId();
     }
 
+    std::optional<Property> RepositoryProperty::find(snowflake propID) {
+        auto reader = conn->executeReader(
+            "SELECT name, coll_id, type FROM property where id = @id;",
+            {{"@id", propID}});
+
+        std::shared_ptr<IDBRowReader> row;
+        if (reader->readRow(row)) {
+            return Property(propID, row->readString(0),
+                            (PropertyType)row->readInt32(2),
+                            row->isNull(1) ? -1 : row->readInt64(1));
+        } else {
+            return std::nullopt;
+        }
+    }
+
     std::optional<Property> RepositoryProperty::find(
         snowflake collectionID, const std::string& propName) {
         if (propName == common::internal_id_string)
@@ -53,7 +68,7 @@ namespace nldb {
         return this->find(collectionID, propName).has_value();
     }
 
-    std::vector<Property> RepositoryProperty::find(snowflake collectionId) {
+    std::vector<Property> RepositoryProperty::findAll(snowflake collectionId) {
         const std::string sql =
             "select id, name, type from property where coll_id = @id;";
 

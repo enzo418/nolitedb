@@ -1,3 +1,4 @@
+
 #include "QueryRunner.hpp"
 
 #include <algorithm>
@@ -104,7 +105,7 @@ namespace nldb {
                                      std::to_string(prop.getId()));
         }
 
-        auto expanded = repos->repositoryProperty->find(subColl->getId());
+        auto expanded = repos->repositoryProperty->findAll(subColl->getId());
 
         Object composed(prop, {}, subColl->getId());
 
@@ -116,13 +117,29 @@ namespace nldb {
         return std::move(composed);
     }
 
+    void expandObjectProperties(Object& composed, auto&,
+                                std::shared_ptr<Repositories> const& repos);
+
     template <typename IT>
     requires std::output_iterator<IT, Object>
     void expandObjectProperties(const Property& prop, IT& it,
                                 std::shared_ptr<Repositories> const& repos) {
         if (prop.getType() == PropertyType::OBJECT) {
             try {
-                Object composed = ObjectPropertyToComposed(prop, repos);
+                auto subColl =
+                    repos->repositoryCollection->findByOwner(prop.getId());
+
+                if (!subColl) {
+                    // return Object::empty();
+                    throw std::runtime_error(
+                        "Couldn't expand property with id " +
+                        std::to_string(prop.getId()));
+                }
+
+                Object composed(prop, {}, subColl->getId());
+
+                expandObjectProperties(composed, it, repos);
+
                 // change the property of type object to a composed property
                 *it = composed;
             } catch (...) {
@@ -130,23 +147,20 @@ namespace nldb {
         }
     }
 
-    void expandObjectProperties(const AggregatedProperty& prop, auto& it,
+    void expandObjectProperties(const AggregatedProperty& prop, auto&,
                                 std::shared_ptr<Repositories> const& repos) {}
 
-    void expandObjectProperties(Object& composed, auto& it_parent,
+    void expandObjectProperties(Object& composed, auto&,
                                 std::shared_ptr<Repositories> const& repos) {
         auto& props = composed.getPropertiesRef();
 
         if (props.empty()) {
-            auto p = composed.getProperty();
+            auto expanded =
+                repos->repositoryProperty->findAll(composed.getCollId());
 
-            auto coll = repos->repositoryCollection->findByOwner(p.getId());
-
-            if (!coll) return;  // leave it empty, we will remove it later
-
-            auto expanded = repos->repositoryProperty->find(coll->getId());
-
-            props.insert(props.begin(), expanded.begin(), expanded.end());
+            props.insert(props.begin(),
+                         std::make_move_iterator(expanded.begin()),
+                         std::make_move_iterator(expanded.end()));
         }
 
         for (auto it = props.begin(); it != props.end(); it++) {
@@ -159,10 +173,10 @@ namespace nldb {
     }
 
     void expandObjectProperties(std::shared_ptr<Repositories> const& repos,
-                                std::forward_list<SelectableProperty>& data) {
-        for (auto it = data.begin(); it != data.end(); it++) {
+                                std::forward_list<SelectableProperty>& select) {
+        for (auto it = select.begin(); it != select.end(); it++) {
             std::visit(
-                [&data, &it, repos](auto& prop) {
+                [&it, repos](auto& prop) {
                     expandObjectProperties(prop, it, repos);
                 },
                 *it);
@@ -444,6 +458,17 @@ namespace nldb {
             << (limit.pageNumber - 1) * limit.elementsPerPage;
     }
 
+    void selectAllOnEmpty(QueryPlannerContextSelect& data,
+                          std::shared_ptr<Repositories> const& repos) {
+        if (data.select_value.empty()) {
+            auto allProps =
+                repos->repositoryProperty->findAll(data.from.begin()->getId());
+
+            data.select_value.assign(std::make_move_iterator(allProps.begin()),
+                                     std::make_move_iterator(allProps.end()));
+        }
+    }
+
     /* ------------------------ READ ------------------------ */
     void read(const Property& prop, std::shared_ptr<IDBRowReader> row, int& i,
               json& out) {
@@ -508,6 +533,8 @@ namespace nldb {
     /* ------------------- EXECUTE SELECT ------------------- */
     json QueryRunnerSQ3::select(QueryPlannerContextSelect&& data) {
         populateData(data);
+
+        selectAllOnEmpty(data, repos);
 
         std::stringstream sql;
 

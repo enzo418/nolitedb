@@ -18,11 +18,12 @@ namespace nldb {
         snowflake add(const std::string& name) override;
         snowflake add(const std::string& name, snowflake collectionID,
                       PropertyType type) override;
+        std::optional<Property> find(snowflake propID) override;
         std::optional<Property> find(snowflake collectionID,
                                      const std::string& propName) override;
         bool exists(snowflake collectionID,
                     const std::string& propName) override;
-        std::vector<Property> find(snowflake collectionId) override;
+        std::vector<Property> findAll(snowflake collectionId) override;
 
        private:
         IDB* conn;

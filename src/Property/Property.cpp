@@ -1,14 +1,30 @@
 #include "nldb/Property/Property.hpp"
 
+#include "nldb/Common.hpp"
 #include "nldb/Property/AggregatedProperty.hpp"
 #include "nldb/Property/PropertyExpression.hpp"
 #include "nldb/Property/SortedProperty.hpp"
 
 namespace nldb {
 
+    Property::Property(const std::string& coll_name)
+        : name(coll_name), type(PropertyType::OBJECT) {}
+
     Property::Property(const std::string& pName,
                        std::optional<std::string> pCollName)
-        : name(pName), collName(pCollName) {}
+        : name(pName), collName(pCollName) {
+        if (pName == common::internal_id_string) {
+            type = PropertyType::ID;
+        }
+#if NLDB_SHOW_ID_WARNING
+        if (pName != common::internal_id_string && pName == "id") {
+            NLDB_WARN(
+                "If you are trying to get the document id, use the "
+                "internal id '{}' instead of 'id'",
+                common::internal_id_string);
+        }
+#endif
+    }
 
     Property::Property(snowflake pId, const std::string& pName,
                        PropertyType pType, snowflake collID)
