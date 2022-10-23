@@ -27,6 +27,7 @@
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 #include "nldb/Utils/Variant.hpp"
 #include "nldb/nldb_json.hpp"
+#include "signal.h"
 
 #define IN_VEC(vec, x) (std::find(vec.begin(), vec.end(), x) != vec.end())
 
@@ -246,10 +247,25 @@ namespace nldb {
         if (!IN_VEC(ids, prop.getId()) && prop.getType() != PropertyType::ID) {
             auto& tables = definitions::tables::getPropertyTypesTable();
 
+            std::string subObjectCondition =
+                "and @doc_alias.id = @row_alias.obj_id";
+
+            if (prop.getType() == PropertyType::OBJECT &&
+                prop.getCollectionId() == NullID) {
+                // it's an independent object, for example an aggregation
+                // between collections so it.
+                subObjectCondition = "";
+            }
+
+            // subObjectCondition is replaced before the rest because the
+            // order of the parambinds is the same as that of the
+            // initialization.
+
             sql << parseSQL(
-                " left join @table as @row_alias on (@doc_alias.id = "
-                "@row_alias.obj_id and @row_alias.prop_id = @prop_id)\n",
-                {{"@table", tables[prop.getType()]},
+                " left join @table as @row_alias on (@row_alias.prop_id = "
+                "@prop_id @obj_condition)\n",
+                {{"@obj_condition", subObjectCondition},
+                 {"@table", tables[prop.getType()]},
                  {"@row_alias", ctx.getAlias(prop)},
                  {"@prop_id", prop.getId()},
                  {"@doc_alias", docAlias}},

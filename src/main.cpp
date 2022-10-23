@@ -37,6 +37,11 @@ void tweetsTest(DBSL3* db) {
                      std::chrono::milliseconds(1)
               << " ms" << std::endl;
 
+    // Select all won't work because this dataset has more than 64 properties,
+    // which is the maximum join limit of sqlite. If you really want to handle
+    // data of this size then you can use something like firebird that enables
+    // up to 256 joins.
+    // https://www.ibphoenix.com/resources/documents/general/doc_323#:~:text=Maximum%20number%20of%20joined%20tables,evaluations%20required%20by%20the%20joins.
     auto res = collQuery.from("tweets").select().page(1, 10).execute();
 
     std::cout << res << std::endl;
@@ -81,9 +86,9 @@ void cars_example(Query<DBSL3>& collQuery) {
 
     collQuery.from("cars").insert(data_cars);
 
-    auto [id, model, maker, year] = cars.get("id", "model", "maker", "year");
+    auto [id, model, maker, year] = cars.get("_id", "model", "maker", "year");
 
-    auto automaker = automakers.group("id", "model", "maker", "year");
+    auto automaker = automakers.group("_id", "name", "founded", "country");
 
     // select id, model, maker and max year from each model
     auto res1 = collQuery.from("cars")
@@ -91,14 +96,14 @@ void cars_example(Query<DBSL3>& collQuery) {
                             automaker)
                     .where(year > 1990 && automaker["name"] == maker)
                     .page(1, 10)
-                    .groupBy(model, maker)
+                    // .groupBy(model, maker)
                     .execute();
 
     std::cout << "\n\nRES1: " << res1.dump(2) << std::endl << std::endl;
 
     // update first car, set year to 2100 and add a new property called
     // price
-    collQuery.from("cars").update(res1[0]["id"],
+    collQuery.from("cars").update(res1[0]["_id"],
                                   {{"year", 2100}, {"price", 50000}});
 
     auto res2 = collQuery.from("cars")
@@ -137,7 +142,7 @@ void example_notion_object(Query<DBSL3>& collQuery) {
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
     auto [id, name, information] =
-        collQuery.collection("persona").get("id"_id, "name", "information"_obj);
+        collQuery.collection("persona").get("_id", "name", "information"_obj);
 
     // auto cond = id > 2;
 
@@ -229,10 +234,10 @@ int main() {
     // collQuery.from("persona").insert({{"name", "enzo"}});
 
     auto [id, name, aliases, contact] = collQuery.collection("persona").get(
-        "id"_id, "name", "aliases", "contact{email}"_obj);
+        "_id", "name", "aliases", "contact{email}"_obj);
 
     auto [_id, _contact] = collQuery.collection("persona").get(
-        "id"_id, "contact{_id, email, location{_id}}"_obj);
+        "_id", "contact{_id, email, location{_id}}"_obj);
 
     // auto cond = id > 2;
 
@@ -294,7 +299,7 @@ int main() {
     //     collQuery.collection("persona").get("name", "contact.address",
     //     "contact.email");
 
-    // cars_example(collQuery);
+    cars_example(collQuery);
 
     nldb::LogManager::Shutdown();
 }

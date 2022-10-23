@@ -24,12 +24,6 @@ namespace nldb {
         return ObjectExpression {s, size};
     }
 
-    // mark a string as _id if you want the document id and not the property id
-    // (which might not exist)
-    constexpr const char* operator"" _id(const char* id, std::size_t size) {
-        return common::internal_id_string;
-    }
-
     /**
      * @brief This class represents the so-called root collections.
      * Giving them functionality to query inner objects and properties.
