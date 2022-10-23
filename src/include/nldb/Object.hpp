@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "nldb/Property/Property.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
 
@@ -38,10 +39,10 @@ namespace nldb {
          * @param collId the id of the collection it represents, `contact`.id
          */
         Object(Property prop, std::vector<SubProperty>&& properties,
-               int collId = -1);
+               snowflake collId = -1);
 
         Object(Property prop, const std::vector<SubProperty>& properties,
-               int collId = -1);
+               snowflake collId = -1);
 
        public:
         Property getProperty() const;  // the property of type object
@@ -49,11 +50,11 @@ namespace nldb {
         std::vector<SubProperty> getProperties() const;
         std::vector<SubProperty>& getPropertiesRef();
 
-        int getCollId() const;
+        snowflake getCollId() const;
 
        public:
         void addProperty(SubProperty prop);
-        void setCollId(int pCollId);
+        void setCollId(snowflake pCollId);
 
        public:
         /**
@@ -80,6 +81,6 @@ namespace nldb {
        private:
         Property prop;
         std::vector<SubProperty> properties;
-        int collID;  // the id of the collection it represents
+        snowflake collID;  // the id of the collection it represents
     };
 }  // namespace nldb
