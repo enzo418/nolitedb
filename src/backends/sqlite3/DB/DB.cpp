@@ -55,7 +55,7 @@ namespace nldb {
 
     std::unique_ptr<IDBQueryReader> DBSL3::executeReader(
         const std::string& query, const Paramsbind& params) {
-        NLDB_TRACE("Executing: {}", query.c_str());
+        // NLDB_TRACE("Executing: {}", query.c_str());
 
         if (query.empty()) {
             NLDB_ERROR("Empty query");
@@ -126,7 +126,7 @@ namespace nldb {
          */
         std::string sql = utils::paramsbind::parseSQL(query, params);
 
-        NLDB_TRACE("Executing: {}", sql);
+        // NLDB_TRACE("Executing: {}", sql);
 
         char* err = 0;
         int rc = sqlite3_exec(db, sql.c_str(), 0, 0, &err);

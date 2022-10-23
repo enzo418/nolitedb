@@ -96,11 +96,23 @@ void print(const Composed& p, int tab = 0) {
     }
 }
 
+void showInp() { std::cout << "\n input >"; }
+
 int main() {
     std::string expr =
         "user{name, last_login_date, data{email, phone, address{city}}}";
 
     Composed res = readProperty(expr);
 
-    print(res, 0);
+    showInp();
+    std::cout << expr << "\n";
+    print(res);
+
+    std::string input;
+    while (true) {
+        showInp();
+        std::cin >> input;
+        Composed r = readProperty(input);
+        print(r);
+    }
 }

@@ -61,6 +61,5 @@ namespace nldb {
     DBQueryReaderSL3::~DBQueryReaderSL3() {
         // Invoking sqlite3_finalize() on a NULL pointer is a harmless no-op.
         sqlite3_finalize(stmt);
-        std::cout << "Query ended. Cleaning up stmt\n";
     }
 }  // namespace nldb

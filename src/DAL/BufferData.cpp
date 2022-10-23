@@ -22,7 +22,7 @@ namespace nldb {
           bufferProperty(bufferSize<BufferValueProperty>()) {};
 
     void BufferData::pushPendingData() {
-        NLDB_INFO("FLUSHING PENDING DATA");
+        NLDB_PERF_SUCCESS("FLUSHING PENDING DATA");
         lock.lock();  // next push should wait
 
         auto now = std::chrono::high_resolution_clock::now();
@@ -51,10 +51,10 @@ namespace nldb {
             this->pushStringLikeValues();
         }
 
-        std::cout << "buffer insert took "
-                  << (std::chrono::high_resolution_clock::now() - now) /
-                         std::chrono::milliseconds(1)
-                  << " ms" << std::endl;
+        NLDB_PERF_SUCCESS("buffer insert took {} ms",
+                          (std::chrono::high_resolution_clock::now() - now) /
+                              std::chrono::milliseconds(1),
+                          " ms");
 
         lock.unlock();
     }

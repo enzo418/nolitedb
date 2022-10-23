@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.22)
 
 project(noLiteDb)
 
+option(BUILD_EXAMPLES "Build examples" OFF)
+
 # -------------------- CONFIGURATION ------------------- #
 
 # A string used to differentiate between a user id and a document id.
@@ -15,10 +17,6 @@ option(NLDB_DEBUG_CACHE_BUFFER "Shows cache hit/miss and buffer warnings" OFF)
 
 # ----------------------- SOURCES ---------------------- #
 file(GLOB_RECURSE SOURCES src/*.cpp)
-
-# REMOVE MAIN from sources
-# Note: this way we don't need to compile the code again for the tests
-list(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
 # Set std version 
 # Note: I do it this way because otherwise export compile commands doesn't export it
@@ -55,8 +53,19 @@ target_link_libraries(noLitedb_lb PUBLIC ${DEPENDENCY_LIBS})
 target_link_directories(noLitedb_lb PUBLIC ${DEPENDENCY_LIB_DIR})
 
 # ------------------ NOLITE EXECUTABLE ----------------- #
-add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} noLitedb_lb)
+if(BUILD_EXAMPLES OR PROJECT_IS_TOP_LEVEL)
+    file(GLOB nldb_example_files 
+        "examples/*.cpp")
+
+    foreach(filename ${nldb_example_files})
+        STRING(REGEX REPLACE
+        "([/\\][A-Za-z0-9_]+)+[/\\]([A-Za-z0-9_]+)\.c(pp)?"
+        "\\2" nldb_exec_name ${filename}) # get exec output name
+    
+        add_executable(${nldb_exec_name} ${filename})
+        target_link_libraries(${nldb_exec_name} noLitedb_lb "-lz")
+    endforeach()
+endif()
 
 # ------------------------ TESTS ----------------------- #
 add_subdirectory(vendor/googletest)

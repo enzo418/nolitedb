@@ -188,7 +188,6 @@ namespace nldb {
     void addSelectClause(std::stringstream& sql, const Property& prop,
                          QueryRunnerCtx& ctx) {
         sql << ctx.getValueExpression(prop) << " as " << ctx.getAlias(prop);
-        std::cout << sql.str() << "\n\n";
     }
 
     void addSelectClause(std::stringstream& sql,
