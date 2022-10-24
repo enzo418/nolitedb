@@ -88,11 +88,10 @@ int main() {
                     .execute();
 
     std::cout << "\n\nNewest models with automaker details: " << res1.dump(2)
-              << std::endl
               << std::endl;
 
-    // update first car, set year to 2100 and add a new property called
-    // price
+    // update first car, set year to 2100 and add a new
+    // property called price
     query.from("cars").update(res1[0]["_id"],
                               {{"year", 2100}, {"price", 50000}});
 
