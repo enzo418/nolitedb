@@ -118,7 +118,9 @@ namespace nldb {
 
         if (data.documents.is_array()) {
             for (auto& doc : data.documents) {
+#ifdef NLDB_DEBUG_QUERY
                 NLDB_TRACE("INSERTING {}", doc.dump(2));
+#endif
                 insertDocumentRecursive(doc, from.getName());
             }
         } else {

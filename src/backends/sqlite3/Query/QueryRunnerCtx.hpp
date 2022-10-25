@@ -6,6 +6,7 @@
 #include "nldb/DB/IDB.hpp"
 #include "nldb/Object.hpp"
 #include "nldb/Query/QueryRunner.hpp"
+#include "nldb/typedef.hpp"
 
 namespace nldb {
 
@@ -28,12 +29,27 @@ namespace nldb {
 
         std::string_view getAlias(const AggregatedProperty& agProp);
 
-        std::string getValueExpression(const Property& prop);
+        /**
+         * @brief Get the property alias. It depends on the context.
+         *
+         * let isPassThrough = statementCollId == prop.getCollID()
+         * If `isPassThrough` is true, then we already have its value and
+         * therefore returns {prop.name}_{id}, otherwise it returns a statement
+         * to get its value.
+         *
+         * @param prop
+         * @param statementCollId if the current statement collection id
+         * @return std::string
+         */
+        std::string getContextualizedAlias(const Property& prop,
+                                           snowflake statementCollId);
 
         void set(Object& composed);
 
         snowflake getRootCollId();
         snowflake getRootPropId();
+
+        std::string getValueExpression(const Property& prop);
 
        private:
         // {prop_id, prop_coll_id} -> alias

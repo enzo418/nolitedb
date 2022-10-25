@@ -28,6 +28,7 @@ int main() {
 
     DBSL3 db;
 
+    // remove("./tests.db");
     if (!db.open("./tests.db" /*":memory:"*/)) {
         std::cerr << "Could not open the database \n";
         db.throwLastError();
@@ -78,8 +79,8 @@ int main() {
     now = std::chrono::high_resolution_clock::now();
     auto result = collQuery.from("persona")
                       .select()
-                      .where(_id != 9)
-                      .sortBy(contact["email"].desc())
+                      //   .where(_id != 9)
+                      //   .sortBy(contact["email"].desc())
                       .execute();
 
     std::cout << "select took "

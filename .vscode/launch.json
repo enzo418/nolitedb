@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/build/noLiteDb",
+            "program": "${workspaceFolder}/build/cars",
             "args": [],
             "preLaunchTask": "build",
             "cwd": "${workspaceFolder}/build"

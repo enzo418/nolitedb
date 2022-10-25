@@ -27,6 +27,7 @@
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 #include "nldb/Utils/Variant.hpp"
 #include "nldb/nldb_json.hpp"
+#include "nldb/typedef.hpp"
 #include "signal.h"
 
 #define IN_VEC(vec, x) (std::find(vec.begin(), vec.end(), x) != vec.end())
@@ -186,30 +187,63 @@ namespace nldb {
 
     /* -------------------- SELECT CLAUSE ------------------- */
     void addSelectClause(std::stringstream& sql, const Property& prop,
-                         QueryRunnerCtx& ctx) {
-        sql << ctx.getValueExpression(prop) << " as " << ctx.getAlias(prop);
+                         QueryRunnerCtx& ctx, snowflake currentSelectCollId) {
+        // If the condition is false, then we already have its value and
+        // therefore we use its alias {prop.name}_{id}, otherwise it writes a
+        // statement to get its value.
+        if (prop.getCollectionId() == currentSelectCollId) {
+            sql << ctx.getValueExpression(prop) + " as " +
+                       std::string(ctx.getAlias(prop));
+        } else {
+            sql << ctx.getAlias(prop);
+        }
     }
 
     void addSelectClause(std::stringstream& sql,
-                         const AggregatedProperty& agProp,
-                         QueryRunnerCtx& ctx) {
-        sql << parseSQL(
-            "@ag_type(@ag_prop) as @alias",
-            {{"@ag_type", std::string(magic_enum::enum_name(agProp.type))},
-             {"@ag_prop", ctx.getValueExpression(agProp.property)},
-             {"@alias", ctx.getAlias(agProp)}},
-            false);
+                         const AggregatedProperty& agProp, QueryRunnerCtx& ctx,
+                         snowflake currentSelectCollId) {
+        const auto& prop = agProp.property;
+        const auto collID = prop.getCollectionId();
+
+        if (currentSelectCollId == ctx.getRootCollId()) {
+            // we were requested by the first select statement, we need to do
+            // the aggregation.
+
+            std::string alias = collID == currentSelectCollId
+                                    ? ctx.getValueExpression(prop)
+                                    : std::string(ctx.getAlias(prop));
+            sql << parseSQL(
+                "@ag_type(@prop_alias) as @alias",
+                {{"@ag_type", std::string(magic_enum::enum_name(agProp.type))},
+                 {"@prop_alias", alias},
+                 {"@alias", ctx.getAlias(agProp)}},
+                false);
+
+        } else if (collID == currentSelectCollId) {
+            // is not the root select, we need to get its value
+            sql << ctx.getValueExpression(prop) + " as " +
+                       std::string(ctx.getAlias(prop));
+        } else {
+            // is a pass through
+            sql << ctx.getAlias(agProp);
+        }
     }
 
     void addSelectClause(std::stringstream& sql, Object& composed,
-                         QueryRunnerCtx& ctx) {
+                         QueryRunnerCtx& ctx, snowflake currentSelectCollId) {
         ctx.set(composed);
 
         auto& props = composed.getPropertiesRef();
 
         for (int i = 0; i < props.size(); i++) {
-            std::visit([&sql, &ctx](auto& p) { addSelectClause(sql, p, ctx); },
-                       props[i]);
+            // why don't we use the composed.collId?
+            // because we aren't building the select for ourself, we are
+            // building it for `currentSelectCollId`.
+            std::visit(
+                [&sql, &ctx, currentSelectCollId](auto& p) {
+                    addSelectClause(sql, p, ctx, currentSelectCollId);
+                },
+                props[i]);
 
             if (i != props.size() - 1) {
                 sql << ", ";
@@ -223,8 +257,11 @@ namespace nldb {
         sql << "select ";
 
         for (auto it = props.begin(); it != props.end(); it++) {
-            std::visit([&sql, &ctx](auto& p) { addSelectClause(sql, p, ctx); },
-                       *it);
+            std::visit(
+                [&sql, &ctx](auto& p) {
+                    addSelectClause(sql, p, ctx, ctx.getRootCollId());
+                },
+                *it);
 
             if (std::next(it) != props.end()) {
                 sql << ", ";
@@ -246,25 +283,13 @@ namespace nldb {
         if (!IN_VEC(ids, prop.getId()) && prop.getType() != PropertyType::ID) {
             auto& tables = definitions::tables::getPropertyTypesTable();
 
-            std::string subObjectCondition =
-                "and @doc_alias.id = @row_alias.obj_id";
-
-            if (prop.getType() == PropertyType::OBJECT &&
-                prop.getCollectionId() == NullID) {
-                // it's an independent object, for example an aggregation
-                // between collections so it.
-                subObjectCondition = "";
-            }
-
-            // subObjectCondition is replaced before the rest because the
-            // order of the parambinds is the same as that of the
-            // initialization.
+            NLDB_ASSERT(prop.getType() != PropertyType::OBJECT,
+                        "Property should be a value");
 
             sql << parseSQL(
                 " left join @table as @row_alias on (@row_alias.prop_id = "
-                "@prop_id @obj_condition)\n",
-                {{"@obj_condition", subObjectCondition},
-                 {"@table", tables[prop.getType()]},
+                "@prop_id and @doc_alias.id = @row_alias.obj_id)\n",
+                {{"@table", tables[prop.getType()]},
                  {"@row_alias", ctx.getAlias(prop)},
                  {"@prop_id", prop.getId()},
                  {"@doc_alias", docAlias}},
@@ -278,22 +303,48 @@ namespace nldb {
                        std::vector<snowflake>& ids, QueryRunnerCtx& ctx,
                        std::string_view docAlias = doc_alias) {
         ctx.set(composed);
-        addFromClause(sql, composed.getProperty(), ids, ctx, docAlias);
-
+        auto prop = composed.getProperty();
+        std::string_view alias = ctx.getAlias(prop);
         auto& props = composed.getPropertiesRef();
+        // addFromClause(sql, composed.getProperty(), ids, ctx, docAlias);
 
-        auto composedCB =
-            overloaded {[&sql, &ctx, &ids, &composed](const Property& prop) {
-                            addFromClause(sql, prop, ids, ctx,
-                                          ctx.getAlias(composed.getProperty()));
-                        },
-                        [&sql, &ctx, &ids, &composed](Object& composed2) {
-                            addFromClause(sql, composed2, ids, ctx,
-                                          ctx.getAlias(composed.getProperty()));
-                        }};
+        sql << "left join (select ";
+
+        addSelectClause(sql, composed, ctx, composed.getCollId());
+
+        // select obj_id
+        sql << parseSQL(" @comma @alias.obj_id as 'obj_id' ",
+                        {{"@comma", std::string(props.empty() ? "" : ",")},
+                         {"@alias", alias}},
+                        false);
+
+        // add main from
+        sql << parseSQL(" from 'object' as @alias ", {{"@alias", alias}},
+                        false);
+
+        auto composedCB = overloaded {
+            [&sql, &ctx, &ids, &composed, &alias](const Property& prop) {
+                addFromClause(sql, prop, ids, ctx, alias);
+            },
+            [&sql, &ctx, &ids, &composed, &alias](Object& composed2) {
+                addFromClause(sql, composed2, ids, ctx, alias);
+            }};
 
         for (auto& p : props) {
             std::visit(composedCB, p);
+        }
+
+        sql << parseSQL(" where @alias.prop_id = @prop_id ",
+                        {{"@alias", alias}, {"@prop_id", prop.getId()}}, false);
+
+        // consume obj id
+        if (prop.getCollectionId() == NullID) {
+            // it's a root collection, it doesn't depend on this object.
+            sql << parseSQL(" ) as @obj_alias", {{"@obj_alias", alias}});
+        } else {
+            sql << parseSQL(
+                " ) as @obj_alias on @doc_alias.id = @obj_alias.obj_id ",
+                {{"@obj_alias", alias}, {"@doc_alias", docAlias}}, false);
         }
     }
 
@@ -382,7 +433,7 @@ namespace nldb {
                             QueryRunnerCtx& ctx) {
         auto cbConstVal = overloaded {
             [&sql, &ctx](const Property& prop) {
-                sql << ctx.getValueExpression(prop);
+                sql << ctx.getContextualizedAlias(prop, ctx.getRootCollId());
             },
             [&sql, &ctx](const std::string& str) {
                 sql << encloseQuotesConst(str);
@@ -440,7 +491,7 @@ namespace nldb {
         sql << " GROUP BY ";
 
         for (int i = 0; i < props.size(); i++) {
-            sql << ctx.getValueExpression(props[i]);
+            sql << ctx.getAlias(props[i]);
 
             if (i != props.size() - 1) {
                 sql << ", ";
@@ -457,7 +508,7 @@ namespace nldb {
         sql << " ORDER BY ";
 
         for (int i = 0; i < props.size(); i++) {
-            sql << ctx.getValueExpression(props[i].property) << " "
+            sql << ctx.getAlias(props[i].property) << " "
                 << magic_enum::enum_name(props[i].type);
 
             if (i != props.size() - 1) {
