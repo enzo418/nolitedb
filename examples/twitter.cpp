@@ -46,6 +46,7 @@ int main() {
                      std::chrono::milliseconds(1)
               << " ms" << std::endl;
 
+    now = std::chrono::high_resolution_clock::now();
     // Select all won't work because this dataset has more than 64 properties,
     // which is the maximum join limit of sqlite. If you really want to handle
     // data of this size then you can use something like firebird that enables
@@ -54,6 +55,11 @@ int main() {
     auto res = query.from("tweets").select().page(1, 10).execute();
 
     std::cout << res << std::endl;
+
+    std::cout << "select took "
+              << (std::chrono::high_resolution_clock::now() - now) /
+                     std::chrono::milliseconds(1)
+              << " ms" << std::endl;
 
     nldb::LogManager::Shutdown();
 }
