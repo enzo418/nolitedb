@@ -538,42 +538,41 @@ namespace nldb {
     /* ------------------------ READ ------------------------ */
     void read(const Property& prop, std::shared_ptr<IDBRowReader> row, int& i,
               json& out) {
-        if (row->isNull(i)) {
-            // Should we set the field to null?
-            // jrow[prop.getName()] = nullptr;
-            return;
+        if (!row->isNull(i)) {
+            switch (prop.getType()) {
+                case PropertyType::INTEGER:
+                    out[prop.getName()] = row->readInt64(i);
+                    break;
+                case PropertyType::DOUBLE:
+                    out[prop.getName()] = row->readDouble(i);
+                    break;
+                case PropertyType::STRING:
+                    out[prop.getName()] = row->readString(i);
+                    break;
+                case PropertyType::ID:
+                    out["_id"] = row->readInt64(i);
+                    break;
+                case PropertyType::ARRAY:
+                    out[prop.getName()] = json::parse(row->readString(i));
+                    break;
+                case PropertyType::BOOLEAN:
+                    out[prop.getName()] = row->readInt32(i) == 1 ? true : false;
+                    break;
+                default:
+                    throw std::runtime_error(
+                        "Select properties should not hold a reserved "
+                        "property directly!");
+                    break;
+            }
         }
 
-        switch (prop.getType()) {
-            case PropertyType::INTEGER:
-                out[prop.getName()] = row->readInt64(i);
-                break;
-            case PropertyType::DOUBLE:
-                out[prop.getName()] = row->readDouble(i);
-                break;
-            case PropertyType::STRING:
-                out[prop.getName()] = row->readString(i);
-                break;
-            case PropertyType::ID:
-                out["_id"] = row->readInt64(i);
-                break;
-            case PropertyType::ARRAY:
-                out[prop.getName()] = json::parse(row->readString(i));
-                break;
-            case PropertyType::BOOLEAN:
-                out[prop.getName()] = row->readInt32(i) == 1 ? true : false;
-                break;
-            default:
-                throw std::runtime_error(
-                    "Select properties should not hold a reserved "
-                    "property directly!");
-                break;
-        }
+        i++;
     }
 
     void read(const AggregatedProperty& prop, std::shared_ptr<IDBRowReader> row,
               int& i, json& out) {
         out[prop.alias] = row->readInt64(i);
+        i++;
     }
 
     void read(Object& composed, std::shared_ptr<IDBRowReader> row, int& i,
@@ -585,15 +584,46 @@ namespace nldb {
 
         auto& propsRef = composed.getPropertiesRef();
         for (auto& prop : propsRef) {
-            if (std::holds_alternative<Property>(prop)) {
-                read(std::get<Property>(prop), row, i, temp);
-                i++;
-            } else {
-                read(std::get<Object>(prop), row, i, temp);
-            }
+            std::visit([&row, &i, &temp](auto& t) { read(t, row, i, temp); },
+                       prop);
         }
 
         if (!temp.is_null()) out[name] = std::move(temp);
+    }
+
+    void printSelect(Property& p, int tab = 0) {
+        std::cout << std::string(tab, ' ') << p.getName() << ": " << p.getId()
+                  << std::endl;
+    }
+
+    void printSelect(AggregatedProperty& p, int tab = 0) {
+        std::cout << std::string(tab, ' ') << "["
+                  << std::string(magic_enum::enum_name(p.type)) << "]"
+                  << p.property.getName() << ": " << p.property.getId()
+                  << std::endl;
+    }
+
+    void printSelect(Object& p, int tab = 0) {
+        std::cout << std::string(tab, ' ') << "- " << p.getProperty().getName()
+                  << std::endl;
+
+        auto cb = [&tab](auto& p) { printSelect(p, tab + 2); };
+
+        for (auto& prop : p.getPropertiesRef()) {
+            std::visit(cb, prop);
+        }
+    }
+
+    void printSelect(std::forward_list<SelectableProperty>& list) {
+        auto cb = [](auto& p) { printSelect(p, 2); };
+
+        std::cout << "\nSelect:\n";
+
+        for (auto& st : list) {
+            std::visit(cb, st);
+        }
+
+        std::cout << "\n";
     }
 
     /* ------------------- EXECUTE SELECT ------------------- */
@@ -620,6 +650,10 @@ namespace nldb {
                 .value_or(-1),
             doc_alias);
 
+#ifdef NLDB_DEBUG_QUERY
+        printSelect(data.select_value);
+#endif
+
         addSelectClause(sql, data.select_value, ctx);
         addFromClause(sql, data, ctx);
         addWhereClause(sql, data, ctx);
@@ -644,7 +678,6 @@ namespace nldb {
                 std::visit([&row, &i, &rowValue](
                                auto& val) { read(val, row, i, rowValue); },
                            *it);
-                i++;
             }
 
             if (!rowValue.is_null()) result.push_back(std::move(rowValue));
