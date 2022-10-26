@@ -16,7 +16,9 @@ This is an embedded `c++` document oriented data base with all the CRUD operatio
     - Update by id; add new properties or update existing
     - Delete by id
 
-# Example
+# Examples
+check out all the examples in [here](/examples)
+
 ```c++
 #include "nlohmann/json.hpp"
 #include "dbwrapper/sq3wrapper/DB.hpp"
@@ -26,50 +28,106 @@ using namespace nlohmann;
 int main() {
     DBSL3 db;
 
-    if (!db.open("./tests.db")) {
+    if (!db.open("./cars.db" /*":memory:"*/)) {
         std::cerr << "Could not open the database \n";
         db.throwLastError();
     }
 
-    // create a query object with the `db` connection and the cars collection
-    auto query = QueryFactory::create(&db, "cars");
+    // a query object can be used to execute multiple queries.
+    Query query = Query(&db);
 
-    json cars = {{{"maker", "ford"}, {"model", "focus"}, {"year", 2011}},
-                 {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
-                 {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
+    // {name, founded, country}
+    json data_automaker = {{{"name", "ford"},
+                            {"founded", "June 16, 1903"},
+                            {"country", "United States"}},
+                           // -------------
+                           {{"name", "subaru"},
+                            {"founded", "July 15, 1953"},
+                            {"country", "Japan"}}};
 
-    const int totalChanges = query.insert(cars);
+    // {maker, model, year}
+    json data_cars = {
+        {{"maker", "ford"}, {"model", "focus"}, {"year", 2011}},
+        {{"maker", "ford"}, {"model", "focus"}, {"year", 2015}},
+        {{"maker", "subaru"}, {"model", "impreza"}, {"year", 2003}}};
 
-    auto [id, model, maker, year] =
-        query.prepareProperties("id", "model", "maker", "year");
+    // insert automakers
+    query.from("automaker").insert(data_automaker);
 
-    // get the first 10 newest model with its id, model name and maker name
-    json newestPerModel =
-        query.select(id, model, maker, year.maxAs("year_newest_model"))
-            .where(year > 1990)
-            .page(1, 10)
-            .groupBy(model, maker)
-            .execute();
+    // group all the automaker properties into the `automaker` variable.
+    Collection automakers = query.collection("automaker");
+    auto automaker = automakers.group("_id", "name", "founded", "country");
 
-    std::cout << "newest per model: " << newestPerModel << std::endl;
+    // we can obtain the properties from a collection before inserting any value
+    // in it
+    Collection cars = query.collection("cars");
+    auto [id, model, maker, year] = cars.get("_id", "model", "maker", "year");
 
-    // update first car, set year to 2418 and add a new property called price
-    query.update(res1[0]["id"], {{"year", 2418}, {"price", 50000}});
+    // insert cars data
+    query.from("cars").insert(data_cars);
 
-    // remove element with id 1
-    int totalChangesDel = query.remove(1);
+    // select all the cars with manufacturer details
+    json all = query.from("cars")
+                   .select(id, model, maker, year, automaker)
+                   .where(year > 1990 && automaker["name"] == maker)
+                   .page(1, 10)
+                   .execute();
 
-    // select all cars with all the fields
-    auto finalCars = query.select().execute();
+    std::cout << "\n\nCars with automaker: " << all.dump(2) << std::endl
+              << std::endl;
 
-    std::cout << "cars after operations: " << finalCars << std::endl;    
+    // Output:
+    // [
+    //   {
+    //       "_id": 3495450966444999936,
+    //       "automaker": {
+    //          "_id": 3495450965218165120,
+    //          "country": "United States",
+    //          "founded": "June 16, 1903",
+    //          "name": "ford"
+    //       },
+    //       "maker": "ford",
+    //       "model": "focus",
+    //       "year": 2011
+    //   },
+    //   {
+    //       "_id": 3495450966447097600,
+    //       "automaker": {
+    //          "_id": 3495450965218165120,
+    //          "country": "United States",
+    //          "founded": "June 16, 1903",
+    //          "name": "ford"
+    //       },
+    //       "maker": "ford",
+    //       "model": "focus",
+    //       "year": 2015
+    //   },
+    //   {
+    //       "_id": 3495450966447097728,
+    //       "automaker": {
+    //          "_id": 3495450965220262784,
+    //          "country": "Japan",
+    //          "founded": "July 15, 1953",
+    //          "name": "subaru"
+    //       },
+    //       "maker": "subaru",
+    //       "model": "impreza",
+    //       "year": 2003
+    //   }
+    // ]
 }
 ```
 
-## Limits
+# Limits
 - Up to 64 properties/members/name value pair per object
     
     This limit comes from the [sqlite maximum number of tables in a join](https://www.sqlite.org/limits.html#:~:text=Maximum%20Number%20Of%20Tables%20In%20A%20Join) and since we do a new select subquery for each object.
 
+# Identifiers
+- Ids are 64 bits long integers with the
+    - first 43 bits to store the timestamp in milliseconds
+    - 7 bits for the thread/process id
+    - 14 bits thread element counter
+
 ## *Note*
-You can read more about this project in my [~~devlog~~ 🚧]()
+You can read more about this project, the process of generating identifiers, performance tests and the inner workings  of it in my [~~devlog~~ 🚧]()
