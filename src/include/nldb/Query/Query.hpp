@@ -53,7 +53,7 @@ namespace nldb {
         }
 
         /**
-         * @brief Get a collection from the db based on the name.
+         * @brief Get a collection placeholder.
          *
          * @param name
          * @return Collection

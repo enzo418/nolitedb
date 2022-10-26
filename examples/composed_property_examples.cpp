@@ -1,3 +1,8 @@
+/**
+ * this file shows how the program evaluates a string to obtain only the desired
+ * properties.
+ */
+
 #include <iostream>
 #include <stdexcept>
 #include <string>

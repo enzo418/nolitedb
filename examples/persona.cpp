@@ -34,7 +34,7 @@ int main() {
         db.throwLastError();
     }
 
-    auto collQuery = Query(&db);
+    auto query = Query(&db);
 
     json data = json::array({{// obj 1
                               {"name", "enzo"},
@@ -63,21 +63,22 @@ int main() {
                              }});
 
     auto now = std::chrono::high_resolution_clock::now();
-    collQuery.from("persona").insert(data);
+    query.from("persona").insert(data);
 
     std::cout << "insert took "
               << (std::chrono::high_resolution_clock::now() - now) /
                      std::chrono::milliseconds(1)
               << " ms" << std::endl;
 
-    auto [id, name, aliases, contact] = collQuery.collection("persona").get(
+    auto [id, name, aliases, contact] = query.collection("persona").get(
         "_id", "name", "aliases", "contact{email}"_obj);
 
-    auto [_id, _contact] = collQuery.collection("persona").get(
+    // TODO: Suppress fields with !<field>
+    auto [_id, _contact] = query.collection("persona").get(
         "_id", "contact{_id, email, location{_id}}"_obj);
 
     now = std::chrono::high_resolution_clock::now();
-    auto result = collQuery.from("persona")
+    auto result = query.from("persona")
                       .select()
                       //   .where(_id != 9)
                       //   .sortBy(contact["email"].desc())
@@ -89,6 +90,39 @@ int main() {
               << " ms" << std::endl;
 
     std::cout << result.dump(4);
+
+    /* ------------------ filter out fields ----------------- */
+    // you can pass (!<field>)* to the group query and it will get all the
+    // fields but <field>. We don't select any fields by default, so if you only
+    // want the person name you just .get("name") and then .select(name).
+
+    // get all persons without id and name.
+    Object allButIdName = query.collection("persona").group("!_id", "!name");
+
+    result = query.from("persona")
+                 .select(allButIdName)
+                 //  you can use all the person members in where/sort/groupBy,
+                 //  even if you didn't select them.
+                 .where(allButIdName["name"] != "test")
+                 .execute();
+
+    std::cout << "all but _id, name: " << result.dump(2) << std::endl;
+
+    /* ------- suppress fields in embedded documents ------ */
+    // suppose we want to suppress all the ids from the inner documents and the
+    // phone from contact
+    Object allButIds = query.collection("persona").group(
+        "!_id", "contact{!_id, !phone, location{!_id}}"_obj);
+
+    result = query.from("persona")
+                 .select(allButIds)
+                 .where(allButIds["contact.phone"] != "test" &&
+                        allButIds["name"] != "hola")
+                 .sortBy(allButIds["contact.location._id"].asc())
+                 .execute();
+
+    std::cout << "all but _id and contact phone " << result.dump(2)
+              << std::endl;
 
     nldb::LogManager::Shutdown();
 }

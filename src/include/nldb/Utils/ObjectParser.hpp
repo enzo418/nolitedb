@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <stdexcept>
 
 #include "nldb/CommonConcepts.hpp"
@@ -32,6 +33,76 @@ namespace nldb::utils {
      */
     // Property getPropertyFromExpression(const std::string& expr,
     //                                    const std::string& collName);
+
+    /**
+     * @brief Checks if a string follows the object syntax.
+     * Constexpr function that does the same as readNextPropertyRecursive but is
+     * used to avoid the _obj postfix.
+     *
+     * @tparam IsFirst is first call to this function?
+     * @tparam N char array length
+     * @param start from where to start the test
+     * @return constexpr std::array<size_t, 2> first element is a boolean wether
+     * the read string was valid or not, last element is the last position
+     * checked
+     */
+    template <bool IsFirst, size_t N>
+    constexpr std::array<size_t, 2> isValidObject(const char (&exp)[N],
+                                                  size_t start = 0) {
+        size_t i = start;
+        char c = exp[i];
+
+        while (i < N) {
+            c = exp[i];
+
+            if (c == '{') {
+                ++i;  // skip {
+
+                if (exp[i] == ',' || exp[i] == '}') {
+                    return {false, i};
+                }
+
+                do {
+                    if (exp[i] == ',') i++;    // skip , to read the prop name
+                    while (exp[i] <= 32) i++;  // skip spaces
+
+                    auto result = isValidObject<false>(exp, i);
+                    if (!result[0]) {
+                        return {false, i};
+                    } else {
+                        i = result[1];
+                    }
+
+                } while (exp[i] == ',');
+
+                if (exp[i] == '}') {  // composed ended
+                    i++;
+                    return {true, i};
+                } else {
+                    return {false, i};
+                }
+            } else if (c == '}' || c == ',') {
+                if constexpr (IsFirst) {
+                    // Unexpected character at the root property
+                    return {false, i};
+                }
+
+                // found a } or a , outside a composed, that means that
+                // we are just a property.
+                return {true, i};
+            } else if (c > 32) {
+                i++;
+            } else {
+                return {false, i};
+            }
+        }
+
+        if constexpr (IsFirst) {
+            return {i > 0, i};
+        } else {
+            return {true, i};
+        }
+    }
 
     namespace {
         /**
