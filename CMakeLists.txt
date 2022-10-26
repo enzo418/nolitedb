@@ -14,7 +14,9 @@ option(NLDB_SHOW_ID_WARNING "Prints a warning if the requested is not the intern
 # ------------------ CONFIGURATION DEV ----------------- #
 option(NLDB_DEBUG_CACHE_BUFFER "Shows cache hit/miss and buffer warnings" OFF)
 
-option(NLDB_DEBUG_QUERY "Displays executed queries and human-readable aliases")
+option(NLDB_DEBUG_QUERY "Displays executed queries and human-readable aliases" OFF)
+
+option(NLDB_PROFILE "Profile query execution time." OFF)
 
 # ----------------------- SOURCES ---------------------- #
 file(GLOB_RECURSE SOURCES src/*.cpp)
@@ -49,6 +51,7 @@ foreach(_VAR IN ITEMS
     NLDB_DEBUG_QUERY
     NLDB_DEBUG_CACHE_BUFFER
     NLDB_SHOW_ID_WARNING
+    NLDB_PROFILE
 )
     if(${_VAR})
         target_compile_definitions(noLitedb_lb PUBLIC "${_VAR}")

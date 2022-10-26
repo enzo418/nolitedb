@@ -5,6 +5,7 @@
 
 #include "backends/sqlite3/DAL/Definitions.hpp"
 #include "nldb/LOG/log.hpp"
+#include "nldb/Profiling/Profiler.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 
@@ -14,6 +15,8 @@ namespace nldb {
     BufferDataSQ3::BufferDataSQ3(IDB* db) : BufferData(db) {}
 
     void BufferDataSQ3::pushRootProperties() {
+        NLDB_PROFILE_FUNCTION();
+
         std::stringstream root_prop_sql;
         root_prop_sql << "insert into property (id, name, type) values ";
 
@@ -33,6 +36,8 @@ namespace nldb {
     }
 
     void BufferDataSQ3::pushCollections() {
+        NLDB_PROFILE_FUNCTION();
+
         std::stringstream coll_sql;
         coll_sql << "insert into collection (id, name, owner_id) values ";
 
@@ -51,6 +56,8 @@ namespace nldb {
     }
 
     void BufferDataSQ3::pushProperties() {
+        NLDB_PROFILE_FUNCTION();
+
         std::stringstream prop_sql;
         prop_sql << "insert into property (id, name, type, coll_id) values ";
 
@@ -70,6 +77,8 @@ namespace nldb {
     }
 
     void BufferDataSQ3::pushIndependentObjects() {
+        NLDB_PROFILE_FUNCTION();
+
         auto& tables = tables::getPropertyTypesTable();
 
         // first insert the objects that does not depend on other
@@ -97,6 +106,8 @@ namespace nldb {
     }
 
     void BufferDataSQ3::pushDependentObjects() {
+        NLDB_PROFILE_FUNCTION();
+
         auto& tables = tables::getPropertyTypesTable();
 
         // now that we have inserted the object that does not depend on other
@@ -126,6 +137,8 @@ namespace nldb {
     }
 
     void BufferDataSQ3::pushStringLikeValues() {
+        NLDB_PROFILE_FUNCTION();
+
         auto& tables = tables::getPropertyTypesTable();
 
         std::map<PropertyType, std::stringstream> queries;

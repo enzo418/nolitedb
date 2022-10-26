@@ -18,6 +18,7 @@
 #include "nldb/Exceptions.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Object.hpp"
+#include "nldb/Profiling/Profiler.hpp"
 #include "nldb/Property/AggregatedProperty.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Property/PropertyExpression.hpp"
@@ -43,6 +44,8 @@ namespace nldb {
 
     /* -------------- FILTER OUT EMPTY OBJECTS -------------- */
     void filterOutEmptyObjects(std::forward_list<SelectableProperty>& data) {
+        NLDB_PROFILE_FUNCTION();
+
         auto cb = overloaded {[](Object& composed) {
                                   return composed.getPropertiesRef().empty();
                               },
@@ -176,6 +179,7 @@ namespace nldb {
 
     void expandObjectProperties(std::shared_ptr<Repositories> const& repos,
                                 std::forward_list<SelectableProperty>& select) {
+        NLDB_PROFILE_FUNCTION();
         for (auto it = select.begin(); it != select.end(); it++) {
             std::visit(
                 [&it, repos](auto& prop) {
@@ -254,6 +258,7 @@ namespace nldb {
     void addSelectClause(std::stringstream& sql,
                          std::forward_list<SelectableProperty>& props,
                          QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
         sql << "select ";
 
         for (auto it = props.begin(); it != props.end(); it++) {
@@ -411,6 +416,8 @@ namespace nldb {
 
     void addFromClause(std::stringstream& sql, QueryPlannerContextSelect& data,
                        QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
+
         // main from is document/object
         sql << " from 'object' " << doc_alias << "\n";
 
@@ -470,6 +477,7 @@ namespace nldb {
 
     void addWhereClause(std::stringstream& sql, QueryPlannerContextSelect& data,
                         QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
         sql << " WHERE "
             << parseSQL("@doc.prop_id = @root_prop_id",
                         {{"@doc", std::string(doc_alias)},
@@ -486,6 +494,8 @@ namespace nldb {
     /* ----------------- GROUP BY CLAUSE ---------------- */
     void addGroupByClause(std::stringstream& sql, std::vector<Property>& props,
                           QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
+
         if (props.empty()) return;
 
         sql << " GROUP BY ";
@@ -503,6 +513,8 @@ namespace nldb {
     void addOrderByClause(std::stringstream& sql,
                           std::vector<SortedProperty>& props,
                           QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
+
         if (props.empty()) return;
 
         sql << " ORDER BY ";
@@ -626,64 +638,93 @@ namespace nldb {
         std::cout << "\n";
     }
 
-    /* ------------------- EXECUTE SELECT ------------------- */
-    json QueryRunnerSQ3::select(QueryPlannerContextSelect&& data) {
-        populateData(data);
-
-        selectAllOnEmpty(data, repos);
-
-        std::stringstream sql;
-
-        expandObjectProperties(repos, data.select_value);
-        filterOutEmptyObjects(data.select_value);
-
-        auto rootColl =
-            repos->repositoryCollection->find(data.from.begin()->getName());
-
-        if (!rootColl) {
-            return {};  // the collection doesn't even exists
-        }
-
-        QueryRunnerCtx ctx(
-            rootColl->getId(),
-            repos->repositoryCollection->getOwnerId(rootColl->getId())
-                .value_or(-1),
-            doc_alias);
-
-#ifdef NLDB_DEBUG_QUERY
-        printSelect(data.select_value);
-#endif
-
-        addSelectClause(sql, data.select_value, ctx);
-        addFromClause(sql, data, ctx);
-        addWhereClause(sql, data, ctx);
-        addGroupByClause(sql, data.groupBy_value, ctx);
-        addOrderByClause(sql, data.sortBy_value, ctx);
-        if (data.pagination_value)
-            addPaginationClause(sql, data.pagination_value.value());
-
-        // execute it
-        auto reader = this->connection->executeReader(sql.str(), {});
+    json readQuery(std::stringstream& sql, nldb::IDB* connection,
+                   QueryPlannerContextSelect& data) {
+        NLDB_PROFILE_FUNCTION();
+        std::unique_ptr<nldb::IDBQueryReader> reader;
         std::shared_ptr<IDBRowReader> row;
+
+        {
+            NLDB_PROFILE_SCOPE("execute reader");
+            reader = connection->executeReader(sql.str(), {});
+        }
 
         json result = json::array();
         auto begin = data.select_value.begin();
         auto end = data.select_value.end();
 
-        while (reader->readRow(row)) {
-            json rowValue;
+        while (true) {
+            {
+                NLDB_PROFILE_SCOPE("read row");
+                if (!reader->readRow(row)) break;
+            }
 
-            int i = 0;
-            for (auto it = begin; it != end; it++) {
-                std::visit([&row, &i, &rowValue](
-                               auto& val) { read(val, row, i, rowValue); },
-                           *it);
+            NLDB_PROFILE_SCOPE("into json");
+
+            json rowValue;
+            {
+                int i = 0;
+                for (auto it = begin; it != end; it++) {
+                    std::visit([&row, &i, &rowValue](
+                                   auto& val) { read(val, row, i, rowValue); },
+                               *it);
+                }
             }
 
             if (!rowValue.is_null()) result.push_back(std::move(rowValue));
         }
 
-        // read output and build object
         return result;
+    }
+
+    /* ------------------- EXECUTE SELECT ------------------- */
+    json QueryRunnerSQ3::select(QueryPlannerContextSelect&& data) {
+        NLDB_PROFILE_BEGIN_SESSION("select", "nldb-profile-select.json");
+
+        json res;
+
+        {
+            NLDB_PROFILE_FUNCTION();
+
+            populateData(data);
+
+            selectAllOnEmpty(data, repos);
+
+            std::stringstream sql;
+
+            expandObjectProperties(repos, data.select_value);
+            filterOutEmptyObjects(data.select_value);
+
+            auto rootColl =
+                repos->repositoryCollection->find(data.from.begin()->getName());
+
+            if (!rootColl) {
+                return {};  // the collection doesn't even exists
+            }
+
+            QueryRunnerCtx ctx(
+                rootColl->getId(),
+                repos->repositoryCollection->getOwnerId(rootColl->getId())
+                    .value_or(-1),
+                doc_alias);
+
+#ifdef NLDB_DEBUG_QUERY
+            printSelect(data.select_value);
+#endif
+
+            addSelectClause(sql, data.select_value, ctx);
+            addFromClause(sql, data, ctx);
+            addWhereClause(sql, data, ctx);
+            addGroupByClause(sql, data.groupBy_value, ctx);
+            addOrderByClause(sql, data.sortBy_value, ctx);
+            if (data.pagination_value)
+                addPaginationClause(sql, data.pagination_value.value());
+
+            // execute it
+            res = readQuery(sql, connection, data);
+        }
+
+        NLDB_PROFILE_END_SESSION();
+        return res;
     }
 }  // namespace nldb
