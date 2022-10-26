@@ -18,6 +18,7 @@
 #include "nldb/Exceptions.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Object.hpp"
+#include "nldb/Profiling/Profiler.hpp"
 #include "nldb/Property/AggregatedProperty.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Property/PropertyExpression.hpp"
@@ -27,6 +28,7 @@
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 #include "nldb/Utils/Variant.hpp"
 #include "nldb/nldb_json.hpp"
+#include "nldb/typedef.hpp"
 #include "signal.h"
 
 #define IN_VEC(vec, x) (std::find(vec.begin(), vec.end(), x) != vec.end())
@@ -42,6 +44,8 @@ namespace nldb {
 
     /* -------------- FILTER OUT EMPTY OBJECTS -------------- */
     void filterOutEmptyObjects(std::forward_list<SelectableProperty>& data) {
+        NLDB_PROFILE_FUNCTION();
+
         auto cb = overloaded {[](Object& composed) {
                                   return composed.getPropertiesRef().empty();
                               },
@@ -175,6 +179,7 @@ namespace nldb {
 
     void expandObjectProperties(std::shared_ptr<Repositories> const& repos,
                                 std::forward_list<SelectableProperty>& select) {
+        NLDB_PROFILE_FUNCTION();
         for (auto it = select.begin(); it != select.end(); it++) {
             std::visit(
                 [&it, repos](auto& prop) {
@@ -186,30 +191,63 @@ namespace nldb {
 
     /* -------------------- SELECT CLAUSE ------------------- */
     void addSelectClause(std::stringstream& sql, const Property& prop,
-                         QueryRunnerCtx& ctx) {
-        sql << ctx.getValueExpression(prop) << " as " << ctx.getAlias(prop);
+                         QueryRunnerCtx& ctx, snowflake currentSelectCollId) {
+        // If the condition is false, then we already have its value and
+        // therefore we use its alias {prop.name}_{id}, otherwise it writes a
+        // statement to get its value.
+        if (prop.getCollectionId() == currentSelectCollId) {
+            sql << ctx.getValueExpression(prop) + " as " +
+                       std::string(ctx.getAlias(prop));
+        } else {
+            sql << ctx.getAlias(prop);
+        }
     }
 
     void addSelectClause(std::stringstream& sql,
-                         const AggregatedProperty& agProp,
-                         QueryRunnerCtx& ctx) {
-        sql << parseSQL(
-            "@ag_type(@ag_prop) as @alias",
-            {{"@ag_type", std::string(magic_enum::enum_name(agProp.type))},
-             {"@ag_prop", ctx.getValueExpression(agProp.property)},
-             {"@alias", ctx.getAlias(agProp)}},
-            false);
+                         const AggregatedProperty& agProp, QueryRunnerCtx& ctx,
+                         snowflake currentSelectCollId) {
+        const auto& prop = agProp.property;
+        const auto collID = prop.getCollectionId();
+
+        if (currentSelectCollId == ctx.getRootCollId()) {
+            // we were requested by the first select statement, we need to do
+            // the aggregation.
+
+            std::string alias = collID == currentSelectCollId
+                                    ? ctx.getValueExpression(prop)
+                                    : std::string(ctx.getAlias(prop));
+            sql << parseSQL(
+                "@ag_type(@prop_alias) as @alias",
+                {{"@ag_type", std::string(magic_enum::enum_name(agProp.type))},
+                 {"@prop_alias", alias},
+                 {"@alias", ctx.getAlias(agProp)}},
+                false);
+
+        } else if (collID == currentSelectCollId) {
+            // is not the root select, we need to get its value
+            sql << ctx.getValueExpression(prop) + " as " +
+                       std::string(ctx.getAlias(prop));
+        } else {
+            // is a pass through
+            sql << ctx.getAlias(agProp);
+        }
     }
 
     void addSelectClause(std::stringstream& sql, Object& composed,
-                         QueryRunnerCtx& ctx) {
+                         QueryRunnerCtx& ctx, snowflake currentSelectCollId) {
         ctx.set(composed);
 
         auto& props = composed.getPropertiesRef();
 
         for (int i = 0; i < props.size(); i++) {
-            std::visit([&sql, &ctx](auto& p) { addSelectClause(sql, p, ctx); },
-                       props[i]);
+            // why don't we use the composed.collId?
+            // because we aren't building the select for ourself, we are
+            // building it for `currentSelectCollId`.
+            std::visit(
+                [&sql, &ctx, currentSelectCollId](auto& p) {
+                    addSelectClause(sql, p, ctx, currentSelectCollId);
+                },
+                props[i]);
 
             if (i != props.size() - 1) {
                 sql << ", ";
@@ -220,11 +258,15 @@ namespace nldb {
     void addSelectClause(std::stringstream& sql,
                          std::forward_list<SelectableProperty>& props,
                          QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
         sql << "select ";
 
         for (auto it = props.begin(); it != props.end(); it++) {
-            std::visit([&sql, &ctx](auto& p) { addSelectClause(sql, p, ctx); },
-                       *it);
+            std::visit(
+                [&sql, &ctx](auto& p) {
+                    addSelectClause(sql, p, ctx, ctx.getRootCollId());
+                },
+                *it);
 
             if (std::next(it) != props.end()) {
                 sql << ", ";
@@ -246,25 +288,13 @@ namespace nldb {
         if (!IN_VEC(ids, prop.getId()) && prop.getType() != PropertyType::ID) {
             auto& tables = definitions::tables::getPropertyTypesTable();
 
-            std::string subObjectCondition =
-                "and @doc_alias.id = @row_alias.obj_id";
-
-            if (prop.getType() == PropertyType::OBJECT &&
-                prop.getCollectionId() == NullID) {
-                // it's an independent object, for example an aggregation
-                // between collections so it.
-                subObjectCondition = "";
-            }
-
-            // subObjectCondition is replaced before the rest because the
-            // order of the parambinds is the same as that of the
-            // initialization.
+            NLDB_ASSERT(prop.getType() != PropertyType::OBJECT,
+                        "Property should be a value");
 
             sql << parseSQL(
                 " left join @table as @row_alias on (@row_alias.prop_id = "
-                "@prop_id @obj_condition)\n",
-                {{"@obj_condition", subObjectCondition},
-                 {"@table", tables[prop.getType()]},
+                "@prop_id and @doc_alias.id = @row_alias.obj_id)\n",
+                {{"@table", tables[prop.getType()]},
                  {"@row_alias", ctx.getAlias(prop)},
                  {"@prop_id", prop.getId()},
                  {"@doc_alias", docAlias}},
@@ -278,22 +308,48 @@ namespace nldb {
                        std::vector<snowflake>& ids, QueryRunnerCtx& ctx,
                        std::string_view docAlias = doc_alias) {
         ctx.set(composed);
-        addFromClause(sql, composed.getProperty(), ids, ctx, docAlias);
-
+        auto prop = composed.getProperty();
+        std::string_view alias = ctx.getAlias(prop);
         auto& props = composed.getPropertiesRef();
+        // addFromClause(sql, composed.getProperty(), ids, ctx, docAlias);
 
-        auto composedCB =
-            overloaded {[&sql, &ctx, &ids, &composed](const Property& prop) {
-                            addFromClause(sql, prop, ids, ctx,
-                                          ctx.getAlias(composed.getProperty()));
-                        },
-                        [&sql, &ctx, &ids, &composed](Object& composed2) {
-                            addFromClause(sql, composed2, ids, ctx,
-                                          ctx.getAlias(composed.getProperty()));
-                        }};
+        sql << "left join (select ";
+
+        addSelectClause(sql, composed, ctx, composed.getCollId());
+
+        // select obj_id
+        sql << parseSQL(" @comma @alias.obj_id as 'obj_id' ",
+                        {{"@comma", std::string(props.empty() ? "" : ",")},
+                         {"@alias", alias}},
+                        false);
+
+        // add main from
+        sql << parseSQL(" from 'object' as @alias ", {{"@alias", alias}},
+                        false);
+
+        auto composedCB = overloaded {
+            [&sql, &ctx, &ids, &composed, &alias](const Property& prop) {
+                addFromClause(sql, prop, ids, ctx, alias);
+            },
+            [&sql, &ctx, &ids, &composed, &alias](Object& composed2) {
+                addFromClause(sql, composed2, ids, ctx, alias);
+            }};
 
         for (auto& p : props) {
             std::visit(composedCB, p);
+        }
+
+        sql << parseSQL(" where @alias.prop_id = @prop_id ",
+                        {{"@alias", alias}, {"@prop_id", prop.getId()}}, false);
+
+        // consume obj id
+        if (prop.getCollectionId() == NullID) {
+            // it's a root collection, it doesn't depend on this object.
+            sql << parseSQL(" ) as @obj_alias", {{"@obj_alias", alias}});
+        } else {
+            sql << parseSQL(
+                " ) as @obj_alias on @doc_alias.id = @obj_alias.obj_id ",
+                {{"@obj_alias", alias}, {"@doc_alias", docAlias}}, false);
         }
     }
 
@@ -360,6 +416,8 @@ namespace nldb {
 
     void addFromClause(std::stringstream& sql, QueryPlannerContextSelect& data,
                        QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
+
         // main from is document/object
         sql << " from 'object' " << doc_alias << "\n";
 
@@ -382,7 +440,7 @@ namespace nldb {
                             QueryRunnerCtx& ctx) {
         auto cbConstVal = overloaded {
             [&sql, &ctx](const Property& prop) {
-                sql << ctx.getValueExpression(prop);
+                sql << ctx.getContextualizedAlias(prop, ctx.getRootCollId());
             },
             [&sql, &ctx](const std::string& str) {
                 sql << encloseQuotesConst(str);
@@ -419,6 +477,7 @@ namespace nldb {
 
     void addWhereClause(std::stringstream& sql, QueryPlannerContextSelect& data,
                         QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
         sql << " WHERE "
             << parseSQL("@doc.prop_id = @root_prop_id",
                         {{"@doc", std::string(doc_alias)},
@@ -435,12 +494,14 @@ namespace nldb {
     /* ----------------- GROUP BY CLAUSE ---------------- */
     void addGroupByClause(std::stringstream& sql, std::vector<Property>& props,
                           QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
+
         if (props.empty()) return;
 
         sql << " GROUP BY ";
 
         for (int i = 0; i < props.size(); i++) {
-            sql << ctx.getValueExpression(props[i]);
+            sql << ctx.getAlias(props[i]);
 
             if (i != props.size() - 1) {
                 sql << ", ";
@@ -452,12 +513,14 @@ namespace nldb {
     void addOrderByClause(std::stringstream& sql,
                           std::vector<SortedProperty>& props,
                           QueryRunnerCtx& ctx) {
+        NLDB_PROFILE_FUNCTION();
+
         if (props.empty()) return;
 
         sql << " ORDER BY ";
 
         for (int i = 0; i < props.size(); i++) {
-            sql << ctx.getValueExpression(props[i].property) << " "
+            sql << ctx.getAlias(props[i].property) << " "
                 << magic_enum::enum_name(props[i].type);
 
             if (i != props.size() - 1) {
@@ -487,42 +550,41 @@ namespace nldb {
     /* ------------------------ READ ------------------------ */
     void read(const Property& prop, std::shared_ptr<IDBRowReader> row, int& i,
               json& out) {
-        if (row->isNull(i)) {
-            // Should we set the field to null?
-            // jrow[prop.getName()] = nullptr;
-            return;
+        if (!row->isNull(i)) {
+            switch (prop.getType()) {
+                case PropertyType::INTEGER:
+                    out[prop.getName()] = row->readInt64(i);
+                    break;
+                case PropertyType::DOUBLE:
+                    out[prop.getName()] = row->readDouble(i);
+                    break;
+                case PropertyType::STRING:
+                    out[prop.getName()] = row->readString(i);
+                    break;
+                case PropertyType::ID:
+                    out["_id"] = row->readInt64(i);
+                    break;
+                case PropertyType::ARRAY:
+                    out[prop.getName()] = json::parse(row->readString(i));
+                    break;
+                case PropertyType::BOOLEAN:
+                    out[prop.getName()] = row->readInt32(i) == 1 ? true : false;
+                    break;
+                default:
+                    throw std::runtime_error(
+                        "Select properties should not hold a reserved "
+                        "property directly!");
+                    break;
+            }
         }
 
-        switch (prop.getType()) {
-            case PropertyType::INTEGER:
-                out[prop.getName()] = row->readInt64(i);
-                break;
-            case PropertyType::DOUBLE:
-                out[prop.getName()] = row->readDouble(i);
-                break;
-            case PropertyType::STRING:
-                out[prop.getName()] = row->readString(i);
-                break;
-            case PropertyType::ID:
-                out["_id"] = row->readInt64(i);
-                break;
-            case PropertyType::ARRAY:
-                out[prop.getName()] = json::parse(row->readString(i));
-                break;
-            case PropertyType::BOOLEAN:
-                out[prop.getName()] = row->readInt32(i) == 1 ? true : false;
-                break;
-            default:
-                throw std::runtime_error(
-                    "Select properties should not hold a reserved "
-                    "property directly!");
-                break;
-        }
+        i++;
     }
 
     void read(const AggregatedProperty& prop, std::shared_ptr<IDBRowReader> row,
               int& i, json& out) {
         out[prop.alias] = row->readInt64(i);
+        i++;
     }
 
     void read(Object& composed, std::shared_ptr<IDBRowReader> row, int& i,
@@ -534,72 +596,135 @@ namespace nldb {
 
         auto& propsRef = composed.getPropertiesRef();
         for (auto& prop : propsRef) {
-            if (std::holds_alternative<Property>(prop)) {
-                read(std::get<Property>(prop), row, i, temp);
-                i++;
-            } else {
-                read(std::get<Object>(prop), row, i, temp);
-            }
+            std::visit([&row, &i, &temp](auto& t) { read(t, row, i, temp); },
+                       prop);
         }
 
         if (!temp.is_null()) out[name] = std::move(temp);
     }
 
-    /* ------------------- EXECUTE SELECT ------------------- */
-    json QueryRunnerSQ3::select(QueryPlannerContextSelect&& data) {
-        populateData(data);
+    void printSelect(Property& p, int tab = 0) {
+        std::cout << std::string(tab, ' ') << p.getName() << ": " << p.getId()
+                  << std::endl;
+    }
 
-        selectAllOnEmpty(data, repos);
+    void printSelect(AggregatedProperty& p, int tab = 0) {
+        std::cout << std::string(tab, ' ') << "["
+                  << std::string(magic_enum::enum_name(p.type)) << "]"
+                  << p.property.getName() << ": " << p.property.getId()
+                  << std::endl;
+    }
 
-        std::stringstream sql;
+    void printSelect(Object& p, int tab = 0) {
+        std::cout << std::string(tab, ' ') << "- " << p.getProperty().getName()
+                  << std::endl;
 
-        expandObjectProperties(repos, data.select_value);
-        filterOutEmptyObjects(data.select_value);
+        auto cb = [&tab](auto& p) { printSelect(p, tab + 2); };
 
-        auto rootColl =
-            repos->repositoryCollection->find(data.from.begin()->getName());
+        for (auto& prop : p.getPropertiesRef()) {
+            std::visit(cb, prop);
+        }
+    }
 
-        if (!rootColl) {
-            return {};  // the collection doesn't even exists
+    void printSelect(std::forward_list<SelectableProperty>& list) {
+        auto cb = [](auto& p) { printSelect(p, 2); };
+
+        std::cout << "\nSelect:\n";
+
+        for (auto& st : list) {
+            std::visit(cb, st);
         }
 
-        QueryRunnerCtx ctx(
-            rootColl->getId(),
-            repos->repositoryCollection->getOwnerId(rootColl->getId())
-                .value_or(-1),
-            doc_alias);
+        std::cout << "\n";
+    }
 
-        addSelectClause(sql, data.select_value, ctx);
-        addFromClause(sql, data, ctx);
-        addWhereClause(sql, data, ctx);
-        addGroupByClause(sql, data.groupBy_value, ctx);
-        addOrderByClause(sql, data.sortBy_value, ctx);
-        if (data.pagination_value)
-            addPaginationClause(sql, data.pagination_value.value());
-
-        // execute it
-        auto reader = this->connection->executeReader(sql.str(), {});
+    json readQuery(std::stringstream& sql, nldb::IDB* connection,
+                   QueryPlannerContextSelect& data) {
+        NLDB_PROFILE_FUNCTION();
+        std::unique_ptr<nldb::IDBQueryReader> reader;
         std::shared_ptr<IDBRowReader> row;
+
+        {
+            NLDB_PROFILE_SCOPE("execute reader");
+            reader = connection->executeReader(sql.str(), {});
+        }
 
         json result = json::array();
         auto begin = data.select_value.begin();
         auto end = data.select_value.end();
 
-        while (reader->readRow(row)) {
-            json rowValue;
+        while (true) {
+            {
+                NLDB_PROFILE_SCOPE("read row");
+                if (!reader->readRow(row)) break;
+            }
 
-            int i = 0;
-            for (auto it = begin; it != end; it++) {
-                std::visit([&row, &i, &rowValue](
-                               auto& val) { read(val, row, i, rowValue); },
-                           *it);
-                i++;
+            NLDB_PROFILE_SCOPE("into json");
+
+            json rowValue;
+            {
+                int i = 0;
+                for (auto it = begin; it != end; it++) {
+                    std::visit([&row, &i, &rowValue](
+                                   auto& val) { read(val, row, i, rowValue); },
+                               *it);
+                }
             }
 
             if (!rowValue.is_null()) result.push_back(std::move(rowValue));
         }
 
-        // read output and build object
         return result;
+    }
+
+    /* ------------------- EXECUTE SELECT ------------------- */
+    json QueryRunnerSQ3::select(QueryPlannerContextSelect&& data) {
+        NLDB_PROFILE_BEGIN_SESSION("select", "nldb-profile-select.json");
+
+        json res;
+
+        {
+            NLDB_PROFILE_FUNCTION();
+
+            populateData(data);
+
+            selectAllOnEmpty(data, repos);
+
+            std::stringstream sql;
+
+            expandObjectProperties(repos, data.select_value);
+            filterOutEmptyObjects(data.select_value);
+
+            auto rootColl =
+                repos->repositoryCollection->find(data.from.begin()->getName());
+
+            if (!rootColl) {
+                return {};  // the collection doesn't even exists
+            }
+
+            QueryRunnerCtx ctx(
+                rootColl->getId(),
+                repos->repositoryCollection->getOwnerId(rootColl->getId())
+                    .value_or(-1),
+                doc_alias);
+
+#ifdef NLDB_DEBUG_QUERY
+            printSelect(data.select_value);
+#endif
+
+            addSelectClause(sql, data.select_value, ctx);
+            addFromClause(sql, data, ctx);
+            addWhereClause(sql, data, ctx);
+            addGroupByClause(sql, data.groupBy_value, ctx);
+            addOrderByClause(sql, data.sortBy_value, ctx);
+            if (data.pagination_value)
+                addPaginationClause(sql, data.pagination_value.value());
+
+            // execute it
+            res = readQuery(sql, connection, data);
+        }
+
+        NLDB_PROFILE_END_SESSION();
+        return res;
     }
 }  // namespace nldb

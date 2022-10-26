@@ -14,6 +14,7 @@
 #include "nldb/DAL/Repositories.hpp"
 #include "nldb/Exceptions.hpp"
 #include "nldb/LOG/log.hpp"
+#include "nldb/Profiling/Profiler.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Property/SortedProperty.hpp"
 #include "nldb/Query/QueryContext.hpp"
@@ -85,47 +86,67 @@ namespace nldb {
     }
 
     void QueryRunner::update(QueryPlannerContextUpdate&& data) {
-        populateData(data);
+        NLDB_PROFILE_BEGIN_SESSION("update", "nldb-profile-update.json");
 
-        // check if doc exists
-        snowflake& docID = data.documentID;
-        if (!repos->valuesDAO->existsObject(docID)) {
-            throw DocumentNotFound("id: " + std::to_string(docID));
+        {
+            NLDB_PROFILE_FUNCTION();
+            populateData(data);
+
+            // check if doc exists
+            snowflake& docID = data.documentID;
+            if (!repos->valuesDAO->existsObject(docID)) {
+                throw DocumentNotFound("id: " + std::to_string(docID));
+            }
+
+            // get the collection
+            auto& from = *data.from.begin();
+
+            updateDocumentRecursive(docID, from, data.object);
+
+            repos->buffered->pushPendingData();
         }
 
-        // get the collection
-        auto& from = *data.from.begin();
-
-        updateDocumentRecursive(docID, from, data.object);
-
-        repos->buffered->pushPendingData();
+        NLDB_PROFILE_END_SESSION();
     }
 
     void QueryRunner::insert(QueryPlannerContextInsert&& data) {
-        NLDB_ASSERT(data.from.size() > 0, "missing target collection");
+        NLDB_PROFILE_BEGIN_SESSION("insert", "nldb-profile-insert.json");
 
-        if (data.from.size() > 1) {
-            NLDB_WARN("multiple collections given in an insert clause");
-        }
+        {
+            NLDB_PROFILE_FUNCTION();
 
-        try {
-            populateData(data);
-        } catch (CollectionNotFound& e) {
-            // expected, do nothing
-        }
+            NLDB_ASSERT(data.from.size() > 0, "missing target collection");
 
-        Collection& from = *data.from.begin();
-
-        if (data.documents.is_array()) {
-            for (auto& doc : data.documents) {
-                NLDB_TRACE("INSERTING {}", doc.dump(2));
-                insertDocumentRecursive(doc, from.getName());
+            if (data.from.size() > 1) {
+                NLDB_WARN("multiple collections given in an insert clause");
             }
-        } else {
-            insertDocumentRecursive(data.documents, from.getName());
+
+            try {
+                populateData(data);
+            } catch (CollectionNotFound& e) {
+                // expected, do nothing
+            }
+
+            Collection& from = *data.from.begin();
+
+            if (data.documents.is_array()) {
+                for (auto& doc : data.documents) {
+#ifdef NLDB_DEBUG_QUERY
+                    NLDB_TRACE("INSERTING {}", doc.dump(2));
+#endif
+                    insertDocumentRecursive(doc, from.getName());
+                }
+            } else {
+                insertDocumentRecursive(data.documents, from.getName());
+            }
+
+            {
+                NLDB_PROFILE_SCOPE("Flush data");
+                repos->buffered->pushPendingData();
+            }
         }
 
-        repos->buffered->pushPendingData();
+        NLDB_PROFILE_END_SESSION();
     }
 
     void QueryRunner::remove(QueryPlannerContextRemove&& data) {
@@ -170,6 +191,8 @@ namespace nldb {
          * "contact" property to that function, so it knows the parent
          * prop.
          */
+
+        NLDB_PROFILE_FUNCTION();
 
         //  - Add the collection if missing
         auto [collID, rootPropID] =
@@ -223,6 +246,7 @@ namespace nldb {
     void QueryRunner::updateDocumentRecursive(snowflake objID,
                                               const Collection& collection,
                                               json& object) {
+        NLDB_PROFILE_FUNCTION();
         for (auto& [propName, valueJson] : object.items()) {
             std::optional<Property> found =
                 repos->repositoryProperty->find(collection.getId(), propName);
@@ -391,6 +415,8 @@ namespace nldb {
     }
 
     void QueryRunner::populateData(QueryPlannerContextSelect& data) {
+        NLDB_PROFILE_FUNCTION();
+
         populateData((QueryPlannerContext&)data);
         auto cb = overloaded {
             [this](auto& prop) { populateData(prop); },

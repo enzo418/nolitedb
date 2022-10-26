@@ -1,6 +1,7 @@
 #include "nldb/Property/Property.hpp"
 
 #include "nldb/Common.hpp"
+#include "nldb/LOG/log.hpp"
 #include "nldb/Property/AggregatedProperty.hpp"
 #include "nldb/Property/PropertyExpression.hpp"
 #include "nldb/Property/SortedProperty.hpp"
@@ -16,7 +17,7 @@ namespace nldb {
         if (pName == common::internal_id_string) {
             type = PropertyType::ID;
         }
-#if NLDB_SHOW_ID_WARNING
+#ifdef NLDB_SHOW_ID_WARNING
         if (pName != common::internal_id_string && pName == "id") {
             NLDB_WARN(
                 "If you are trying to get the document id, use the "

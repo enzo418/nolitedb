@@ -12,14 +12,27 @@ namespace nldb {
                                    const std::string& pDocAlias)
         : rootCollectionID(rootCollectionID),
           rootPropId(pRootPropID),
-          docAlias(pDocAlias) {};
+          docAlias(pDocAlias) {
+
+          };
 
     std::string QueryRunnerCtx::generateAlias(const Property& prop) {
-        return utils::paramsbind::encloseQuotesConst(
-            prop.getName() + "_" +
+        return
+#ifdef NLDB_DEBUG_QUERY
+#warning "`NLDB_DEBUG_QUERY` is vulnerable to sql injection"
+            prop.getName() +
+#endif
+            "_" +
             std::to_string(prop.getType() == PropertyType::ID
                                ? prop.getCollectionId()
-                               : prop.getId()));
+                               : prop.getId());
+    }
+
+    std::string QueryRunnerCtx::getContextualizedAlias(
+        const Property& prop, snowflake statementCollId) {
+        bool isPassThrough = prop.getCollectionId() == statementCollId;
+        return isPassThrough ? getValueExpression(prop)
+                             : std::string(getAlias(prop));
     }
 
     std::string QueryRunnerCtx::generateAlias(
@@ -29,9 +42,9 @@ namespace nldb {
     }
 
     std::string QueryRunnerCtx::generateValueExpression(const Property& prop) {
-        if (prop.getType() == PropertyType::ID) {
-            snowflake parentColl = prop.getCollectionId();
+        snowflake parentColl = prop.getCollectionId();
 
+        if (prop.getType() == PropertyType::ID) {
             if (parentColl == rootCollectionID) {
                 return std::string(docAlias) + ".id";
             } else if (this->colls_aliases.contains(parentColl)) {

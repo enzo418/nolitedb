@@ -27,7 +27,7 @@
         NLDB_BREAK                                                          \
     }
 
-#if NLDB_DEBUG_CACHE_BUFFER
+#ifdef NLDB_DEBUG_CACHE_BUFFER
 #define NLDB_PERF_SUCCESS(...) NLDB_INFO(__VA_ARGS__)
 #define NLDB_PERF_FAIL(...) NLDB_WARN(__VA_ARGS__)
 #else

@@ -14,6 +14,9 @@ option(NLDB_SHOW_ID_WARNING "Prints a warning if the requested is not the intern
 # ------------------ CONFIGURATION DEV ----------------- #
 option(NLDB_DEBUG_CACHE_BUFFER "Shows cache hit/miss and buffer warnings" OFF)
 
+option(NLDB_DEBUG_QUERY "Displays executed queries and human-readable aliases" OFF)
+
+option(NLDB_PROFILE "Profile query execution time." OFF)
 
 # ----------------------- SOURCES ---------------------- #
 file(GLOB_RECURSE SOURCES src/*.cpp)
@@ -42,11 +45,23 @@ add_library(noLitedb_lb ${SOURCES})
 
 add_dependencies(noLitedb_lb ${DEPENDENCY_LIST})
 target_include_directories(noLitedb_lb PUBLIC ${DEPENDENCY_INCLUDE_DIR} ${DEPENDENCY_INCLUDE_LIST})
+
+# boolean definitions
+foreach(_VAR IN ITEMS
+    NLDB_DEBUG_QUERY
+    NLDB_DEBUG_CACHE_BUFFER
+    NLDB_SHOW_ID_WARNING
+    NLDB_PROFILE
+)
+    if(${_VAR})
+        target_compile_definitions(noLitedb_lb PUBLIC "${_VAR}")
+    endif()
+endforeach()
+
+# valued definitions
 target_compile_definitions(noLitedb_lb 
     PUBLIC 
     "NLDB_INTERNAL_ID=\"${NLDB_INTERNAL_ID}\"" 
-    NLDB_SHOW_ID_WARNING=${NLDB_SHOW_ID_WARNING}
-    NLDB_DEBUG_CACHE_BUFFER=${NLDB_DEBUG_CACHE_BUFFER}
 )
 
 target_link_libraries(noLitedb_lb PUBLIC ${DEPENDENCY_LIBS})
