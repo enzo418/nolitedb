@@ -58,7 +58,7 @@ add_include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/json/include)
 add_include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/magic_enum/include)
 
 # ---------------------- LRU CACHE --------------------- #
-add_include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/lrucache11)
+add_include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/lrucache11/include)
 
 # ----------------------- OTHERS ----------------------- #
 add_include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/others)
