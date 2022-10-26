@@ -47,12 +47,9 @@ int main() {
               << " ms" << std::endl;
 
     now = std::chrono::high_resolution_clock::now();
-    // Select all won't work because this dataset has more than 64 properties,
-    // which is the maximum join limit of sqlite. If you really want to handle
-    // data of this size then you can use something like firebird that enables
-    // up to 256 joins.
-    // https://www.ibphoenix.com/resources/documents/general/doc_323#:~:text=Maximum%20number%20of%20joined%20tables,evaluations%20required%20by%20the%20joins.
-    auto res = query.from("tweets").select().page(1, 1000).execute();
+
+    // Select all does work (Y)
+    auto res = query.from("tweets").select().page(1, 100).execute();
 
     std::cout << res << std::endl;
 

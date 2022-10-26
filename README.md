@@ -2,6 +2,7 @@
 This is an embedded `c++` document oriented data base with all the CRUD operations and with support for most common queries. Its main DTO (data transfer object) is [nlohmann::json](https://github.com/nlohmann/json).
 
 # Features
+- Multi platforms
 - Built-in SQLite3 backend support
 - Full C++ API, no need to write any SQL string
 - CRUD operations
@@ -11,6 +12,7 @@ This is an embedded `c++` document oriented data base with all the CRUD operatio
         - sort by properties
         - pagination
         - group by properties
+        - join multiple collections
     - Update by id; add new properties or update existing
     - Delete by id
 
@@ -60,16 +62,14 @@ int main() {
     // select all cars with all the fields
     auto finalCars = query.select().execute();
 
-    std::cout << "cars after operations: " finalCars << std::endl;    
+    std::cout << "cars after operations: " << finalCars << std::endl;    
 }
 ```
 
+## Limits
+- Up to 64 properties/members/name value pair per object
+    
+    This limit comes from the [sqlite maximum number of tables in a join](https://www.sqlite.org/limits.html#:~:text=Maximum%20Number%20Of%20Tables%20In%20A%20Join) and since we do a new select subquery for each object.
+
 ## *Note*
 You can read more about this project in my [~~devlog~~ 🚧]()
-
-It was intended to serve as a fast development tool for a backend server where I needed an embedded NoSQL database that just worked with json objects out of the box.
-
-# Next
-Since this version (1.0) was just to explore how to make it work, it has some problems. For example **working across different databases and collections can fail** due to the way in which we cache the properties. 
-
-So in version 2.0, I expect to solve all the pending problems and actually think about the design. Also, it might work with the SOCI library. All of this without changing the query API, so it's an internal reowork.
