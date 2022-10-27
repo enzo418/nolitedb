@@ -75,15 +75,25 @@ constexpr std::array<size_t, 2> isValidObject(const char (&exp)[N],
 template <size_t N>
 constexpr bool IsProperty(const char (&exp)[N]) {
     size_t i = 0;
-    while (i < N) {
-        // https://www.rfc-editor.org/rfc/rfc7159#section-1
-        char c = exp[i];
-        if (/*A-Z*/ (c >= 65 && c <= 90) || /*_*/ (c == 95) ||
+    while (i < N - 1) {
+      char c = exp[i];
+      // Match \w (character a-z, A-Z, 0-9, including _ (underscore))
+      // I know that the json standar allows almost anything as a the member
+      // key, but mostly you will use an \w identifier. If you still would
+      // want to use other caracters, you need to use the _prop suffix.
+
+      // https://www.rfc-editor.org/rfc/rfc7159#section-1
+
+      if (!(/*A-Z*/ (c >= 65 && c <= 90) || /*_*/ (c == 95) ||
             /*a-z*/ (c >= 97 && c <= 122) ||
-            /*0-9*/ (c >= 48 && c <= 57)) {
-            return true;
-        }
+            /*0-9*/ (c >= 48 && c <= 57))) {
+        return false;
+      }
+
+      i++;
     }
+
+    return true;
 }
 
 template <size_t N>
@@ -92,21 +102,32 @@ constexpr bool IsObject(const char (&exp)[N]) {
 }
 
 int main() {
-    // CORRECT SYNTAX
-    static_assert(IsObject("user{a}"), "expected an object");
+  // -- Object
 
-    static_assert(IsObject("user{details{gps_position, city{name, state}}}"),
-                  "expected an object");
+  // CORRECT SYNTAX
+  static_assert(IsObject("user{a}"), "expected an object");
 
-    // WRONG SYNTAX
-    static_assert(!IsObject("usera}"), "wasn't expecting an object");
+  static_assert(IsObject("user{details{gps_position, city{name, state}}}"),
+                "expected an object");
 
-    static_assert(!IsObject("wrongComma{missing comma}"),
-                  "wasn't expecting an object");
+  // WRONG SYNTAX
+  static_assert(!IsObject("usera}"), "wasn't expecting an object");
 
-    static_assert(!IsObject("wrongComma{not, missing, comma, but{curly}"),
-                  "wasn't expecting an object");
+  static_assert(!IsObject("wrongComma{missing comma}"),
+                "wasn't expecting an object");
 
-    // Debug:
-    // std::cout << "Is object? " << IsObject("user{a}") << std::endl;
+  static_assert(!IsObject("wrongComma{not, missing, comma, but{curly}"),
+                "wasn't expecting an object");
+
+  // Debug:
+  // std::cout << "Is object? " << IsObject("user{a}") << std::endl;
+
+  // -- Property
+  static_assert(IsProperty("name"), "Expected a property");
+  static_assert(IsProperty("_na123123me44"), "Expected a property");
+  static_assert(IsProperty("33312_3me44__"), "Expected a property");
+
+  static_assert(!IsProperty("na$me"), "wasn't expecting a property");
+  static_assert(!IsProperty("na\"me"), "wasn't expecting a property");
+  //   std::cout << "Is prop? " << IsProperty("name") << std::endl;
 }
