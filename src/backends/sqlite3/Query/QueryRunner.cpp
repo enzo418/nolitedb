@@ -45,25 +45,19 @@ namespace nldb {
     void filterOutEmptyObjects(std::forward_list<SelectableProperty>& data) {
         NLDB_PROFILE_FUNCTION();
 
-        auto cb = overloaded {[](Object& composed) {
-                                  return composed.getPropertiesRef().empty();
-                              },
-                              [](const Property& prop) {
-                                  // something went wrong at the expansion,
-                                  // delete it
-                                  return prop.getType() == OBJECT;
-                              },
-                              [](const auto&) { return false; }};
+        auto isEmpty =
+            overloaded {[](Object& composed) {
+                            return composed.getPropertiesRef().empty();
+                        },
+                        [](const Property& prop) {
+                            // something went wrong at the expansion,
+                            // delete it
+                            return prop.getType() == OBJECT;
+                        },
+                        [](const auto&) { return false; }};
 
-        for (auto prev_it = data.before_begin(); prev_it != data.end();
-             prev_it++) {
-            auto it = std::next(prev_it);
-            if (it != data.end()) {
-                if (std::visit(cb, *it)) {
-                    data.erase_after(prev_it);
-                }
-            }
-        }
+        data.remove_if(
+            [&isEmpty](auto& prop) { return std::visit(isEmpty, prop); });
     }
 
     /* -------------- EXPAND OBJECT PROPERTIES -------------- */
@@ -576,14 +570,10 @@ namespace nldb {
             [&fields](Property& prop) { return isSuppressed(prop, fields); },
             [](AggregatedProperty& agg) { return false; }};
 
-        size_t size = props.size();
-        for (int i = 0; i < size; i++) {
-            if (std::visit(cb, props[i])) {
-                props.erase(props.begin() + i);
-                i--;
-                size--;
-            }
-        }
+        props.erase(
+            std::remove_if(props.begin(), props.end(),
+                           [&cb](auto& prop) { return std::visit(cb, prop); }),
+            props.end());
     }
 
     void suppressFields(std::forward_list<SelectableProperty>& select,
@@ -596,15 +586,7 @@ namespace nldb {
             [&fields](Property& prop) { return isSuppressed(prop, fields); },
             [](AggregatedProperty& agg) { return false; }};
 
-        for (auto prev_it = select.before_begin(); prev_it != select.end();
-             prev_it++) {
-            auto it = std::next(prev_it);
-            if (it != select.end()) {
-                if (std::visit(cb, *it)) {
-                    select.erase_after(prev_it);
-                }
-            }
-        }
+        select.remove_if([&cb](auto& prop) { return std::visit(cb, prop); });
     }
 
     /* ------------------------ READ ------------------------ */
