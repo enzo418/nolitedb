@@ -102,7 +102,7 @@ int main() {
                       //  where/sort/groupBy, even if we will suppress them
                       //  .where(_id > 0)
                       //   .suppress(_id)  // equal to:
-                      .suppress(contact["_id"])
+                      .suppress(persona_c["_id"], persona_c["contact._id"])
                       .execute();
 
     std::cout << "all but _id, name: " << result.dump(2) << std::endl;

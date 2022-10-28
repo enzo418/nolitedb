@@ -60,7 +60,7 @@ namespace nldb {
         if (pos != expr.npos) {
             std::string propName = expr.substr(pos + 1, expr.length() - pos);
             std::string parentExpr = expr.substr(0, pos);
-            return Property(propName, parentExpr);
+            return Property(propName, parents + "." + parentExpr);
         } else {
             return Property(expr, parents);
         }
