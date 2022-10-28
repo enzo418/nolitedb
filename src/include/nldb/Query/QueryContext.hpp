@@ -39,6 +39,7 @@ namespace nldb {
         std::optional<QueryPagination> pagination_value;
         std::vector<Property> groupBy_value;
         std::vector<SortedProperty> sortBy_value;
+        std::vector<Property> suppress_value;
     };
 
     struct QueryPlannerContextRemove : public QueryPlannerContext {

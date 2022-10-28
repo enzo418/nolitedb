@@ -45,6 +45,22 @@ namespace nldb {
             return *this;
         }
 
+        /**
+         * @brief Suppress properties of the resulting query, that is, it is
+         * possible to use them in a where/group/sort but they will not appear
+         * in the resulting json object.
+         *
+         * @tparam PR
+         * @param props properties to suppress
+         * @return QueryPlannerSelect&
+         */
+        template <IsProperty... PR>
+        QueryPlannerSelect& suppress(const PR&... props) {
+            this->context.suppress_value = {props...};
+
+            return *this;
+        }
+
         json execute();
 
        protected:
