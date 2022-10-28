@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/build/composed_constexpr",
+            "program": "${workspaceFolder}/build/persona",
             "args": [],
             "preLaunchTask": "build",
             "cwd": "${workspaceFolder}/build"

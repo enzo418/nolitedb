@@ -1,7 +1,10 @@
 #include "QueryRunnerCtx.hpp"
 
+#include <algorithm>
+
 #include "magic_enum.hpp"
 #include "nldb/LOG/log.hpp"
+#include "nldb/Property/Property.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 #include "nldb/typedef.hpp"
 
@@ -12,9 +15,7 @@ namespace nldb {
                                    const std::string& pDocAlias)
         : rootCollectionID(rootCollectionID),
           rootPropId(pRootPropID),
-          docAlias(pDocAlias) {
-
-          };
+          docAlias(pDocAlias) {};
 
     std::string QueryRunnerCtx::generateAlias(const Property& prop) {
         return

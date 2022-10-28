@@ -1,4 +1,3 @@
-
 #include "QueryRunner.hpp"
 
 #include <algorithm>
@@ -547,6 +546,67 @@ namespace nldb {
         }
     }
 
+    /* ------------------- SUPPRESS FIELDS ------------------ */
+    bool isSuppressed(const Property& prop, std::vector<Property>& fields) {
+        // maybe just store the prop.id and then search for it instead of using
+        // a lambda? No, "_id" property are used with id = -1, type = ID and the
+        // only distinct value is coll_id
+        auto type = prop.getType();
+        return std::find_if(
+                   fields.begin(), fields.end(),
+                   [&prop, isId = type == PropertyType::ID](Property& a) {
+                       // -1 = -1 !! compare by collection id
+                       if (isId && a.getType() == PropertyType::ID) {
+                           return prop.getCollectionId() == a.getCollectionId();
+                       }
+
+                       // else compare by property id
+                       return a.getId() == prop.getId();
+                   }) != fields.end();
+    }
+
+    void suppressFields(Object& object, std::vector<Property>& fields) {
+        auto& props = object.getPropertiesRef();
+
+        auto cb = overloaded {
+            [&fields](Object& composed) {
+                suppressFields(composed, fields);
+                return false;
+            },
+            [&fields](Property& prop) { return isSuppressed(prop, fields); },
+            [](AggregatedProperty& agg) { return false; }};
+
+        size_t size = props.size();
+        for (int i = 0; i < size; i++) {
+            if (std::visit(cb, props[i])) {
+                props.erase(props.begin() + i);
+                i--;
+                size--;
+            }
+        }
+    }
+
+    void suppressFields(std::forward_list<SelectableProperty>& select,
+                        std::vector<Property>& fields) {
+        auto cb = overloaded {
+            [&fields](Object& composed) {
+                suppressFields(composed, fields);
+                return false;
+            },
+            [&fields](Property& prop) { return isSuppressed(prop, fields); },
+            [](AggregatedProperty& agg) { return false; }};
+
+        for (auto prev_it = select.before_begin(); prev_it != select.end();
+             prev_it++) {
+            auto it = std::next(prev_it);
+            if (it != select.end()) {
+                if (std::visit(cb, *it)) {
+                    select.erase_after(prev_it);
+                }
+            }
+        }
+    }
+
     /* ------------------------ READ ------------------------ */
     void read(const Property& prop, std::shared_ptr<IDBRowReader> row, int& i,
               json& out) {
@@ -693,6 +753,7 @@ namespace nldb {
             std::stringstream sql;
 
             expandObjectProperties(repos, data.select_value);
+            suppressFields(data.select_value, data.suppress_value);
             filterOutEmptyObjects(data.select_value);
 
             auto rootColl =

@@ -101,8 +101,8 @@ int main() {
                       //  you can use all the person members in
                       //  where/sort/groupBy, even if we will suppress them
                       //  .where(_id > 0)
-                      .suppress(_id)  // equal to:
-                      //  .suppress(persona_c["_id"], name)
+                      //   .suppress(_id)  // equal to:
+                      .suppress(contact["_id"])
                       .execute();
 
     std::cout << "all but _id, name: " << result.dump(2) << std::endl;

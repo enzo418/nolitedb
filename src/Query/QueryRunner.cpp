@@ -439,5 +439,10 @@ namespace nldb {
         for (auto& s : data.sortBy_value) {
             populateData(s.property);
         }
+
+        // suppress
+        for (auto& prop : data.suppress_value) {
+            populateData(prop);
+        }
     }
 }  // namespace nldb

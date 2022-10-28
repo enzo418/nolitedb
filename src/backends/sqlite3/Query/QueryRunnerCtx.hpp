@@ -5,6 +5,7 @@
 #include "nldb/DAL/Repositories.hpp"
 #include "nldb/DB/IDB.hpp"
 #include "nldb/Object.hpp"
+#include "nldb/Property/Property.hpp"
 #include "nldb/Query/QueryRunner.hpp"
 #include "nldb/typedef.hpp"
 
