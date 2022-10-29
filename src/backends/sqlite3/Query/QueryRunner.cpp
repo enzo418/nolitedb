@@ -13,6 +13,7 @@
 #include "backends/sqlite3/DAL/Definitions.hpp"
 #include "magic_enum.hpp"
 #include "nldb/Collection.hpp"
+#include "nldb/Common.hpp"
 #include "nldb/DAL/Repositories.hpp"
 #include "nldb/Exceptions.hpp"
 #include "nldb/LOG/log.hpp"
@@ -40,6 +41,17 @@ namespace nldb {
     using namespace ::utils::paramsbind;
 
     const std::string doc_alias = "__doc";
+
+    inline bool equal(const Property& a, const Property& b) {
+        // -1 = -1 !! compare by collection id
+        if (b.getType() == PropertyType::ID) {
+            return a.getType() == PropertyType::ID &&
+                   b.getCollectionId() == a.getCollectionId();
+        }
+
+        // else compare by property id
+        return a.getId() == b.getId();
+    }
 
     /* -------------- FILTER OUT EMPTY OBJECTS -------------- */
     void filterOutEmptyObjects(std::forward_list<SelectableProperty>& data) {
@@ -107,13 +119,11 @@ namespace nldb {
 
         auto expanded = repos->repositoryProperty->findAll(subColl->getId());
 
-        Object composed(prop, {}, subColl->getId());
-
         // move expanded props into the composed property
         auto& props = composed.getPropertiesRef();
         props.insert_after(props.before_begin(),
                            std::make_move_iterator(expanded.begin()),
-                     std::make_move_iterator(expanded.end()));
+                           std::make_move_iterator(expanded.end()));
 
         return std::move(composed);
     }
@@ -160,8 +170,8 @@ namespace nldb {
                 repos->repositoryProperty->findAll(composed.getCollId());
 
             props.insert_after(props.before_begin(),
-                         std::make_move_iterator(expanded.begin()),
-                         std::make_move_iterator(expanded.end()));
+                               std::make_move_iterator(expanded.begin()),
+                               std::make_move_iterator(expanded.end()));
         }
 
         for (auto it = props.begin(); it != props.end(); it++) {
@@ -369,47 +379,6 @@ namespace nldb {
         }
     }
 
-    void addFromClause(std::stringstream& sql, std::vector<Property>& props,
-                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
-        for (auto& p : props) {
-            addFromClause(sql, p, ids, ctx);
-        }
-    }
-
-    void addFromClause(std::stringstream& sql,
-                       std::vector<SortedProperty>& props,
-                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
-        for (auto& p : props) {
-            addFromClause(sql, p.property, ids, ctx);
-        }
-    }
-
-    void addFromClause(std::stringstream& sql,
-                       PropertyExpressionOperand const& prop,
-                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
-        auto cb = overloaded {
-            [&sql, &ctx, &ids](LogicConstValue const& prop) {
-                if (std::holds_alternative<Property>(prop)) {
-                    addFromClause(sql, std::get<Property>(prop), ids, ctx);
-                }
-            },
-            [&sql, &ctx, &ids](box<struct PropertyExpression> const& agProp) {
-                addFromClause(sql, agProp->left, ids, ctx);
-                addFromClause(sql, agProp->right, ids, ctx);
-            },
-            [&sql, &ctx, &ids](PropertyExpressionOperand const& agProp) {
-                addFromClause(sql, agProp, ids, ctx);
-            }};
-
-        std::visit(cb, prop);
-    }
-
-    void addFromClause(std::stringstream& sql, PropertyExpression& props,
-                       std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
-        addFromClause(sql, props.left, ids, ctx);
-        addFromClause(sql, props.right, ids, ctx);
-    }
-
     void addFromClause(std::stringstream& sql, QueryPlannerContextSelect& data,
                        QueryRunnerCtx& ctx) {
         NLDB_PROFILE_FUNCTION();
@@ -420,11 +389,9 @@ namespace nldb {
         // add all properties that appear in the data
         std::vector<snowflake> ids;
         addFromClause(sql, data.select_value, ids, ctx);
-        addFromClause(sql, data.groupBy_value, ids, ctx);
-        addFromClause(sql, data.sortBy_value, ids, ctx);
 
-        if (data.where_value)
-            addFromClause(sql, data.where_value.value(), ids, ctx);
+        // before this call, select was modified to select all the fields used
+        // in where/group/sort.
     }
 
     /* ------------------ WHERE CLAUSE ------------------ */
@@ -552,38 +519,23 @@ namespace nldb {
         return std::find_if(
                    fields.begin(), fields.end(),
                    [&prop, isId = type == PropertyType::ID](Property& a) {
-                       // -1 = -1 !! compare by collection id
-                       if (isId && a.getType() == PropertyType::ID) {
-                           return prop.getCollectionId() == a.getCollectionId();
-                       }
-
-                       // else compare by property id
-                       return a.getId() == prop.getId();
+                       return equal(prop, a);
                    }) != fields.end();
     }
 
-    void suppressFields(Object& object, std::vector<Property>& fields) {
-        auto& props = object.getPropertiesRef();
-
+    /**
+     * @tparam T container
+     */
+    template <typename T>
+    void suppressFields(T& select, std::vector<Property>& fields) {
         auto cb = overloaded {
             [&fields](Object& composed) {
-                suppressFields(composed, fields);
-                return false;
-            },
-            [&fields](Property& prop) { return isSuppressed(prop, fields); },
-            [](AggregatedProperty& agg) { return false; }};
+                // Check if there is a property of type Object == root of object
+                if (isSuppressed(composed.getPropertyRef(), fields)) {
+                    return true;
+                }
 
-        props.erase(
-            std::remove_if(props.begin(), props.end(),
-                           [&cb](auto& prop) { return std::visit(cb, prop); }),
-            props.end());
-    }
-
-    void suppressFields(std::forward_list<SelectableProperty>& select,
-                        std::vector<Property>& fields) {
-        auto cb = overloaded {
-            [&fields](Object& composed) {
-                suppressFields(composed, fields);
+                suppressFields(composed.getPropertiesRef(), fields);
                 return false;
             },
             [&fields](Property& prop) { return isSuppressed(prop, fields); },
@@ -592,10 +544,162 @@ namespace nldb {
         select.remove_if([&cb](auto& prop) { return std::visit(cb, prop); });
     }
 
+    /* ------------------- ADD USED FIELDS ------------------ */
+    template <typename T>
+    inline Object* findObjectInSelect(T& data, snowflake coll_id) {
+        for (auto it = data.begin(); it != data.end(); ++it) {
+            // no need to make a visitor, we are searching for an Object
+            if (std::holds_alternative<Object>(*it)) {
+                Object& objRef = std::get<Object>(*it);
+                if (objRef.getCollId() == coll_id) {
+                    return &(std::get<Object>(*it));
+                } else {
+                    // if the object is not what we wanted, look for it in its
+                    // props.
+                    auto& props = objRef.getPropertiesRef();
+                    auto found_it = findObjectInSelect(props, coll_id);
+                    if (found_it != nullptr) {
+                        return found_it;
+                    }
+                }
+            }
+        }
+
+        return nullptr;
+    }
+
+    Object& findOrAddObjectToSelectRecursive(
+        std::forward_list<SelectableProperty>& select_value, snowflake coll_id,
+        std::shared_ptr<Repositories> const& repos) {
+        Object* found = findObjectInSelect(select_value, coll_id);
+        if (found != nullptr) {
+            // this is why we use forward_list, references are not invalidated.
+            // Plus we are sure this reference will be valid because the caller
+            // doesn't remove elements.
+            return *found;
+        }
+
+        auto root_prop =
+            repos->repositoryProperty
+                ->find(repos->repositoryCollection->getOwnerId(coll_id).value())
+                .value();
+
+        Object composed(root_prop, {}, coll_id);
+
+        if (root_prop.getCollectionId() != NullID) {
+            Object& parent = findOrAddObjectToSelectRecursive(
+                select_value, root_prop.getCollectionId(), repos);
+
+            Object& added =
+                std::get<Object>(parent.addProperty(std::move(composed)));
+
+            return added;
+        } else {
+            select_value.push_front(composed);
+
+            return std::get<Object>(select_value.front());
+        }
+    }
+
+    template <typename T>
+    inline bool isPropertyInList(T& select, const Property& prop) {
+        auto cb =
+            overloaded {[&prop](const Property& b) { return equal(prop, b); },
+                        [](const auto&) { return false; }};
+
+        return std::find_if(select.begin(), select.end(), [&cb](const auto& t) {
+                   return std::visit(cb, t);
+               }) != select.end();
+    }
+
+    void addToSelectIfMissingProperty(
+        std::forward_list<SelectableProperty>& select, const Property& prop,
+        std::shared_ptr<Repositories> const& repos, QueryRunnerCtx& ctx) {
+        if (prop.getCollectionId() == ctx.getRootCollId()) {
+            if (!isPropertyInList(select, prop)) select.push_front(prop);
+        } else {
+            Object& object = findOrAddObjectToSelectRecursive(
+                select, prop.getCollectionId(), repos);
+
+            if (!isPropertyInList(object.getPropertiesRef(), prop)) {
+                object.addProperty(prop);
+            }
+        }
+    }
+
+    void addUsedFields(std::forward_list<SelectableProperty>& select,
+                       const PropertyExpressionOperand& expr,
+                       std::shared_ptr<Repositories> const& repos,
+                       QueryRunnerCtx& ctx);
+
+    void addUsedFields(std::forward_list<SelectableProperty>& select,
+                       const PropertyExpression& expr,
+                       std::shared_ptr<Repositories> const& repos,
+                       QueryRunnerCtx& ctx) {
+        addUsedFields(select, expr.left, repos, ctx);
+        addUsedFields(select, expr.right, repos, ctx);
+    }
+
+    void addUsedFields(std::forward_list<SelectableProperty>& select,
+                       const PropertyExpressionOperand& expr,
+                       std::shared_ptr<Repositories> const& repos,
+                       QueryRunnerCtx& ctx) {
+        auto cbConstVal = overloaded {
+            [&select, &repos, &ctx](const Property& prop) {
+                addToSelectIfMissingProperty(select, prop, repos, ctx);
+            },
+            [](const auto& str) {}};
+
+        auto cbOperand = overloaded {
+            [&cbConstVal](LogicConstValue const& prop) {
+                std::visit(cbConstVal, prop);
+            },
+            [&select, &repos,
+             &ctx](box<struct PropertyExpression> const& agProp) {
+                addUsedFields(select, *agProp, repos, ctx);
+            },
+            [&select, &repos, &ctx](PropertyExpressionOperand const& agProp) {
+                addUsedFields(select, agProp, repos, ctx);
+            }};
+
+        std::visit(cbOperand, expr);
+    }
+
+    /**
+     * @brief Makes the union of the properties of where, group, sort and select
+     * into select.
+     */
+    void addUsedFields(QueryPlannerContextSelect& data,
+                       std::shared_ptr<Repositories> const& repos,
+                       QueryRunnerCtx& ctx) {
+        // Why:
+        //   Since the last design change, the from clause depends on the
+        //   order in which joins are added, so we can no longer call addFrom
+        //   for select, where, group and sort separately. Instead, we have to
+        //   run it once with all the properties the user used in the query,
+        //   which may have more than the select.
+
+        // Context: all the properties have an id (except the ones of type ID)
+
+        for (auto& prop : data.groupBy_value) {
+            addToSelectIfMissingProperty(data.select_value, prop, repos, ctx);
+        }
+
+        for (auto& sortedProp : data.sortBy_value) {
+            addToSelectIfMissingProperty(data.select_value, sortedProp.property,
+                                         repos, ctx);
+        }
+
+        if (data.where_value) {
+            addUsedFields(data.select_value, data.where_value.value(), repos,
+                          ctx);
+        }
+    }
+
     /* ------------------------ READ ------------------------ */
     void read(const Property& prop, std::shared_ptr<IDBRowReader> row, int& i,
-              json& out) {
-        if (!row->isNull(i)) {
+              json& out, std::vector<Property>& suppressed) {
+        if (!row->isNull(i) && !isSuppressed(prop, suppressed)) {
             switch (prop.getType()) {
                 case PropertyType::INTEGER:
                     out[prop.getName()] = row->readInt64(i);
@@ -607,7 +711,7 @@ namespace nldb {
                     out[prop.getName()] = row->readString(i);
                     break;
                 case PropertyType::ID:
-                    out["_id"] = row->readInt64(i);
+                    out[common::internal_id_string] = row->readInt64(i);
                     break;
                 case PropertyType::ARRAY:
                     out[prop.getName()] = json::parse(row->readString(i));
@@ -627,13 +731,13 @@ namespace nldb {
     }
 
     void read(const AggregatedProperty& prop, std::shared_ptr<IDBRowReader> row,
-              int& i, json& out) {
+              int& i, json& out, std::vector<Property>&) {
         out[prop.alias] = row->readInt64(i);
         i++;
     }
 
     void read(Object& composed, std::shared_ptr<IDBRowReader> row, int& i,
-              json& out) {
+              json& out, std::vector<Property>& suppressed) {
         const std::string& name = composed.getProperty().getName();
         // out[name] = json::object();  // an object
 
@@ -641,11 +745,53 @@ namespace nldb {
 
         auto& propsRef = composed.getPropertiesRef();
         for (auto& prop : propsRef) {
-            std::visit([&row, &i, &temp](auto& t) { read(t, row, i, temp); },
+            std::visit([&row, &i, &temp, &suppressed](
+                           auto& t) { read(t, row, i, temp, suppressed); },
                        prop);
         }
 
         if (!temp.is_null()) out[name] = std::move(temp);
+    }
+
+    json readQuery(std::stringstream& sql, nldb::IDB* connection,
+                   QueryPlannerContextSelect& data) {
+        NLDB_PROFILE_FUNCTION();
+        std::unique_ptr<nldb::IDBQueryReader> reader;
+        std::shared_ptr<IDBRowReader> row;
+
+        {
+            NLDB_PROFILE_SCOPE("execute reader");
+            reader = connection->executeReader(sql.str(), {});
+        }
+
+        json result = json::array();
+        auto begin = data.select_value.begin();
+        auto end = data.select_value.end();
+
+        while (true) {
+            {
+                NLDB_PROFILE_SCOPE("read row");
+                if (!reader->readRow(row)) break;
+            }
+
+            NLDB_PROFILE_SCOPE("into json");
+
+            json rowValue;
+            {
+                int i = 0;
+                for (auto it = begin; it != end; it++) {
+                    std::visit(
+                        [&row, &i, &rowValue, &data](auto& val) {
+                            read(val, row, i, rowValue, data.suppress_value);
+                        },
+                        *it);
+                }
+            }
+
+            if (!rowValue.is_null()) result.push_back(std::move(rowValue));
+        }
+
+        return result;
     }
 
     void printSelect(Property& p, int tab = 0) {
@@ -683,45 +829,6 @@ namespace nldb {
         std::cout << "\n";
     }
 
-    json readQuery(std::stringstream& sql, nldb::IDB* connection,
-                   QueryPlannerContextSelect& data) {
-        NLDB_PROFILE_FUNCTION();
-        std::unique_ptr<nldb::IDBQueryReader> reader;
-        std::shared_ptr<IDBRowReader> row;
-
-        {
-            NLDB_PROFILE_SCOPE("execute reader");
-            reader = connection->executeReader(sql.str(), {});
-        }
-
-        json result = json::array();
-        auto begin = data.select_value.begin();
-        auto end = data.select_value.end();
-
-        while (true) {
-            {
-                NLDB_PROFILE_SCOPE("read row");
-                if (!reader->readRow(row)) break;
-            }
-
-            NLDB_PROFILE_SCOPE("into json");
-
-            json rowValue;
-            {
-                int i = 0;
-                for (auto it = begin; it != end; it++) {
-                    std::visit([&row, &i, &rowValue](
-                                   auto& val) { read(val, row, i, rowValue); },
-                               *it);
-                }
-            }
-
-            if (!rowValue.is_null()) result.push_back(std::move(rowValue));
-        }
-
-        return result;
-    }
-
     /* ------------------- EXECUTE SELECT ------------------- */
     json QueryRunnerSQ3::select(QueryPlannerContextSelect&& data) {
         NLDB_PROFILE_BEGIN_SESSION("select", "nldb-profile-select.json");
@@ -757,6 +864,8 @@ namespace nldb {
 #ifdef NLDB_DEBUG_QUERY
             printSelect(data.select_value);
 #endif
+
+            addUsedFields(data, repos, ctx);
 
             addSelectClause(sql, data.select_value, ctx);
             addFromClause(sql, data, ctx);

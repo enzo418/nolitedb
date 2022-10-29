@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/build/persona",
+            "program": "${workspaceFolder}/build/twitter",
             "args": [],
             "preLaunchTask": "build",
             "cwd": "${workspaceFolder}/build"

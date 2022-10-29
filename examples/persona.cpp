@@ -96,30 +96,37 @@ int main() {
     //     "_id", "contact{_id, email, location{_id}}"_obj);
 
     // Select all from persona without persona._id and contact._id
-    auto result = query.from("persona")
-                      .select()
-                      //  you can use all the person members in
-                      //  where/sort/groupBy, even if we will suppress them
-                      //  .where(_id > 0)
-                      //   .suppress(_id)  // equal to:
-                      .suppress(persona_c["_id"], persona_c["contact._id"])
-                      .execute();
+    // auto result = query.from("persona")
+    //                   .select()
+    //                   //  you can use all the person members in
+    //                   //  where/sort/groupBy, even if we will suppress them
+    //                   //   .where(_id > 0)
+    //                   //   .suppress(_id)  // equal to:
+    //                   .suppress(persona_c["_id"], persona_c["contact._id"],
+    //                             persona_c["contact.location._id"])
+    //                   .execute();
 
-    std::cout << "all but _id, name: " << result.dump(2) << std::endl;
+    // std::cout << "all but _id, name: " << result.dump(2) << std::endl;
 
     /* ------- suppress fields in embedded documents ------ */
     // suppose we want to suppress all the ids from the inner documents and the
     // phone from contact
 
-    // result = query.from("persona")
-    //              .select()
-    //              .where(allButIds["contact.phone"] != "test" &&
-    //                     allButIds["name"] != "hola")
-    //              .sortBy(allButIds["contact.location._id"].asc())
-    //              .execute();
+    auto result = query.from("persona")
+                      .select()
+                      .where(persona_c["contact.phone"] != "12344" &&
+                             persona_c["name"] != "hola")
+                      .sortBy(persona_c["contact.location._id"].asc())
+                      .suppress(persona_c["_id"], persona_c["contact.phone"],
+                                persona_c["aliases"])
+                      .execute();
 
-    // std::cout << "all but _id and contact phone " << result.dump(2)
-    //           << std::endl;
+    std::cout << "all but _id and contact phone " << result.dump(2)
+              << std::endl;
+
+    // Note: we try to use as few tables as possible, so in case you select all
+    // but suppressed fields A, B and C, those fields won't be joined in the sql
+    // query unless you explicitly use them in a where/sort/group by.
 
     nldb::LogManager::Shutdown();
 }

@@ -69,6 +69,9 @@ namespace nldb {
 
         std::optional<std::string> getAlias() const;
 
+       public:
+        Property operator[](const std::string& expr);
+
        protected:
         template <StringLike F>
         Property toPropertyOrComposed(F str) {
