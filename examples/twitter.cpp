@@ -26,22 +26,22 @@ int main() {
 
     DBSL3 db;
 
-    // remove("./twitter.db");
+    remove("./twitter.db");
 
     if (!db.open("./twitter.db" /*":memory:"*/)) {
         std::cerr << "Could not open the database \n";
         db.throwLastError();
     }
 
-    // std::ifstream f("twitter.json");
-    // json data = json::parse(f)["statuses"];
+    std::ifstream f("twitter.json");
+    json data = json::parse(f)["statuses"];
 
     auto query = Query(&db);
 
     Collection tweets = query.collection("tweets");
 
     auto now = std::chrono::high_resolution_clock::now();
-    // query.from(tweets).insert(data);
+    query.from(tweets).insert(data);
 
     std::cout << "took "
               << (std::chrono::high_resolution_clock::now() - now) /
@@ -50,7 +50,6 @@ int main() {
 
     now = std::chrono::high_resolution_clock::now();
 
-    // Select all does work (Y)
     auto res =
         query.from("tweets")
             .select()

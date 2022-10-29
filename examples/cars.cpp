@@ -73,6 +73,7 @@ int main() {
                    .select(id, model, maker, year, automaker)
                    .where(year > 1990 && automaker["name"] == maker)
                    .page(1, 10)
+                   .suppress(automaker["_id"])
                    .execute();
 
     std::cout << "\n\nCars with automaker: " << all.dump(2) << std::endl

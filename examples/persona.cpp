@@ -62,6 +62,8 @@ int main() {
                                  //
                              }});
 
+    auto persona = query.collection("persona");
+
     auto now = std::chrono::high_resolution_clock::now();
     query.from("persona").insert(data);
 
@@ -70,59 +72,53 @@ int main() {
                      std::chrono::milliseconds(1)
               << " ms" << std::endl;
 
-    // now = std::chrono::high_resolution_clock::now();
-    // auto result = query.from("persona")
-    //                   .select()
-    //                   //   .where(_id != 9)
-    //                   //   .sortBy(contact["email"].desc())
-    //                   .execute();
+    now = std::chrono::high_resolution_clock::now();
 
-    // std::cout << "select took "
-    //           << (std::chrono::high_resolution_clock::now() - now) /
-    //                  std::chrono::milliseconds(1)
-    //           << " ms" << std::endl;
+    auto [_id, name, aliases, contact] = query.collection("persona").get(
+        "_id", "name", "aliases", "contact{email, location{_id, country}}"_obj);
 
-    // std::cout << result.dump(4);
+    auto result = query.from(persona)
+                      .select(_id, aliases, contact)
+                      .where(_id != 9 && name != "foo")
+                      .sortBy(contact["email"].desc())
+                      .execute();
+
+    std::cout << "select took "
+              << (std::chrono::high_resolution_clock::now() - now) /
+                     std::chrono::milliseconds(1)
+              << " ms" << std::endl;
+
+    std::cout << result.dump(4);
 
     /* ------------------ filter out fields ----------------- */
     // you can suppress filters by passing them in the suppress function
 
-    auto [_id, name, aliases, contact] = query.collection("persona").get(
-        "_id", "name", "aliases", "contact"_obj);
-
     auto persona_c = query.collection("persona").group();
 
-    // auto [_id, _contact] = query.collection("persona").get(
-    //     "_id", "contact{_id, email, location{_id}}"_obj);
+    // Select all from persona but persona._id and persona.name
+    result = query.from("persona")
+                 .select()
+                 //  you can use all the person members in
+                 //  where/sort/groupBy, even if we will suppress them
+                 .where(_id > 0)
+                 //   .suppress(_id)  // equal to:
+                 .suppress(persona_c["_id"], name)
+                 .execute();
 
-    // Select all from persona without persona._id and contact._id
-    // auto result = query.from("persona")
-    //                   .select()
-    //                   //  you can use all the person members in
-    //                   //  where/sort/groupBy, even if we will suppress them
-    //                   //   .where(_id > 0)
-    //                   //   .suppress(_id)  // equal to:
-    //                   .suppress(persona_c["_id"], persona_c["contact._id"],
-    //                             persona_c["contact.location._id"])
-    //                   .execute();
-
-    // std::cout << "all but _id, name: " << result.dump(2) << std::endl;
+    std::cout << "all but _id, name: " << result.dump(2) << std::endl;
 
     /* ------- suppress fields in embedded documents ------ */
-    // suppose we want to suppress all the ids from the inner documents and the
-    // phone from contact
-
-    auto result = query.from("persona")
-                      .select()
-                      .where(persona_c["contact.phone"] != "12344" &&
-                             persona_c["name"] != "hola")
-                      .sortBy(persona_c["contact.location._id"].asc())
-                      .suppress(persona_c["_id"], persona_c["contact.phone"],
-                                persona_c["aliases"])
-                      .execute();
+    result = query.from("persona")
+                 .select()
+                 .where(persona["contact.phone"] != "12344" && name != "hola")
+                 .sortBy(persona["contact.location._id"].asc())
+                 .suppress(_id, persona["contact.phone"], persona["aliases"])
+                 .execute();
 
     std::cout << "all but _id and contact phone " << result.dump(2)
               << std::endl;
+
+    assert(result.size() == 1 && result[0]["name"] == "pepe");
 
     // Note: we try to use as few tables as possible, so in case you select all
     // but suppressed fields A, B and C, those fields won't be joined in the sql
