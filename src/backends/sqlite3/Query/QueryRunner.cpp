@@ -103,13 +103,16 @@ namespace nldb {
                                      std::to_string(prop.getId()));
         }
 
+        Object composed(prop, {}, subColl->getId());
+
         auto expanded = repos->repositoryProperty->findAll(subColl->getId());
 
         Object composed(prop, {}, subColl->getId());
 
         // move expanded props into the composed property
         auto& props = composed.getPropertiesRef();
-        props.insert(props.begin(), std::make_move_iterator(expanded.begin()),
+        props.insert_after(props.before_begin(),
+                           std::make_move_iterator(expanded.begin()),
                      std::make_move_iterator(expanded.end()));
 
         return std::move(composed);
@@ -156,7 +159,7 @@ namespace nldb {
             auto expanded =
                 repos->repositoryProperty->findAll(composed.getCollId());
 
-            props.insert(props.begin(),
+            props.insert_after(props.before_begin(),
                          std::make_move_iterator(expanded.begin()),
                          std::make_move_iterator(expanded.end()));
         }
@@ -232,7 +235,7 @@ namespace nldb {
 
         auto& props = composed.getPropertiesRef();
 
-        for (int i = 0; i < props.size(); i++) {
+        for (auto it = props.begin(); it != props.end(); it++) {
             // why don't we use the composed.collId?
             // because we aren't building the select for ourself, we are
             // building it for `currentSelectCollId`.
@@ -240,9 +243,9 @@ namespace nldb {
                 [&sql, &ctx, currentSelectCollId](auto& p) {
                     addSelectClause(sql, p, ctx, currentSelectCollId);
                 },
-                props[i]);
+                *it);
 
-            if (i != props.size() - 1) {
+            if (std::next(it) != props.end()) {
                 sql << ", ";
             }
         }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <forward_list>
 #include <string>
 #include <vector>
 
@@ -38,22 +39,22 @@ namespace nldb {
          * @param properties 'email' and 'phone'
          * @param collId the id of the collection it represents, `contact`.id
          */
-        Object(Property prop, std::vector<SubProperty>&& properties,
+        Object(Property prop, std::forward_list<SubProperty>&& properties,
                snowflake collId = -1);
 
-        Object(Property prop, const std::vector<SubProperty>& properties,
+        Object(Property prop, const std::forward_list<SubProperty>& properties,
                snowflake collId = -1);
 
        public:
         Property getProperty() const;  // the property of type object
         Property& getPropertyRef();
-        std::vector<SubProperty> getProperties() const;
-        std::vector<SubProperty>& getPropertiesRef();
+        std::forward_list<SubProperty> getProperties() const;
+        std::forward_list<SubProperty>& getPropertiesRef();
 
         snowflake getCollId() const;
 
        public:
-        void addProperty(SubProperty prop);
+        SubProperty& addProperty(SubProperty prop);
         void setCollId(snowflake pCollId);
 
        public:
@@ -80,7 +81,7 @@ namespace nldb {
 
        private:
         Property prop;
-        std::vector<SubProperty> properties;
+        std::forward_list<SubProperty> properties;
         snowflake collID;  // the id of the collection it represents
     };
 }  // namespace nldb

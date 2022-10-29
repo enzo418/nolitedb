@@ -9,13 +9,14 @@
 #include "nldb/Utils/ObjectParser.hpp"
 
 namespace nldb {
-    Object::Object(Property prop, std::vector<SubProperty>&& pProperties,
+    Object::Object(Property prop, std::forward_list<SubProperty>&& pProperties,
                    snowflake pCollId)
         : prop(std::move(prop)),
           properties(std::move(pProperties)),
           collID(pCollId) {}
 
-    Object::Object(Property prop, const std::vector<SubProperty>& pProperties,
+    Object::Object(Property prop,
+                   const std::forward_list<SubProperty>& pProperties,
                    snowflake pCollId)
         : prop(std::move(prop)), properties(pProperties), collID(pCollId) {}
 
@@ -27,14 +28,17 @@ namespace nldb {
 
     void Object::setCollId(snowflake pCollId) { this->collID = pCollId; }
 
-    std::vector<SubProperty>& Object::getPropertiesRef() { return properties; }
-
-    std::vector<SubProperty> Object::getProperties() const {
+    std::forward_list<SubProperty>& Object::getPropertiesRef() {
         return properties;
     }
 
-    void Object::addProperty(SubProperty prop) {
-        this->properties.push_back(std::move(prop));
+    std::forward_list<SubProperty> Object::getProperties() const {
+        return properties;
+    }
+
+    SubProperty& Object::addProperty(SubProperty prop) {
+        this->properties.push_front(std::move(prop));
+        return this->properties.front();
     }
 
     Object Object::evaluateExpresion(const ObjectExpression& expr,
