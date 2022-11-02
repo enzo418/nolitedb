@@ -28,8 +28,10 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++20")
 # clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Compilation type
-set(CMAKE_BUILD_TYPE DEBUG)
+if(NOT CMAKE_BUILD_TYPE )
+  # Compilation type
+  set(CMAKE_BUILD_TYPE DEBUG)
+endif()
 
 include(Dependecy.cmake)
 
