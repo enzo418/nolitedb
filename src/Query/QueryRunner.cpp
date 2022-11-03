@@ -103,7 +103,7 @@ namespace nldb {
 
             updateDocumentRecursive(docID, from, data.object);
 
-            repos->buffered->pushPendingData();
+            repos->pushPendingData();
         }
 
         NLDB_PROFILE_END_SESSION();
@@ -142,7 +142,7 @@ namespace nldb {
 
             {
                 NLDB_PROFILE_SCOPE("Flush data");
-                repos->buffered->pushPendingData();
+                repos->pushPendingData();
             }
         }
 
