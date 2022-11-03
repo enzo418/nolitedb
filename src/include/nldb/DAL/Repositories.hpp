@@ -17,5 +17,14 @@ namespace nldb {
         std::unique_ptr<IRepositoryProperty> repositoryProperty;
         std::unique_ptr<IValuesDAO> valuesDAO;
         std::shared_ptr<BufferData> buffered;
+
+        Repositories(std::unique_ptr<IRepositoryCollection> pRColl,
+                     std::unique_ptr<IRepositoryProperty> pRProp,
+                     std::unique_ptr<IValuesDAO> pValDAO,
+                     std::shared_ptr<BufferData> pBuffered)
+            : repositoryCollection(std::move(pRColl)),
+              repositoryProperty(std::move(pRProp)),
+              valuesDAO(std::move(pValDAO)),
+              buffered(std::move(pBuffered)) {}
     };
 }  // namespace nldb

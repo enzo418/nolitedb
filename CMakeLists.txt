@@ -18,6 +18,8 @@ option(NLDB_DEBUG_QUERY "Displays executed queries and human-readable aliases" O
 
 option(NLDB_PROFILE "Profile query execution time." OFF)
 
+option(NLDB_SANITIZE_EXAMPLES "Use the compiler sanitizer in the examples." OFF)
+
 # ----------------------- SOURCES ---------------------- #
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
@@ -70,6 +72,11 @@ target_link_libraries(noLitedb_lb PUBLIC ${DEPENDENCY_LIBS})
 target_link_directories(noLitedb_lb PUBLIC ${DEPENDENCY_LIB_DIR})
 
 # ------------------ NOLITE EXECUTABLE ----------------- #
+if (NLDB_SANITIZE_EXAMPLES)
+  set(NLDB_SANITIZER_ARGS -fsanitize=address -fno-omit-frame-pointer)
+  message(STATUS "Using sanitizer options: ${NLDB_SANITIZER_ARGS}")
+endif()
+
 if(BUILD_EXAMPLES OR PROJECT_IS_TOP_LEVEL)
     file(GLOB nldb_example_files 
         "examples/*.cpp")
@@ -81,6 +88,11 @@ if(BUILD_EXAMPLES OR PROJECT_IS_TOP_LEVEL)
     
         add_executable(${nldb_exec_name} ${filename})
         target_link_libraries(${nldb_exec_name} noLitedb_lb "-lz")
+        
+        if(NLDB_SANITIZE_EXAMPLES)
+          target_compile_options(${nldb_exec_name} PRIVATE ${NLDB_SANITIZER_ARGS})
+          target_link_options(${nldb_exec_name} PRIVATE ${NLDB_SANITIZER_ARGS})
+        endif()
     endforeach()
 endif()
 

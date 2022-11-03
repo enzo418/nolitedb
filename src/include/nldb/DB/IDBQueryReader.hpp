@@ -13,10 +13,14 @@ namespace nldb {
         virtual double readDouble(uint16_t i) = 0;
         virtual bool readBoolean(uint16_t i) = 0;
         virtual bool isNull(uint16_t i) = 0;
+
+        virtual ~IDBRowReader() = default;
     };
 
     class IDBQueryReader {
        public:
         virtual bool readRow(std::shared_ptr<IDBRowReader>& row) = 0;
+
+        virtual ~IDBQueryReader() = default;
     };
 }  // namespace nldb

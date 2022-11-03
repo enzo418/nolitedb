@@ -16,5 +16,7 @@ namespace nldb {
         virtual void update(QueryPlannerContextUpdate&& data) = 0;
         virtual void insert(QueryPlannerContextInsert&& data) = 0;
         virtual void remove(QueryPlannerContextRemove&& data) = 0;
+
+        virtual ~IQueryRunner() = default;
     };
 }  // namespace nldb

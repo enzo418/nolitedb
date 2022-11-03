@@ -8,7 +8,7 @@ namespace nldb {
 
     // how many as you can fit in 0.333 MB
     template <typename T>
-    constexpr int bufferSize() {
+    consteval int bufferSize() {
         return (int)(1e6 / 3 / sizeof(T));
     };
 

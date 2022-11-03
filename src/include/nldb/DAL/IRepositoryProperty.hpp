@@ -20,5 +20,7 @@ namespace nldb {
         virtual bool exists(snowflake collectionID,
                             const std::string& propName) = 0;
         virtual std::vector<Property> findAll(snowflake collectionId) = 0;
+
+        virtual ~IRepositoryProperty() = default;
     };
 }  // namespace nldb

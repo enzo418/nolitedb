@@ -47,7 +47,6 @@ namespace nldb {
             return true;
         } else if (rc == SQLITE_DONE) {
             this->allWasRead = true;
-            sqlite3_finalize(stmt);
             return false;
         } else {
             this->db->throwLastError();
@@ -58,8 +57,5 @@ namespace nldb {
     DBQueryReaderSL3::DBQueryReaderSL3(IDB* pDb, sqlite3_stmt* pStmt)
         : stmt(pStmt), db(pDb) {}
 
-    DBQueryReaderSL3::~DBQueryReaderSL3() {
-        // Invoking sqlite3_finalize() on a NULL pointer is a harmless no-op.
-        sqlite3_finalize(stmt);
-    }
+    DBQueryReaderSL3::~DBQueryReaderSL3() { sqlite3_finalize(stmt); }
 }  // namespace nldb

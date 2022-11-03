@@ -86,7 +86,9 @@ namespace nldb {
                 } else if (std::holds_alternative<std::string>(it.second)) {
                     sqlite3_bind_text(stmt, idx,
                                       std::get<std::string>(it.second).c_str(),
-                                      -1, SQLITE_STATIC);
+                                      -1, SQLITE_TRANSIENT);
+                    // SQLITE_TRANSIENT = copy, because params 99% of the time
+                    // is a r-value and it would be an UB to use SQLITE_STATIC
                 } else if (std::holds_alternative<snowflake>(it.second)) {
                     sqlite3_bind_int64(stmt, idx,
                                        std::get<snowflake>(it.second));
@@ -164,5 +166,7 @@ namespace nldb {
     void DBSL3::throwLastError() {
         throw std::runtime_error(sqlite3_errmsg(this->db));
     }
+
+    DBSL3::~DBSL3() { sqlite3_close(this->db); }
 
 }  // namespace nldb

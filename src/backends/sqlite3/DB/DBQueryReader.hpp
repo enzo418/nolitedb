@@ -7,6 +7,7 @@ namespace nldb {
     class DBRowReaderSL3 : public IDBRowReader {
        public:
         DBRowReaderSL3(IDB* db, sqlite3_stmt* stmt);
+        ~DBRowReaderSL3() {}
 
        public:
         // Note: SQLITE3 - The leftmost column of the result set has the index 0

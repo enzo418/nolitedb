@@ -80,5 +80,7 @@ namespace nldb {
          * @param objID
          */
         virtual void removeObject(snowflake objID) = 0;
+
+        virtual ~IValuesDAO() = default;
     };
 }  // namespace nldb

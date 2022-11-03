@@ -87,5 +87,7 @@ namespace nldb {
         virtual std::optional<int> getChangesCount() = 0;
 
         virtual void throwLastError() = 0;
+
+        virtual ~IDB() = default;
     };
 }  // namespace nldb

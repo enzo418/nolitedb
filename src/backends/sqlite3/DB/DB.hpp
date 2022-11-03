@@ -31,6 +31,8 @@ namespace nldb {
 
         void throwLastError() override;
 
+        ~DBSL3();
+
        private:
         sqlite3* db;
     };

@@ -64,7 +64,7 @@ namespace nldb {
         void add(const BufferValueDependentObject& val);
         void add(const BufferValueIndependentObject& val);
 
-        ~BufferData();
+        virtual ~BufferData();
 
        protected:
         template <typename T>
