@@ -20,6 +20,7 @@
 #include "nldb/Utils/Enums.hpp"
 #include "nldb/Utils/Variant.hpp"
 #include "nldb/nldb_json.hpp"
+#include "nldb/typedef.hpp"
 
 using namespace nldb;
 
@@ -93,8 +94,8 @@ int main() {
 
     // update first car, set year to 2100 and add a new
     // property called price
-    query.from("cars").update(res1[0]["_id"],
-                              {{"year", 2100}, {"price", 50000}});
+    snowflake id0 = std::stoll(res1[0]["_id"].get<std::string>());
+    query.from("cars").update(id0, {{"year", 2100}, {"price", 50000}});
 
     auto res2 =
         query.from("cars").select().page(1, 10).sortBy(year.desc()).execute();
@@ -105,7 +106,7 @@ int main() {
 
     std::cout << "\n\nBefore remove 1: " << final.dump(2) << std::endl;
 
-    query.from("cars").remove(res1[0]["_id"]);
+    query.from("cars").remove(id0);
 
     auto finalThen = query.from("cars").select(model, maker, year).execute();
 

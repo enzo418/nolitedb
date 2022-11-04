@@ -705,7 +705,9 @@ namespace nldb {
                     out[prop.getName()] = row->readString(i);
                     break;
                 case PropertyType::ID:
-                    out[common::internal_id_string] = row->readInt64(i);
+                    // javascript can't read 64 bits long integers
+                    out[common::internal_id_string] =
+                        std::to_string(row->readInt64(i));
                     break;
                 case PropertyType::ARRAY:
                     out[prop.getName()] = json::parse(row->readString(i));
