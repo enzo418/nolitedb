@@ -3,6 +3,8 @@
 namespace utils {
     void replaceAllOccurrences(std::string& str, const std::string& from,
                                const std::string& to) {
+        if (from.empty()) return;
+
         size_t pos;
         size_t offset = 0;
         const size_t fromSize = from.size();
