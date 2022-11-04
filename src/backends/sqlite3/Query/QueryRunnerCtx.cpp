@@ -18,15 +18,24 @@ namespace nldb {
           docAlias(pDocAlias) {};
 
     std::string QueryRunnerCtx::generateAlias(const Property& prop) {
-        return
 #ifdef NLDB_DEBUG_QUERY
-#warning "`NLDB_DEBUG_QUERY` is vulnerable to sql injection"
-            prop.getName() +
+        // `NLDB_DEBUG_QUERY` is vulnerable to sql injection
+        const std::string prefix = prop.getName();
+#else
+        const std::string prefix = "";
 #endif
-            "_" +
-            std::to_string(prop.getType() == PropertyType::ID
-                               ? prop.getCollectionId()
-                               : prop.getId());
+
+        auto type = prop.getType();
+
+        if (type == PropertyType::ID) {
+            return prefix + "___" + std::to_string(prop.getCollectionId());
+        } else if (type == PropertyType::OBJECT) {
+            // avoid collisions with property id in case we are not using
+            // snowflake
+            return prefix + "__" + std::to_string(prop.getId());
+        } else {
+            return prefix + "_" + std::to_string(prop.getId());
+        }
     }
 
     std::string QueryRunnerCtx::getContextualizedAlias(
