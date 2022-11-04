@@ -34,6 +34,9 @@ namespace nldb {
             return false;
         }
 
+        this->execute("PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL;",
+                      {{}});
+
         if (!fileExists) {
             DBInitializer::createTablesAndFKeys(this);
         }
