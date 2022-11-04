@@ -56,7 +56,7 @@ target_compile_options(noLitedb_lb PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_compile_options(noLitedb_lb PRIVATE "${NLDB_LIB_OPTIONAL_FLAGS}")
 
 # in c++20 the expression Property == Property warns about something we don't care.
-add_compile_options(-Wno-error=ambiguous-reversed-operator -Wno-ambiguous-reversed-operator)
+add_compile_options(-Wno-ambiguous-reversed-operator)
 
 # boolean definitions
 foreach(_VAR IN ITEMS
