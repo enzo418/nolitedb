@@ -14,7 +14,7 @@ namespace nldb {
     class BufferedRepositoryCollection : public IRepositoryCollection {
        public:
         BufferedRepositoryCollection(
-            IDB* connection, std::unique_ptr<IRepositoryCollection> repo,
+            std::unique_ptr<IRepositoryCollection> repo,
             const std::shared_ptr<BufferData>& bufferData);
 
        public:
@@ -27,7 +27,6 @@ namespace nldb {
         std::optional<snowflake> getOwnerId(snowflake collID) override;
 
        private:
-        IDB* conn;
         std::unique_ptr<IRepositoryCollection> repo;
         std::shared_ptr<BufferData> bufferData;
     };

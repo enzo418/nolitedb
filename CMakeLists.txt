@@ -50,6 +50,14 @@ add_library(noLitedb_lb ${SOURCES})
 add_dependencies(noLitedb_lb ${DEPENDENCY_LIST})
 target_include_directories(noLitedb_lb PUBLIC ${DEPENDENCY_INCLUDE_DIR} ${DEPENDENCY_INCLUDE_LIST})
 
+target_compile_options(noLitedb_lb PRIVATE -Wall -Wextra -Wpedantic -Werror)
+
+# optional flags, e.g. -DNLDB_LIB_OPTIONAL_FLAGS:STRING="-w"
+target_compile_options(noLitedb_lb PRIVATE "${NLDB_LIB_OPTIONAL_FLAGS}")
+
+# in c++20 the expression Property == Property warns about something we don't care.
+add_compile_options(-Wno-error=ambiguous-reversed-operator -Wno-ambiguous-reversed-operator)
+
 # boolean definitions
 foreach(_VAR IN ITEMS
     NLDB_DEBUG_QUERY
@@ -116,9 +124,9 @@ target_link_libraries(
 )
 
 if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
-  add_definitions( -D LOGGER_MAX_LOG_LEVEL_PRINTED=6 ) # trace
+  add_definitions( -DLOGGER_MAX_LOG_LEVEL_PRINTED=6 ) # trace
 else ()
-  add_definitions( -D LOGGER_MAX_LOG_LEVEL_PRINTED=1 ) # error
+  add_definitions( -DLOGGER_MAX_LOG_LEVEL_PRINTED=1 ) # error
 endif()
 
 include(GoogleTest)

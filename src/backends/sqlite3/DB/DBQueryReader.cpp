@@ -6,8 +6,7 @@
 
 namespace nldb {
 
-    DBRowReaderSL3::DBRowReaderSL3(IDB* pDb, sqlite3_stmt* pStmt)
-        : stmt(pStmt), db(pDb) {}
+    DBRowReaderSL3::DBRowReaderSL3(sqlite3_stmt* pStmt) : stmt(pStmt) {}
 
     std::string DBRowReaderSL3::readString(uint16_t i) {
         auto str = sqlite3_column_text(stmt, i);
@@ -39,7 +38,7 @@ namespace nldb {
         if (this->allWasRead) return false;
 
         if (!row) {
-            row = std::make_shared<DBRowReaderSL3>(this->db, this->stmt);
+            row = std::make_shared<DBRowReaderSL3>(this->stmt);
         }
 
         int rc = sqlite3_step(stmt);
@@ -55,7 +54,7 @@ namespace nldb {
     }
 
     DBQueryReaderSL3::DBQueryReaderSL3(IDB* pDb, sqlite3_stmt* pStmt)
-        : stmt(pStmt), db(pDb) {}
+        : db(pDb), stmt(pStmt) {}
 
     DBQueryReaderSL3::~DBQueryReaderSL3() { sqlite3_finalize(stmt); }
 }  // namespace nldb

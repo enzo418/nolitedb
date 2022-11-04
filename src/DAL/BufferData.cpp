@@ -13,13 +13,13 @@ namespace nldb {
     };
 
     BufferData::BufferData(IDB* pDb)
-        : conn(pDb),
+        : bufferCollection(bufferSize<BufferValueCollection>()),
+          bufferRootProperty(bufferSize<BufferValueRootProperty>()),
+          bufferProperty(bufferSize<BufferValueProperty>()),
           bufferStringLike(bufferSize<BufferValueStringLike>()),
           bufferDependentObject(bufferSize<BufferValueDependentObject>()),
           bufferIndependentObject(bufferSize<BufferValueIndependentObject>()),
-          bufferCollection(bufferSize<BufferValueCollection>()),
-          bufferRootProperty(bufferSize<BufferValueRootProperty>()),
-          bufferProperty(bufferSize<BufferValueProperty>()) {};
+          conn(pDb) {};
 
     void BufferData::pushPendingData() {
         NLDB_PERF_SUCCESS("FLUSHING PENDING DATA");

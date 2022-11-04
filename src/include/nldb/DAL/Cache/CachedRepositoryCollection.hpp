@@ -7,8 +7,7 @@
 namespace nldb {
     class CachedRepositoryCollection : public IRepositoryCollection {
        public:
-        CachedRepositoryCollection(IDB* connection,
-                                   std::unique_ptr<IRepositoryCollection> repo);
+        CachedRepositoryCollection(std::unique_ptr<IRepositoryCollection> repo);
 
        public:
         snowflake add(const std::string& name, snowflake ownerID) override;
@@ -20,7 +19,6 @@ namespace nldb {
         std::optional<snowflake> getOwnerId(snowflake collID) override;
 
        private:
-        IDB* conn;
         std::unique_ptr<IRepositoryCollection> repo;
         lru11::Cache<std::pair<snowflake, std::string>, Collection, pairhash>
             cache_find;

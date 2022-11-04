@@ -4,8 +4,8 @@
 
 namespace nldb {
     CachedRepositoryProperty::CachedRepositoryProperty(
-        IDB* connection, std::unique_ptr<IRepositoryProperty> pRepo)
-        : conn(connection), repo(std::move(pRepo)), cache(300, 200) {}
+        std::unique_ptr<IRepositoryProperty> pRepo)
+        : repo(std::move(pRepo)), cache(300, 200) {}
 
     snowflake CachedRepositoryProperty::add(const std::string& name) {
         return repo->add(name);
@@ -24,7 +24,7 @@ namespace nldb {
 
     std::optional<Property> CachedRepositoryProperty::find(snowflake propID) {
         auto found = cache.findCopy(
-            [&propID](auto& k, Property& v) { return v.getId() == propID; });
+            [&propID](auto&, Property& v) { return v.getId() == propID; });
 
         if (found) {
             NLDB_PERF_SUCCESS("-- PROP -- cache HIT");

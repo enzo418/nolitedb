@@ -10,9 +10,9 @@
 
 namespace nldb {
     BufferedRepositoryCollection::BufferedRepositoryCollection(
-        IDB* connection, std::unique_ptr<IRepositoryCollection> pRepo,
+        std::unique_ptr<IRepositoryCollection> pRepo,
         const std::shared_ptr<BufferData>& pBufferData)
-        : conn(connection), repo(std::move(pRepo)), bufferData(pBufferData) {}
+        : repo(std::move(pRepo)), bufferData(pBufferData) {}
 
     snowflake BufferedRepositoryCollection::add(const std::string& name,
                                                 snowflake ownerID) {

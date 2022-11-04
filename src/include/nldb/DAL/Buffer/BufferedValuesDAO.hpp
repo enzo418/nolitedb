@@ -13,7 +13,7 @@ namespace nldb {
 
     class BufferedValuesDAO : public IValuesDAO {
        public:
-        BufferedValuesDAO(IDB* connection, std::unique_ptr<IValuesDAO>&& repo,
+        BufferedValuesDAO(std::unique_ptr<IValuesDAO>&& repo,
                           std::shared_ptr<BufferData> bufferData);
 
        public:
@@ -38,7 +38,6 @@ namespace nldb {
         void removeObject(snowflake objID) override;
 
        private:
-        IDB* conn;
         std::unique_ptr<IValuesDAO> repo;
         std::shared_ptr<BufferData> bufferData;
     };

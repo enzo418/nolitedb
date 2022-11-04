@@ -6,7 +6,10 @@ namespace nldb {
     enum AggregationType { COUNT, AVG, SUM, MAX, MIN };
 
     struct AggregatedProperty {
-        AggregatedProperty(Property, AggregationType, const char* alias);
+        AggregatedProperty(Property pProp, AggregationType pType,
+                           const char* pAlias)
+            : type(pType), property(pProp), alias(pAlias) {}
+
         AggregationType type;
         Property property;
         const char* alias;

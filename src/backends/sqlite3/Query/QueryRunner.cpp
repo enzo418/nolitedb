@@ -125,7 +125,7 @@ namespace nldb {
                            std::make_move_iterator(expanded.begin()),
                            std::make_move_iterator(expanded.end()));
 
-        return std::move(composed);
+        return composed;
     }
 
     void expandObjectProperties(Object& composed, auto&,
@@ -158,8 +158,8 @@ namespace nldb {
         }
     }
 
-    void expandObjectProperties(const AggregatedProperty& prop, auto&,
-                                std::shared_ptr<Repositories> const& repos) {}
+    void expandObjectProperties(const AggregatedProperty&, auto&,
+                                std::shared_ptr<Repositories> const&) {}
 
     void expandObjectProperties(Object& composed, auto&,
                                 std::shared_ptr<Repositories> const& repos) {
@@ -333,13 +333,13 @@ namespace nldb {
         sql << parseSQL(" from 'object' as @alias ", {{"@alias", alias}},
                         false);
 
-        auto composedCB = overloaded {
-            [&sql, &ctx, &ids, &composed, &alias](const Property& prop) {
-                addFromClause(sql, prop, ids, ctx, alias);
-            },
-            [&sql, &ctx, &ids, &composed, &alias](Object& composed2) {
-                addFromClause(sql, composed2, ids, ctx, alias);
-            }};
+        auto composedCB =
+            overloaded {[&sql, &ctx, &ids, &alias](const Property& prop) {
+                            addFromClause(sql, prop, ids, ctx, alias);
+                        },
+                        [&sql, &ctx, &ids, &alias](Object& composed2) {
+                            addFromClause(sql, composed2, ids, ctx, alias);
+                        }};
 
         for (auto& p : props) {
             std::visit(composedCB, p);
@@ -405,15 +405,12 @@ namespace nldb {
             [&sql, &ctx](const Property& prop) {
                 sql << ctx.getContextualizedAlias(prop, ctx.getRootCollId());
             },
-            [&sql, &ctx](const std::string& str) {
-                sql << encloseQuotesConst(str);
-            },
-            [&sql, &ctx](int val) { sql << val; },
-            [&sql, &ctx](double val) { sql << val; },
-            [&sql, &ctx](const char* str) { sql << encloseQuotesConst(str); }};
+            [&sql](const std::string& str) { sql << encloseQuotesConst(str); },
+            [&sql](int val) { sql << val; }, [&sql](double val) { sql << val; },
+            [&sql](const char* str) { sql << encloseQuotesConst(str); }};
 
         auto cbOperand = overloaded {
-            [&sql, &ctx, &cbConstVal](LogicConstValue const& prop) {
+            [&cbConstVal](LogicConstValue const& prop) {
                 std::visit(cbConstVal, prop);
             },
             [&sql, &ctx](box<struct PropertyExpression> const& agProp) {
@@ -463,7 +460,7 @@ namespace nldb {
 
         sql << " GROUP BY ";
 
-        for (int i = 0; i < props.size(); i++) {
+        for (size_t i = 0; i < props.size(); i++) {
             sql << ctx.getAlias(props[i]);
 
             if (i != props.size() - 1) {
@@ -482,7 +479,7 @@ namespace nldb {
 
         sql << " ORDER BY ";
 
-        for (int i = 0; i < props.size(); i++) {
+        for (size_t i = 0; i < props.size(); i++) {
             sql << ctx.getAlias(props[i].property) << " "
                 << magic_enum::enum_name(props[i].type);
 
@@ -515,12 +512,9 @@ namespace nldb {
         // maybe just store the prop.id and then search for it instead of using
         // a lambda? No, "_id" property are used with id = -1, type = ID and the
         // only distinct value is coll_id
-        auto type = prop.getType();
-        return std::find_if(
-                   fields.begin(), fields.end(),
-                   [&prop, isId = type == PropertyType::ID](Property& a) {
-                       return equal(prop, a);
-                   }) != fields.end();
+        return std::find_if(fields.begin(), fields.end(), [&prop](Property& a) {
+                   return equal(prop, a);
+               }) != fields.end();
     }
 
     /**
@@ -539,7 +533,7 @@ namespace nldb {
                 return false;
             },
             [&fields](Property& prop) { return isSuppressed(prop, fields); },
-            [](AggregatedProperty& agg) { return false; }};
+            [](AggregatedProperty&) { return false; }};
 
         select.remove_if([&cb](auto& prop) { return std::visit(cb, prop); });
     }
@@ -648,7 +642,7 @@ namespace nldb {
             [&select, &repos, &ctx](const Property& prop) {
                 addToSelectIfMissingProperty(select, prop, repos, ctx);
             },
-            [](const auto& str) {}};
+            [](const auto&) {}};
 
         auto cbOperand = overloaded {
             [&cbConstVal](LogicConstValue const& prop) {

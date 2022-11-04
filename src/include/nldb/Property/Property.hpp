@@ -17,9 +17,9 @@ namespace nldb {
         BOOLEAN
     };
 
-    class AggregatedProperty;
-    class SortedProperty;
-    class PropertyExpression;
+    struct AggregatedProperty;
+    struct SortedProperty;
+    struct PropertyExpression;
 
     typedef std::variant<class Property, std::string, int, double, const char*>
         LogicConstValue;
@@ -92,7 +92,7 @@ namespace nldb {
         PropertyExpression operator>=(const LogicConstValue& right);
         PropertyExpression operator<(const LogicConstValue& right);
         PropertyExpression operator<=(const LogicConstValue& right);
-        PropertyExpression operator==(const LogicConstValue& right);
+        PropertyExpression operator==(const LogicConstValue& right) const;
         PropertyExpression operator!=(
             const LogicConstValue& right);  // not equal
         PropertyExpression operator%(const LogicConstValue& right);  // like

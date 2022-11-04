@@ -5,10 +5,10 @@ namespace nldb {
 
     // IQueryRunner -> QueryContext -> queryRunner:IQueryRunner -> IQueryRunner
     // -> ...
-    class QueryPlannerContextUpdate;
-    class QueryPlannerContextInsert;
-    class QueryPlannerContextRemove;
-    class QueryPlannerContextSelect;
+    struct QueryPlannerContextUpdate;
+    struct QueryPlannerContextInsert;
+    struct QueryPlannerContextRemove;
+    struct QueryPlannerContextSelect;
 
     class IQueryRunner {
        public:

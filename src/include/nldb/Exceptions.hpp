@@ -25,12 +25,11 @@ class DocumentNotFound : public std::runtime_error {
 class WrongPropertyType : public std::runtime_error {
    public:
     WrongPropertyType(str pName = "", str pExpected = "", str pActual = "")
-        : propertyName(pName),
+        : std::runtime_error("Wrong property type for " + pName +
+                             ", expected " + pExpected + " actual " + pActual),
+          propertyName(pName),
           expected(pExpected),
-          actual(pActual),
-          std::runtime_error("Wrong property type for " + pName +
-                             ", expected " + pExpected + " actual " + pActual) {
-    }
+          actual(pActual) {}
 
    public:
     std::string propertyName;

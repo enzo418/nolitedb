@@ -14,8 +14,7 @@
 namespace nldb {
     class CachedRepositoryProperty : public IRepositoryProperty {
        public:
-        CachedRepositoryProperty(IDB* connection,
-                                 std::unique_ptr<IRepositoryProperty> repo);
+        CachedRepositoryProperty(std::unique_ptr<IRepositoryProperty> repo);
 
        public:
         snowflake add(const std::string& name) override;
@@ -29,7 +28,6 @@ namespace nldb {
         std::vector<Property> findAll(snowflake collectionId) override;
 
        private:
-        IDB* conn;
         std::unique_ptr<IRepositoryProperty> repo;
 
         /**

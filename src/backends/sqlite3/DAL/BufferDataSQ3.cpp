@@ -144,7 +144,7 @@ namespace nldb {
         std::map<PropertyType, std::stringstream> queries;
 
         bufferStringLike.ForEach(
-            [&queries, &tables](BufferValueStringLike& val, bool isLast) {
+            [&queries, &tables](BufferValueStringLike& val, bool) {
                 if (!queries.contains(val.type)) {
                     queries[val.type] = {};
                     queries[val.type] << utils::paramsbind::parseSQL(

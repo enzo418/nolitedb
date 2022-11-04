@@ -16,9 +16,9 @@
 
 namespace nldb {
     BufferedValuesDAO::BufferedValuesDAO(
-        IDB* pConnection, std::unique_ptr<IValuesDAO>&& pRepo,
+        std::unique_ptr<IValuesDAO>&& pRepo,
         std::shared_ptr<BufferData> pBufferData)
-        : conn(pConnection), repo(std::move(pRepo)), bufferData(pBufferData) {}
+        : repo(std::move(pRepo)), bufferData(pBufferData) {}
 
     void BufferedValuesDAO::addStringLike(snowflake propID, snowflake objID,
                                           PropertyType type,

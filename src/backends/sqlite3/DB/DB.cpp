@@ -147,7 +147,6 @@ namespace nldb {
         const std::string& query, const Paramsbind& params) {
         auto res = this->executeReader(query, params);
         std::shared_ptr<IDBRowReader> row;
-        int first {-1};
         while (res->readRow(row)) {
             return row->readInt64(0);
         }

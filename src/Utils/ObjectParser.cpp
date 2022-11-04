@@ -14,7 +14,7 @@ namespace nldb::utils {
             while (true) {
                 int pos = expr.find('.', last_pos);
 
-                if (pos != expr.npos) {
+                if (pos != (int)expr.npos) {
                     props.push_back(Property {
                         expr.substr(last_pos, pos - last_pos), collName});
                     last_pos = pos + 1;
@@ -29,7 +29,7 @@ namespace nldb::utils {
                 }
             }
 
-            return std::move(props);
+            return props;
         }
 
     }  // namespace dotProperties

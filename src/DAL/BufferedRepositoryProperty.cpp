@@ -7,9 +7,9 @@
 
 namespace nldb {
     BufferedRepositoryProperty::BufferedRepositoryProperty(
-        IDB* connection, std::unique_ptr<IRepositoryProperty> pRepo,
+        std::unique_ptr<IRepositoryProperty> pRepo,
         const std::shared_ptr<BufferData>& bufferData)
-        : conn(connection), repo(std::move(pRepo)), bufferData(bufferData) {}
+        : repo(std::move(pRepo)), bufferData(bufferData) {}
 
     snowflake BufferedRepositoryProperty::add(const std::string& name) {
         snowflake id = SnowflakeGenerator::generate(0);

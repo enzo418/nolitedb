@@ -6,7 +6,7 @@
 namespace nldb {
     class DBRowReaderSL3 : public IDBRowReader {
        public:
-        DBRowReaderSL3(IDB* db, sqlite3_stmt* stmt);
+        DBRowReaderSL3(sqlite3_stmt* stmt);
         ~DBRowReaderSL3() {}
 
        public:
@@ -20,7 +20,6 @@ namespace nldb {
         bool isNull(uint16_t i) override;
 
        private:
-        IDB* db;
         sqlite3_stmt* stmt;
     };
 

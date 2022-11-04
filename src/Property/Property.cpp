@@ -13,7 +13,7 @@ namespace nldb {
 
     Property::Property(const std::string& pName,
                        std::optional<std::string> pCollName)
-        : name(pName), collName(pCollName) {
+        : collName(pCollName), name(pName) {
         if (pName == common::internal_id_string) {
             type = PropertyType::ID;
         }
@@ -29,7 +29,7 @@ namespace nldb {
 
     Property::Property(snowflake pId, const std::string& pName,
                        PropertyType pType, snowflake collID)
-        : id(pId), name(pName), type(pType), collectionId(collID) {}
+        : name(pName), type(pType), id(pId), collectionId(collID) {}
 
     // getters
     std::string Property::getName() const { return name; }
@@ -99,7 +99,8 @@ namespace nldb {
                                   right);
     }
 
-    PropertyExpression Property::operator==(const LogicConstValue& right) {
+    PropertyExpression Property::operator==(
+        const LogicConstValue& right) const {
         return PropertyExpression(PropertyExpressionOperator::EQ, *this, right);
     }
 

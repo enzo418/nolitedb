@@ -9,8 +9,8 @@
 
 namespace nldb {
     CachedRepositoryCollection::CachedRepositoryCollection(
-        IDB* connection, std::unique_ptr<IRepositoryCollection> pRepo)
-        : conn(connection), repo(std::move(pRepo)) {}
+        std::unique_ptr<IRepositoryCollection> pRepo)
+        : repo(std::move(pRepo)) {}
 
     snowflake CachedRepositoryCollection::add(const std::string& name,
                                               snowflake ownerID) {
@@ -25,7 +25,7 @@ namespace nldb {
     std::optional<Collection> CachedRepositoryCollection::find(
         const std::string& name) {
         auto found = cache_find.findCopy(
-            [&name](auto& k, auto& v) { return k.second == name; });
+            [&name](auto& k, auto&) { return k.second == name; });
 
         if (found) {
             NLDB_PERF_SUCCESS("-- COLL -- cache HIT");
@@ -43,8 +43,8 @@ namespace nldb {
     }
 
     std::optional<Collection> CachedRepositoryCollection::find(snowflake id) {
-        auto found = cache_find.findCopy(
-            [id](auto& k, auto& v) { return k.first == id; });
+        auto found =
+            cache_find.findCopy([id](auto& k, auto&) { return k.first == id; });
 
         if (found) {
             NLDB_PERF_SUCCESS("-- COLL -- cache HIT");

@@ -85,6 +85,6 @@ namespace nldb {
         if (!props.empty())
             props.push_back(Property(-1, "id", PropertyType::ID, collectionId));
 
-        return std::move(props);
+        return props;
     }
 }  // namespace nldb
