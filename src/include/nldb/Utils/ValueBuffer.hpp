@@ -77,6 +77,8 @@ namespace nldb {
             return this->elementCount;
         }
 
+        int Capacity() { return this->bufferSize; }
+
         using Guard = std::lock_guard<Lock>;
 
        private:

@@ -28,11 +28,11 @@ namespace nldb {
             [&name](auto& k, auto&) { return k.second == name; });
 
         if (found) {
-            NLDB_PERF_SUCCESS("-- COLL -- cache HIT");
+            // NLDB_PERF_SUCCESS("-- COLL -- cache HIT");
             return found;
         }
 
-        NLDB_PERF_FAIL("-- COLL -- cache MISS");
+        // NLDB_PERF_FAIL("-- COLL -- cache MISS");
         auto p = repo->find(name);
         if (p) cache_find.insert({p->getId(), name}, p.value());
         return p;
@@ -47,11 +47,11 @@ namespace nldb {
             cache_find.findCopy([id](auto& k, auto&) { return k.first == id; });
 
         if (found) {
-            NLDB_PERF_SUCCESS("-- COLL -- cache HIT");
+            // NLDB_PERF_SUCCESS("-- COLL -- cache HIT");
             return found;
         }
 
-        NLDB_PERF_FAIL("-- COLL -- cache MISS");
+        // NLDB_PERF_FAIL("-- COLL -- cache MISS");
         auto p = repo->find(id);
         if (p) cache_find.insert({id, p->getName()}, p.value());
         return p;
@@ -64,11 +64,11 @@ namespace nldb {
     std::optional<Collection> CachedRepositoryCollection::findByOwner(
         snowflake ownerID) {
         if (cache_by_owner.contains(ownerID)) {
-            NLDB_PERF_SUCCESS("-- BY OWNER -- cache HIT");
+            // NLDB_PERF_SUCCESS("-- BY OWNER -- cache HIT");
             return cache_by_owner.getCopy(ownerID);
         }
 
-        NLDB_PERF_FAIL("-- BY OWNER -- cache MISS");
+        // NLDB_PERF_FAIL("-- BY OWNER -- cache MISS");
         auto found = repo->findByOwner(ownerID);
         if (found) cache_by_owner.insert(ownerID, found.value());
         return found;
@@ -77,10 +77,10 @@ namespace nldb {
     std::optional<snowflake> CachedRepositoryCollection::getOwnerId(
         snowflake collID) {
         if (cache_owner_id.contains(collID)) {
-            NLDB_PERF_SUCCESS("-- OWNER ID -- cache HIT");
+            // NLDB_PERF_SUCCESS("-- OWNER ID -- cache HIT");
             return cache_owner_id.getCopy(collID);
         }
-        NLDB_PERF_FAIL("-- OWNER ID -- cache MISS");
+        // NLDB_PERF_FAIL("-- OWNER ID -- cache MISS");
 
         auto found = repo->getOwnerId(collID);
         if (found) cache_owner_id.insert(collID, found.value());

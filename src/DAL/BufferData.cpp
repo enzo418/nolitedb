@@ -3,49 +3,85 @@
 #include <iostream>
 
 #include "nldb/LOG/log.hpp"
+#include "nldb/Profiling/Profiler.hpp"
 
 namespace nldb {
 
-    // how many as you can fit in 0.333 MB
+    /*5 KB*/
+    const int _SmallBufferSize = (int)(5.0 * 1000.0);
+
+    /*50 KB*/
+    const int _MediumBufferSize = (int)(50.0 * 1000.0);
+
+    /*1 MB*/
+    const int _BigBufferSize = (int)(1 * 1e6);
+
+    // how many as you can fit in `bytes`
     template <typename T>
-    consteval int bufferSize() {
-        return (int)(1e6 / 3 / sizeof(T));
+    consteval int bufferSize(int bytes) {
+        return (int)(bytes / sizeof(T));
+    };
+
+    template <typename T>
+    inline double bufferOccupancy(Buffer<T>& buffer) {
+        return (double)buffer.Size() * 100.0 / (double)buffer.Capacity();
     };
 
     BufferData::BufferData(IDB* pDb)
-        : bufferCollection(bufferSize<BufferValueCollection>()),
-          bufferRootProperty(bufferSize<BufferValueRootProperty>()),
-          bufferProperty(bufferSize<BufferValueProperty>()),
-          bufferStringLike(bufferSize<BufferValueStringLike>()),
-          bufferDependentObject(bufferSize<BufferValueDependentObject>()),
-          bufferIndependentObject(bufferSize<BufferValueIndependentObject>()),
+        : bufferCollection(bufferSize<BufferValueCollection>(_SmallBufferSize)),
+          bufferRootProperty(
+              bufferSize<BufferValueRootProperty>(_SmallBufferSize)),
+          bufferProperty(bufferSize<BufferValueProperty>(_MediumBufferSize)),
+          bufferStringLike(bufferSize<BufferValueStringLike>(_BigBufferSize)),
+          bufferDependentObject(
+              bufferSize<BufferValueDependentObject>(_MediumBufferSize)),
+          bufferIndependentObject(
+              bufferSize<BufferValueIndependentObject>(_SmallBufferSize)),
           conn(pDb) {};
 
     void BufferData::pushPendingData() {
+        NLDB_PROFILE_SCOPE("Flush data");
+
         NLDB_PERF_SUCCESS("FLUSHING PENDING DATA");
         lock.lock();  // next push should wait
 
         if (bufferRootProperty.Size() > 0) {
+            NLDB_PERF_SUCCESS("RootProperty: {}%",
+                              bufferOccupancy(bufferRootProperty));
             this->pushRootProperties();
         }
 
         if (bufferCollection.Size() > 0) {
+            NLDB_PERF_SUCCESS("Collection: {}%",
+                              bufferOccupancy(bufferCollection));
+
             this->pushCollections();
         }
 
         if (bufferProperty.Size() > 0) {
+            NLDB_PERF_SUCCESS("Property: {}%", bufferOccupancy(bufferProperty));
+
             this->pushProperties();
         }
 
         if (bufferIndependentObject.Size() > 0) {
+            NLDB_PERF_SUCCESS("IndependentObject: {}%",
+                              bufferOccupancy(bufferIndependentObject));
+
             this->pushIndependentObjects();
         }
 
         if (bufferDependentObject.Size() > 0) {
+            NLDB_PERF_SUCCESS("DependentObject: {}%",
+                              bufferOccupancy(bufferDependentObject));
+
             this->pushDependentObjects();
         }
 
         if (bufferStringLike.Size() > 0) {
+            NLDB_PERF_SUCCESS("StringLike: {}%",
+                              bufferOccupancy(bufferStringLike));
+
             this->pushStringLikeValues();
         }
 

@@ -33,21 +33,52 @@ namespace nldb {
                 // std::make_unique<RepositoryProperty>(conn),
 
                 std::make_unique<CachedRepositoryCollection>(
-                    conn,
                     std::make_unique<BufferedRepositoryCollection>(
-                        conn, std::make_unique<RepositoryCollection>(conn),
+
+                        std::make_unique<RepositoryCollection>(conn),
                         bufferData)),
 
                 std::make_unique<CachedRepositoryProperty>(
-                    conn, std::make_unique<BufferedRepositoryProperty>(
-                              conn, std::make_unique<RepositoryProperty>(conn),
-                              bufferData)),
+                    std::make_unique<BufferedRepositoryProperty>(
+
+                        std::make_unique<RepositoryProperty>(conn),
+                        bufferData)),
 
                 std::make_unique<BufferedValuesDAO>(
-                    conn, std::make_unique<ValuesDAO>(conn), bufferData),
+                    std::make_unique<ValuesDAO>(conn), bufferData),
                 bufferData);
         }
     };
+
+    //     template <>
+    //     struct RepositoriesImpl<DBSL3> {
+    //         static std::shared_ptr<Repositories> create(IDB* conn) {
+    //             // auto bufferData = std::make_shared<BufferDataSQ3>(conn);
+
+    //             return std::make_shared<Repositories>(
+    //                 // std::make_unique<RepositoryCollection>(conn),
+    //                 // std::make_unique<RepositoryProperty>(conn),
+
+    //                 std::make_unique<CachedRepositoryCollection>(
+    //                     /*std::make_unique<BufferedRepositoryCollection>(
+    //                      */
+    //                     std::make_unique<RepositoryCollection>(
+    //                         conn) /*,
+    // bufferData)*/),
+
+    //                 std::make_unique<CachedRepositoryProperty>(
+    //                     /*std::make_unique<BufferedRepositoryProperty>(
+    //                      */
+    //                     std::make_unique<RepositoryProperty>(
+    //                         conn) /*,
+    // bufferData)*/),
+
+    //                 /*std::make_unique<BufferedValuesDAO>(
+    //                  */
+    //                 std::make_unique<ValuesDAO>(conn), /*, bufferData),*/
+    //                 nullptr);
+    //         }
+    //     };
 
     template <>
     struct QueryRunnerImpl<DBSL3> {

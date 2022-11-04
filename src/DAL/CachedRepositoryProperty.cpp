@@ -27,7 +27,7 @@ namespace nldb {
             [&propID](auto&, Property& v) { return v.getId() == propID; });
 
         if (found) {
-            NLDB_PERF_SUCCESS("-- PROP -- cache HIT");
+            // NLDB_PERF_SUCCESS("-- PROP -- cache HIT");
             return found.value();
         } else {
             auto prop = repo->find(propID);
@@ -47,7 +47,7 @@ namespace nldb {
             return Property(-1, "_id", PropertyType::ID, collectionID);
 
         if (cache.contains({collectionID, propName})) {
-            NLDB_PERF_SUCCESS("-- PROP -- cache HIT");
+            // NLDB_PERF_SUCCESS("-- PROP -- cache HIT");
             return cache.get({collectionID, propName});
         } else {
             auto prop = this->repo->find(collectionID, propName);
@@ -67,7 +67,7 @@ namespace nldb {
                 }
 
             } else {
-                NLDB_PERF_SUCCESS("-- PROP -- cache MISS [NOT FOUND]");
+                // NLDB_PERF_SUCCESS("-- PROP -- cache MISS [NOT FOUND]");
             }
 
             return prop;

@@ -140,10 +140,7 @@ namespace nldb {
                 insertDocumentRecursive(data.documents, from.getName());
             }
 
-            {
-                NLDB_PROFILE_SCOPE("Flush data");
-                repos->pushPendingData();
-            }
+            repos->pushPendingData();
         }
 
         NLDB_PROFILE_END_SESSION();
