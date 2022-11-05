@@ -6,7 +6,6 @@
 #include "nldb/typedef.hpp"
 
 namespace nldb {
-
     struct BufferValueStringLike {
         snowflake propID;
         snowflake objID;
@@ -44,7 +43,8 @@ namespace nldb {
     };
 
     struct BufferData {
-        BufferData(IDB* db);
+        BufferData(IDB* db, int SmallBufferSize, int MediumBufferSize,
+                   int LargeBufferSize);
 
         /**
          * @brief if there is data pending to be sent, make sure it is sent.

@@ -7,18 +7,9 @@
 
 namespace nldb {
 
-    /*5 KB*/
-    const int _SmallBufferSize = (int)(5.0 * 1000.0);
-
-    /*50 KB*/
-    const int _MediumBufferSize = (int)(50.0 * 1000.0);
-
-    /*1 MB*/
-    const int _BigBufferSize = (int)(1 * 1e6);
-
     // how many as you can fit in `bytes`
     template <typename T>
-    consteval int bufferSize(int bytes) {
+    constexpr int bufferSize(int bytes) {
         return (int)(bytes / sizeof(T));
     };
 
@@ -27,16 +18,17 @@ namespace nldb {
         return (double)buffer.Size() * 100.0 / (double)buffer.Capacity();
     };
 
-    BufferData::BufferData(IDB* pDb)
-        : bufferCollection(bufferSize<BufferValueCollection>(_SmallBufferSize)),
+    BufferData::BufferData(IDB* pDb, int pSmallBufferSize,
+                           int pMediumBufferSize, int pLargeBufferSize)
+        : bufferCollection(bufferSize<BufferValueCollection>(pSmallBufferSize)),
           bufferRootProperty(
-              bufferSize<BufferValueRootProperty>(_SmallBufferSize)),
-          bufferProperty(bufferSize<BufferValueProperty>(_MediumBufferSize)),
-          bufferStringLike(bufferSize<BufferValueStringLike>(_BigBufferSize)),
+              bufferSize<BufferValueRootProperty>(pSmallBufferSize)),
+          bufferProperty(bufferSize<BufferValueProperty>(pMediumBufferSize)),
+          bufferStringLike(bufferSize<BufferValueStringLike>(pLargeBufferSize)),
           bufferDependentObject(
-              bufferSize<BufferValueDependentObject>(_MediumBufferSize)),
+              bufferSize<BufferValueDependentObject>(pMediumBufferSize)),
           bufferIndependentObject(
-              bufferSize<BufferValueIndependentObject>(_SmallBufferSize)),
+              bufferSize<BufferValueIndependentObject>(pSmallBufferSize)),
           conn(pDb) {};
 
     void BufferData::pushPendingData() {

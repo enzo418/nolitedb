@@ -8,6 +8,21 @@
 #include "nldb/Query/QueryPlannerSources.hpp"
 
 namespace nldb {
+
+    struct QueryConfiguration {
+        // buffered repositories
+        bool PreferBuffer = true;
+        uint SmallBufferSize = (int)(5.0 * 1000.0) /* 5 KB */;
+        uint MediumBufferSize = (int)(50.0 * 1000.0) /* 50 KB*/;
+        uint LargeBufferSize = (int)(1 * 1e6) /* 1 MB */;
+
+        // use cached repositories?
+        bool PreferCache = true;
+
+        // reuse cached repositories
+        std::shared_ptr<Repositories> cachedRepositories = nullptr;
+    };
+
     template <typename T>
     class Query {
        public:
@@ -17,22 +32,17 @@ namespace nldb {
          *
          * @param pConnection
          */
-        Query(T* pConnection) : connection(pConnection) {
-            // having the repositories initialized here and passing it to every
-            // query runner instance gives us a better cache.
-            repositories = RepositoriesImpl<T>::create(connection);
+        Query(T* pConnection,
+              const QueryConfiguration& cfg = QueryConfiguration {})
+            : connection(pConnection) {
+            if (!cfg.cachedRepositories) {
+                // having the repositories initialized here and passing it to
+                // every query runner instance gives us a better cache.
+                repositories = RepositoriesImpl<T>::create(connection, cfg);
+            } else {
+                repositories = cfg.cachedRepositories;
+            }
         }
-
-        /**
-         * @brief Construct a new Query object from a DB connection and
-         * repository instance. Use this overload to reuse the repositories
-         * cache.
-         *
-         * @param pConnection
-         * @param pRepos
-         */
-        Query(T* pConnection, std::shared_ptr<Repositories> pRepos)
-            : connection(pConnection), repositories(pRepos) {}
 
         QueryPlannerSources from(const char* collection1Name) {
             auto newCtx =
@@ -59,6 +69,8 @@ namespace nldb {
          * @return Collection
          */
         Collection collection(const char* name) { return Collection(name); }
+
+        std::shared_ptr<Repositories> getRepositories() { return repositories; }
 
        private:
         T* connection;

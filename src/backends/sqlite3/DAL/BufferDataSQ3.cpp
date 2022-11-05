@@ -12,7 +12,9 @@
 namespace nldb {
     using namespace definitions;
 
-    BufferDataSQ3::BufferDataSQ3(IDB* db) : BufferData(db) {}
+    BufferDataSQ3::BufferDataSQ3(IDB* db, int SmallBufferSize,
+                                 int MediumBufferSize, int LargeBufferSize)
+        : BufferData(db, SmallBufferSize, MediumBufferSize, LargeBufferSize) {}
 
     void BufferDataSQ3::pushRootProperties() {
         NLDB_PROFILE_FUNCTION();

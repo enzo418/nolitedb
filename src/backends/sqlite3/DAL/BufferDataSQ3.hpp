@@ -5,7 +5,8 @@ namespace nldb {
     constexpr int max_sql3_query_length = 1000000000;
 
     struct BufferDataSQ3 : public BufferData {
-        BufferDataSQ3(IDB* db);
+        BufferDataSQ3(IDB* db, int SmallBufferSize, int MediumBufferSize,
+                      int LargeBufferSize);
 
         void pushRootProperties() override;
         void pushCollections() override;

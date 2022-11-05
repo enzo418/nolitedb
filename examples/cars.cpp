@@ -37,7 +37,12 @@ int main() {
     }
 
     // a query object can be used to execute multiple queries.
-    Query query = Query(&db);
+    Query query = Query(&db, QueryConfiguration {
+                                 .PreferBuffer = false,
+                                 .SmallBufferSize = 1000, /*1 KB*/
+                                 .MediumBufferSize = 1000,
+                                 .LargeBufferSize = 1000,
+                             });
 
     // {name, founded, country}
     json data_automaker = {{{"name", "ford"},
