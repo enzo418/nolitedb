@@ -24,7 +24,12 @@ using namespace nldb;
 int main() {
     nldb::LogManager::Initialize();
 
-    DBSL3 db;
+    // optional, tweak the sqlite available memory.
+    // With this example I reduced 70% of the memory usage.
+    DBSL3 db(DBConfig {.page_size = 1000 * 16,
+                       .page_cache_size = 1000 * 16,
+                       .page_cache_N = 41});
+    // DBSL3 db;
 
     remove("./twitter.db");
 
@@ -36,12 +41,19 @@ int main() {
     std::ifstream f("twitter.json");
     json data = json::parse(f)["statuses"];
 
-    auto query = Query(&db);
+    auto query = Query(&db, QueryConfiguration {
+                                .PreferBuffer = true,
+                                .SmallBufferSize = 1000, /*1 KB*/
+                                .MediumBufferSize = 1000,
+                                .LargeBufferSize = 1000 * 100 /*100 KB*/,
+                            });
 
     Collection tweets = query.collection("tweets");
 
     auto now = std::chrono::high_resolution_clock::now();
     query.from(tweets).insert(data);
+
+    db.logStatus();
 
     std::cout << "took "
               << (std::chrono::high_resolution_clock::now() - now) /
@@ -58,7 +70,7 @@ int main() {
             //    .suppress(tweets["user"], tweets["retweeted_status.user"])
             .execute();
 
-    std::cout << res << std::endl;
+    // std::cout << res << std::endl;
 
     std::cout << "size: " << res.size() << std::endl;
 
@@ -66,6 +78,8 @@ int main() {
               << (std::chrono::high_resolution_clock::now() - now) /
                      std::chrono::milliseconds(1)
               << " ms" << std::endl;
+
+    db.logStatus();
 
     nldb::LogManager::Shutdown();
 }

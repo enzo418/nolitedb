@@ -88,6 +88,13 @@ namespace nldb {
 
         virtual void throwLastError() = 0;
 
+        /**
+         * @brief Logs the current database status, mostly about the memory
+         * usage.
+         *
+         */
+        virtual void logStatus() = 0;
+
         virtual ~IDB() = default;
     };
 }  // namespace nldb

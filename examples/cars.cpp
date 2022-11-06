@@ -27,7 +27,10 @@ using namespace nldb;
 int main() {
     nldb::LogManager::Initialize();
 
-    DBSL3 db;
+    // optional, tweak the sqlite available memory.
+    DBSL3 db(DBConfig {
+        .page_size = 2048, .page_cache_size = 6144, .page_cache_N = 3});
+    // DBSL3 db;
 
     remove("./cars.db");
 
@@ -61,6 +64,8 @@ int main() {
 
     // insert automakers
     query.from("automaker").insert(data_automaker);
+
+    db.logStatus();
 
     // group all the automaker properties into the `automaker` variable.
     Collection automakers = query.collection("automaker");
@@ -116,6 +121,8 @@ int main() {
     auto finalThen = query.from("cars").select(model, maker, year).execute();
 
     std::cout << "\n\nAfter remove: " << finalThen.dump(2) << std::endl;
+
+    db.logStatus();
 
     nldb::LogManager::Shutdown();
 }

@@ -22,6 +22,63 @@
 
 namespace nldb {
 
+    DBSL3::DBSL3() : page_cache_ptr(nullptr) {}
+
+    DBSL3::DBSL3(const DBConfig pCfg) : config(pCfg), page_cache_ptr(nullptr) {
+        // configure page cache size
+        if (pCfg.page_cache_N != -1 && pCfg.page_size != -1) {
+            this->page_cache_ptr =
+                malloc(pCfg.page_cache_N * (sqlite3_int64)pCfg.page_cache_size);
+
+            sqlite3_config(SQLITE_CONFIG_PAGECACHE, this->page_cache_ptr,
+                           pCfg.page_cache_size, pCfg.page_cache_N);
+        }
+    }
+
+    void DBSL3::logStatus() {
+        // https://www.sqlite.org/c3ref/c_status_malloc_count.html
+        sqlite3_int64 h;
+
+        sqlite3_int64 currMem;
+        sqlite3_int64 peakMem;
+        sqlite3_status64(SQLITE_STATUS_MEMORY_USED, &currMem, &peakMem, 0);
+
+        sqlite3_int64 currPageCache;
+        sqlite3_int64 peakPageCache;
+        sqlite3_status64(SQLITE_STATUS_PAGECACHE_USED, &currPageCache,
+                         &peakPageCache, 0);
+
+        sqlite3_int64 currPageOverflow;
+        sqlite3_int64 peakPageOverflow;
+        sqlite3_status64(SQLITE_STATUS_PAGECACHE_OVERFLOW, &currPageOverflow,
+                         &peakPageOverflow, 0);
+
+        sqlite3_int64 peakMalloc;
+        sqlite3_status64(SQLITE_STATUS_MALLOC_SIZE, &h, &peakMalloc, 0);
+
+        sqlite3_int64 peakPageSize;
+        sqlite3_status64(SQLITE_STATUS_PAGECACHE_SIZE, &h, &peakPageSize, 0);
+
+        NLDB_INFO("==================== SQLITE STATUS ===================");
+
+        NLDB_INFO("MEMORY_USED: current={} KB | peak={} KB", currMem / 1024.0,
+                  peakMem / 1024.0);
+
+        NLDB_INFO("PAGECACHE_USED: current={} pages | peak={} pages",
+                  currPageCache, peakPageCache);
+
+        NLDB_INFO(
+            "PAGECACHE_OVERFLOW: current={} missing KB | peak={} missing "
+            "KB",
+            currPageOverflow / 1024.0, peakPageOverflow / 1024.0);
+
+        NLDB_INFO("PAGECACHE_SIZE: page size peak={} KB",
+                  peakPageSize / 1024.0);
+
+        NLDB_INFO("MALLOC_SIZE: peak={} KB", peakMalloc / 1024.0);
+        NLDB_INFO("======================================================");
+    }
+
     bool DBSL3::open(const std::string& path) {
         NLDB_INFO("OPENING DATABASE: {}", path);
 
@@ -34,8 +91,10 @@ namespace nldb {
             return false;
         }
 
-        this->execute("PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL;",
-                      {{}});
+        this->execute(
+            "PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; PRAGMA "
+            "page_size = @page_size",
+            {{"@page_size", config.page_size}});
 
         if (!fileExists) {
             DBInitializer::createTablesAndFKeys(this);
@@ -169,6 +228,12 @@ namespace nldb {
         throw std::runtime_error(sqlite3_errmsg(this->db));
     }
 
-    DBSL3::~DBSL3() { sqlite3_close(this->db); }
+    DBSL3::~DBSL3() {
+        sqlite3_close(this->db);
+
+        if (page_cache_ptr != nullptr) {
+            free(page_cache_ptr);
+        }
+    }
 
 }  // namespace nldb
