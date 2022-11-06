@@ -70,7 +70,7 @@ int main() {
             //    .suppress(tweets["user"], tweets["retweeted_status.user"])
             .execute();
 
-    // std::cout << res << std::endl;
+    std::cout << res << std::endl;
 
     std::cout << "size: " << res.size() << std::endl;
 
