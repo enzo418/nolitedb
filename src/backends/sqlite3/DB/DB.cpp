@@ -133,6 +133,8 @@ namespace nldb {
         if (rc == SQLITE_OK) {
             // bind params
             for (const auto& it : params) {
+                if (it.first.empty()) continue;
+
                 if (!it.first.starts_with("@") && !it.first.starts_with("$") &&
                     !it.first.starts_with("?") && !it.first.starts_with(":")) {
                     NLDB_WARN(
