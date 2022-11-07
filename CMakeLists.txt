@@ -114,7 +114,7 @@ include_directories(vendor/googletest/googletest/include)
 
 enable_testing()
 
-file(GLOB TESTS_SRC tests/*.cpp)
+file(GLOB_RECURSE TESTS_SRC tests/*.cpp)
 
 add_executable(
   tests

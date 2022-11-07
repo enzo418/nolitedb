@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "DBBaseTest.hpp"
 #include "backends/sqlite3/DB/DB.hpp"
 
 using namespace nldb;
@@ -19,33 +20,26 @@ inline const char* getTemplateDB<DBSL3>() {
            "'user2','user2@email.com');";
 }
 
-template <typename T>
-class DBTest : public ::testing::Test, public testing::WithParamInterface<T> {
-   public:
-    void SetUp() override {
-        ASSERT_TRUE(db.open(":memory:"));
+template <typename T> class DBTest : public BaseDBTest<T> {
+public:
+  void SetUp() override {
+    BaseDBTest<T>::SetUp();
 
-        db.execute(getTemplateDB<T>(), {{}});
+    this->db.execute(getTemplateDB<T>(), {{}});
 
-        EXPECT_EQ(db.getLastInsertedRowId(), 2);
+    EXPECT_EQ(this->db.getLastInsertedRowId(), 2);
 
-        EXPECT_EQ(db.executeAndGetFirstInt(
-                        "SELECT id from user where name = @name order by id;",
-                        {{"@name", std::string("user1")}})
-                      .value_or(-1),
-                  1);
-    }
-
-    void TearDown() override { db.close(); }
-
-    T db;
+    EXPECT_EQ(this->db
+                  .executeAndGetFirstInt(
+                      "SELECT id from user where name = @name order by id;",
+                      {{"@name", std::string("user1")}})
+                  .value_or(-1),
+              1);
+  }
 };
 
-// declare all the types that are going to be tested
-using TestTypes = ::testing::Types<DBSL3>;
-
 // Templated suit test
-TYPED_TEST_SUITE(DBTest, TestTypes);
+TYPED_TEST_SUITE(DBTest, TestDBTypes);
 
 TYPED_TEST(DBTest, ShouldExecuteQueryReader) {
     auto reader = this->db.executeReader(
