@@ -128,7 +128,9 @@ int main() {
     Because we store them as a string. But nowadays [sqlite3 supports](https://www.sqlite.org/json1.html) some operations over it so maybe we add them in the future.
 
 # Identifiers
-- Ids are 64 bits long integers with the
+The default ids are [snowflake](https://en.wikipedia.org/wiki/Snowflake_ID), since we buffer the values and then insert them all together. This is because they are not yet in the database but anyway we need their ids to relate them.
+If you disable the buffer the ids will be the ones assigned by the database, incremental integers.
+- snowflake Ids are 64 bits long integers with the
     - first 43 bits to store the timestamp in milliseconds
     - 7 bits for the thread/process id
     - 14 bits thread element counter
