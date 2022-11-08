@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <type_traits>
 
 #include "QueryPlannerSelect.hpp"
@@ -11,7 +12,17 @@ namespace nldb {
     template <typename T>
     concept IsSelectProperty =
         IsProperty<T> || std::is_same<T, AggregatedProperty>::value ||
-        std::is_same<T, Object>::value;
+        std::is_same<T, Object>::value || std::is_same<T, Collection>::value;
+
+    template <typename T>
+    inline auto toSelectable(const T& v) {
+        return v;
+    }
+
+    template <>
+    inline auto toSelectable<Collection>(const Collection& v) {
+        return Property(v.getName(), std::nullopt);
+    }
 
     class QueryPlanner {
        public:
@@ -21,7 +32,7 @@ namespace nldb {
         template <IsSelectProperty... PropOrAggregatedProp>
         QueryPlannerSelect select(const PropOrAggregatedProp&... props) {
             QueryPlannerContextSelect ctx(std::move(context));
-            ctx.select_value = {props...};
+            ctx.select_value = {toSelectable(props)...};
 
             return QueryPlannerSelect(std::move(ctx));
         }

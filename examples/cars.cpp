@@ -69,7 +69,6 @@ int main() {
 
     // group all the automaker properties into the `automaker` variable.
     Collection automakers = query.collection("automaker");
-    auto automaker = automakers.group("_id", "name", "founded", "country");
 
     // we can obtain the properties from a collection before inserting any value
     // in it
@@ -81,14 +80,16 @@ int main() {
 
     // select all the cars with manufacturer details
     json all = query.from("cars")
-                   .select(id, model, maker, year, automaker)
-                   .where(year > 1990 && automaker["name"] == maker)
+                   .select(id, model, maker, year, automakers)
+                   .where(year > 1990 && automakers["name"] == maker)
                    .page(1, 10)
-                   .suppress(automaker["_id"])
+                   .suppress(automakers["_id"])
                    .execute();
 
     std::cout << "\n\nCars with automaker: " << all.dump(2) << std::endl
               << std::endl;
+
+    auto automaker = automakers.group("_id", "name", "founded");
 
     // select id, model, maker and max year from each model
     auto res1 = query.from("cars")
@@ -99,8 +100,8 @@ int main() {
                     .groupBy(model, maker)
                     .execute();
 
-    std::cout << "\n\nNewest models with automaker details: " << res1.dump(2)
-              << std::endl;
+    std::cout << "\n\nNewest models with automaker details {name, founded}: "
+              << res1.dump(2) << std::endl;
 
     // update first car, set year to 2100 and add a new
     // property called price

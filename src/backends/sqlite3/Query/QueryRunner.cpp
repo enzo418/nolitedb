@@ -195,6 +195,55 @@ namespace nldb {
         }
     }
 
+    void expandRootProperty(std::shared_ptr<Repositories> const&,
+                            std::forward_list<SelectableProperty>&, auto&,
+                            auto&, QueryRunnerCtx&) {}
+
+    void expandRootProperty(std::shared_ptr<Repositories> const& repos,
+                            std::forward_list<SelectableProperty>& select,
+                            Property& prop, auto& it, QueryRunnerCtx& ctx) {
+        // If you do select(Collection("coll_name")) then we convert it to
+        // Property("coll_name"), which is a root property. If that root
+        // property is the same as the "from collection" then we can't convert
+        // it to an object.
+        if (prop.getType() == PropertyType::OBJECT) {
+            auto subColl =
+                repos->repositoryCollection->findByOwner(prop.getId());
+
+            if (!subColl) {
+                throw std::runtime_error("Couldn't expand property with id " +
+                                         std::to_string(prop.getId()));
+            }
+
+            if (subColl->getId() == ctx.getRootCollId()) {
+                // is the root prop, we need to expand it but not as
+                // an object
+                auto allProps =
+                    repos->repositoryProperty->findAll(ctx.getRootCollId());
+
+                select.insert_after(it,
+                                    std::make_move_iterator(allProps.begin()),
+                                    std::make_move_iterator(allProps.end()));
+
+                // set it to an empty object so it gets removed
+                // later
+                *it = Object(prop, {}, -1);
+            }
+        }
+    }
+
+    void expandRootProperty(std::shared_ptr<Repositories> const& repos,
+                            std::forward_list<SelectableProperty>& select,
+                            QueryRunnerCtx& ctx) {
+        for (auto it = select.begin(); it != select.end(); it++) {
+            std::visit(
+                [&it, &repos, &select, &ctx](auto& p) {
+                    expandRootProperty(repos, select, p, it, ctx);
+                },
+                *it);
+        }
+    }
+
     /* -------------------- SELECT CLAUSE ------------------- */
     void addSelectClause(std::stringstream& sql, const Property& prop,
                          QueryRunnerCtx& ctx, snowflake currentSelectCollId) {
@@ -840,10 +889,6 @@ namespace nldb {
 
             std::stringstream sql;
 
-            expandObjectProperties(repos, data.select_value);
-            suppressFields(data.select_value, data.suppress_value);
-            filterOutEmptyObjects(data.select_value);
-
             auto rootColl =
                 repos->repositoryCollection->find(data.from.begin()->getName());
 
@@ -856,6 +901,11 @@ namespace nldb {
                 repos->repositoryCollection->getOwnerId(rootColl->getId())
                     .value_or(-1),
                 doc_alias);
+
+            expandRootProperty(repos, data.select_value, ctx);
+            expandObjectProperties(repos, data.select_value);
+            suppressFields(data.select_value, data.suppress_value);
+            filterOutEmptyObjects(data.select_value);
 
 #ifdef NLDB_DEBUG_QUERY
             printSelect(data.select_value);

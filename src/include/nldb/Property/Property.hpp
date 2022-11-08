@@ -20,8 +20,8 @@ namespace nldb {
     struct AggregatedProperty;
     struct SortedProperty;
     struct PropertyExpression;
-    
-     typedef std::variant<class Property, std::string, int, double, const char*>
+
+    typedef std::variant<class Property, std::string, int, double, const char*>
         LogicConstValue;
 
     class Property {
