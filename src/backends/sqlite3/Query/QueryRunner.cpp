@@ -646,23 +646,34 @@ namespace nldb {
 
     template <typename T>
     inline bool isPropertyInList(T& select, const Property& prop) {
-        auto cb =
-            overloaded {[&prop](const Property& b) { return equal(prop, b); },
-                        [](const auto&) { return false; }};
+        auto cb = overloaded {[&prop](Property& b) { return equal(prop, b); },
+                              [&prop](Object& ob) {
+                                  return isPropertyInList(ob.getPropertiesRef(),
+                                                          prop);
+                              },
+                              [](auto&) { return false; }};
 
-        return std::find_if(select.begin(), select.end(), [&cb](const auto& t) {
+        return std::find_if(select.begin(), select.end(), [&cb](auto& t) {
                    return std::visit(cb, t);
                }) != select.end();
     }
 
     void addToSelectIfMissingProperty(
         std::forward_list<SelectableProperty>& select, const Property& prop,
-        std::shared_ptr<Repositories> const& repos, QueryRunnerCtx& ctx) {
+        std::shared_ptr<Repositories> const& repos, QueryRunnerCtx& ctx,
+        std::vector<Property>& suppressed) {
         if (prop.getCollectionId() == ctx.getRootCollId()) {
-            if (!isPropertyInList(select, prop)) select.push_front(prop);
+            if (!isPropertyInList(select, prop)) {
+                select.push_front(prop);
+                suppressed.push_back(prop);
+            }
         } else {
             Object& object = findOrAddObjectToSelectRecursive(
                 select, prop.getCollectionId(), repos);
+
+            if (!isPropertyInList(select, prop)) {
+                suppressed.push_back(prop);
+            }
 
             if (!isPropertyInList(object.getPropertiesRef(), prop)) {
                 object.addProperty(prop);
@@ -673,23 +684,28 @@ namespace nldb {
     void addUsedFields(std::forward_list<SelectableProperty>& select,
                        const PropertyExpressionOperand& expr,
                        std::shared_ptr<Repositories> const& repos,
-                       QueryRunnerCtx& ctx);
+                       QueryRunnerCtx& ctx, std::vector<Property>& suppressed);
 
     void addUsedFields(std::forward_list<SelectableProperty>& select,
                        const PropertyExpression& expr,
                        std::shared_ptr<Repositories> const& repos,
-                       QueryRunnerCtx& ctx) {
-        addUsedFields(select, expr.left, repos, ctx);
-        addUsedFields(select, expr.right, repos, ctx);
+                       QueryRunnerCtx& ctx, std::vector<Property>& suppressed) {
+        addUsedFields(select, expr.left, repos, ctx, suppressed);
+        addUsedFields(select, expr.right, repos, ctx, suppressed);
     }
 
     void addUsedFields(std::forward_list<SelectableProperty>& select,
                        const PropertyExpressionOperand& expr,
                        std::shared_ptr<Repositories> const& repos,
-                       QueryRunnerCtx& ctx) {
+                       QueryRunnerCtx& ctx, std::vector<Property>& suppressed) {
         auto cbConstVal = overloaded {
-            [&select, &repos, &ctx](const Property& prop) {
-                addToSelectIfMissingProperty(select, prop, repos, ctx);
+            [&select, &repos, &ctx, &suppressed](const Property& prop) {
+                if (!isPropertyInList(select, prop)) {
+                    suppressed.push_back(prop);
+                }
+
+                addToSelectIfMissingProperty(select, prop, repos, ctx,
+                                             suppressed);
             },
             [](const auto&) {}};
 
@@ -697,12 +713,13 @@ namespace nldb {
             [&cbConstVal](LogicConstValue const& prop) {
                 std::visit(cbConstVal, prop);
             },
-            [&select, &repos,
-             &ctx](box<struct PropertyExpression> const& agProp) {
-                addUsedFields(select, *agProp, repos, ctx);
+            [&select, &repos, &ctx,
+             &suppressed](box<struct PropertyExpression> const& agProp) {
+                addUsedFields(select, *agProp, repos, ctx, suppressed);
             },
-            [&select, &repos, &ctx](PropertyExpressionOperand const& agProp) {
-                addUsedFields(select, agProp, repos, ctx);
+            [&select, &repos, &ctx,
+             &suppressed](PropertyExpressionOperand const& agProp) {
+                addUsedFields(select, agProp, repos, ctx, suppressed);
             }};
 
         std::visit(cbOperand, expr);
@@ -714,7 +731,7 @@ namespace nldb {
      */
     void addUsedFields(QueryPlannerContextSelect& data,
                        std::shared_ptr<Repositories> const& repos,
-                       QueryRunnerCtx& ctx) {
+                       QueryRunnerCtx& ctx, std::vector<Property>& suppressed) {
         // Why:
         //   Since the last design change, the from clause depends on the
         //   order in which joins are added, so we can no longer call addFrom
@@ -724,19 +741,65 @@ namespace nldb {
 
         // Context: all the properties have an id (except the ones of type ID)
 
+        // fields added to select later will need to be ignored if they are not
+        // in the original select.
+
         for (auto& prop : data.groupBy_value) {
-            addToSelectIfMissingProperty(data.select_value, prop, repos, ctx);
+            addToSelectIfMissingProperty(data.select_value, prop, repos, ctx,
+                                         suppressed);
         }
 
         for (auto& sortedProp : data.sortBy_value) {
             addToSelectIfMissingProperty(data.select_value, sortedProp.property,
-                                         repos, ctx);
+                                         repos, ctx, suppressed);
         }
 
         if (data.where_value) {
             addUsedFields(data.select_value, data.where_value.value(), repos,
-                          ctx);
+                          ctx, suppressed);
         }
+    }
+
+    /* ------------ MOVE EMBED PROPS TO SUBOJECTS ----------- */
+    // When a property from another collection is selected, e.g.
+    // automaker["name"], we need to move into an object so in the resulting
+    // object it looks like
+    // {
+    //     name: "car01",
+    //     automaker: {
+    //         name: "ford"
+    //     },
+    //     year: 2001
+    // }
+    // which would cause a name collision if we don't do it.
+
+    void moveEmbedPropsToSubObjects(
+        std::forward_list<SelectableProperty>& select,
+        std::shared_ptr<Repositories> const& repos, QueryRunnerCtx& ctx) {
+        auto wasMoved = overloaded {
+            [&select, &repos, &ctx](const Property& prop) {
+                if (prop.getCollectionId() != ctx.getRootCollId()) {
+                    // If the parent object was not yet created then add it to
+                    // the select, then move the property from select to that
+                    // object
+                    Object& object = findOrAddObjectToSelectRecursive(
+                        select, prop.getCollectionId(), repos);
+
+                    if (!isPropertyInList(object.getPropertiesRef(), prop)) {
+                        object.addProperty(std::move(prop));
+                    }
+
+                    // remove property from the root select since we moved
+                    // it
+                    return true;
+                }
+
+                return false;
+            },
+            [](const auto&) { return false; }};
+
+        select.remove_if(
+            [&wasMoved](auto& prop) { return std::visit(wasMoved, prop); });
     }
 
     /* ------------------------ READ ------------------------ */
@@ -911,7 +974,8 @@ namespace nldb {
             printSelect(data.select_value);
 #endif
 
-            addUsedFields(data, repos, ctx);
+            moveEmbedPropsToSubObjects(data.select_value, repos, ctx);
+            addUsedFields(data, repos, ctx, data.suppress_value);
 
             addSelectClause(sql, data.select_value, ctx);
             addFromClause(sql, data, ctx);

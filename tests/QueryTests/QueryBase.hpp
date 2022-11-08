@@ -31,11 +31,11 @@ inline bool contains(const std::vector<std::string>& l, std::string s) {
 // compares two json objects without comparing the internal id
 inline bool equalObjectsIgnoreID(json& a, json& b,
                                  const std::vector<std::string>& ignore = {}) {
-    if (a && !a.is_object()) {
+    if (!a.is_object()) {
         ADD_FAILURE() << "a is not an object: \n a: " << a << "\n b: " << b;
     }
 
-    if (b && !b.is_object()) {
+    if (!b.is_object()) {
         ADD_FAILURE() << "b is not an object: \n b: " << b << " \n a: " << a;
     }
 

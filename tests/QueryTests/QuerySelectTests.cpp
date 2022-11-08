@@ -107,23 +107,23 @@ TYPED_TEST(QueryCarsTest, ShouldSelectEmbedDocuments) {
                       .where(automaker["name"] == cars["maker"])
                       .execute();
 
-    EXPECT_EQ(result.size(), 3);
+    EXPECT_EQ(result.size(), 3) << result;
 
     for (auto& car : result) {
-        EXPECT_TRUE(car.contains(idStr));
-        EXPECT_TRUE(car.contains("maker"));
-        EXPECT_TRUE(car.contains("model"));
-        EXPECT_TRUE(car.contains("year"));
-        EXPECT_TRUE(car.contains("categories"));
+        ASSERT_TRUE(car.contains(idStr));
+        ASSERT_TRUE(car.contains("maker"));
+        ASSERT_TRUE(car.contains("model"));
+        ASSERT_TRUE(car.contains("year"));
+        ASSERT_TRUE(car.contains("categories"));
 
-        EXPECT_TRUE(car.contains("technical"));
-        EXPECT_TRUE(car["technical"].contains(idStr));
+        ASSERT_TRUE(car.contains("technical"));
+        ASSERT_TRUE(car["technical"].contains(idStr));
 
-        EXPECT_TRUE(car.contains("automaker"));
-        EXPECT_TRUE(car["automaker"].contains(idStr));
-        EXPECT_TRUE(car["automaker"].contains("name"));
-        EXPECT_TRUE(car["automaker"].contains("founded"));
-        EXPECT_TRUE(car["automaker"].contains("country"));
+        ASSERT_TRUE(car.contains("automaker"));
+        ASSERT_TRUE(car["automaker"].contains(idStr));
+        ASSERT_TRUE(car["automaker"].contains("name"));
+        ASSERT_TRUE(car["automaker"].contains("founded"));
+        ASSERT_TRUE(car["automaker"].contains("country"));
     }
 
     for (auto& car : this->data_cars) {
@@ -154,5 +154,28 @@ TYPED_TEST(QueryCarsTest, ShouldSelectEmbedDocuments) {
 
         // compare the car data
         EXPECT_TRUE(equalObjectsIgnoreID(car, *res_car, {"automaker"}));
+    }
+}
+
+TYPED_TEST(QueryCarsTest, ShouldSelectAndSuppressEmbedDocumentMembers) {
+    Collection automaker = this->q.collection("automaker");
+    Collection cars = this->q.collection("cars");
+
+    // Select should look like [{maker: "ford"}, automaker: {name: "ford"}, ...]
+    // we always get all the objects that are not form the source (from)
+    // collection as object to avoid name collisions
+    json result = this->q.from(cars)
+                      .select(cars["maker"], automaker["name"])
+                      .where(automaker["name"] == cars["maker"])
+                      .suppress(automaker["_id"])  // should not matter
+                      .execute();
+
+    EXPECT_EQ(result.size(), 3) << result;
+
+    for (auto& car_res : result) {
+        EXPECT_EQ(countMembers(car_res), 2) << car_res;
+        EXPECT_EQ(countMembers(car_res["automaker"]), 1)
+            << car_res["automaker"];
+        EXPECT_EQ(car_res["maker"], car_res["automaker"]["name"]);
     }
 }
