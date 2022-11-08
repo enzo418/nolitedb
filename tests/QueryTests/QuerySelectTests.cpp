@@ -1,0 +1,158 @@
+#include <gtest/gtest.h>
+
+#include "QueryBase.hpp"
+#include "QueryBaseCars.hpp"
+#include "nldb/Collection.hpp"
+#include "nldb/Common.hpp"
+
+using namespace nldb;
+
+// there is no need to do this in a real usage, you can use _id but i need to in
+// case you change it to ==id!!$$::  :)
+const char* idStr = common::internal_id_string;
+
+TYPED_TEST(QueryCarsTest, ShouldSelectAll) {
+    json result = this->q.from("cars").select().execute();
+
+    EXPECT_TRUE(result.is_array());
+    EXPECT_EQ(result.size(), this->data_cars.size());
+
+    for (auto& car : result) {
+        EXPECT_TRUE(car.contains("maker"));
+        EXPECT_TRUE(car.contains("model"));
+        EXPECT_TRUE(car.contains("year"));
+        EXPECT_TRUE(car.contains("categories"));
+        EXPECT_TRUE(car.contains("technical"));
+        EXPECT_TRUE(car.contains(common::internal_id_string));
+    }
+
+    // check if it has all the properties with the same value
+    for (auto& data_car : this->data_cars) {
+        json* found = 0;
+
+        for (auto& car : result) {
+            if (car["model"] == data_car["model"] &&
+                car["maker"] == data_car["maker"] &&
+                car["year"] == data_car["year"]) {
+                found = &car;
+                break;
+            }
+        }
+
+        if (!found) {
+            ADD_FAILURE() << "missing a car: " << data_car;
+        }
+
+        json& car = *found;
+        for (auto& [k, v] : data_car.items()) {
+            EXPECT_TRUE(equalObjectsIgnoreID(car, data_car));
+        }
+    }
+}
+
+inline int countMembers(json& doc) {
+    return std::distance(doc.items().begin(), doc.items().end());
+}
+
+TYPED_TEST(QueryCarsTest, ShouldSelectSome) {
+    Collection automaker = this->q.collection("automaker");
+    json result = this->q.from("automaker")
+                      .select(automaker[idStr], automaker["name"])
+                      .execute();
+
+    EXPECT_TRUE(result.is_array());
+    EXPECT_EQ(result.size(), this->data_automaker.size());
+
+    for (auto& maker : this->data_automaker) {
+        for (auto& result_maker : result) {
+            EXPECT_TRUE(result_maker.contains(idStr));
+            EXPECT_TRUE(result_maker.contains("name"));
+            EXPECT_EQ(countMembers(result_maker), 2);
+        }
+    }
+}
+
+TYPED_TEST(QueryCarsTest, ShouldIgnoreSome) {
+    auto [id] = this->q.collection("automaker").get(idStr);
+    json result = this->q.from("automaker").select().suppress(id).execute();
+
+    EXPECT_EQ(result.size(), this->data_automaker.size());
+
+    for (auto& maker : this->data_automaker) {
+        json* found;
+
+        for (auto& result_maker : result) {
+            if (result_maker["name"] == maker["name"]) {
+                found = &result_maker;
+            }
+        }
+
+        if (!found) {
+            ADD_FAILURE() << "missing automaker";
+        }
+
+        EXPECT_EQ(*found, maker);
+    }
+}
+
+TYPED_TEST(QueryCarsTest, ShouldSelectEmbedDocuments) {
+    Collection automaker = this->q.collection("automaker");
+    Collection cars = this->q.collection("cars");
+
+    // selects all the members from cars and automaker, resulting in
+    // {maker, model, year, categories, technical, automaker{name, founded,
+    // country}}
+    json result = this->q.from(cars)
+                      .select(cars, automaker)
+                      .where(automaker["name"] == cars["maker"])
+                      .execute();
+
+    EXPECT_EQ(result.size(), 3);
+
+    for (auto& car : result) {
+        EXPECT_TRUE(car.contains(idStr));
+        EXPECT_TRUE(car.contains("maker"));
+        EXPECT_TRUE(car.contains("model"));
+        EXPECT_TRUE(car.contains("year"));
+        EXPECT_TRUE(car.contains("categories"));
+
+        EXPECT_TRUE(car.contains("technical"));
+        EXPECT_TRUE(car["technical"].contains(idStr));
+
+        EXPECT_TRUE(car.contains("automaker"));
+        EXPECT_TRUE(car["automaker"].contains(idStr));
+        EXPECT_TRUE(car["automaker"].contains("name"));
+        EXPECT_TRUE(car["automaker"].contains("founded"));
+        EXPECT_TRUE(car["automaker"].contains("country"));
+    }
+
+    for (auto& car : this->data_cars) {
+        json* static_automaker = 0;
+        for (auto& data_maker : this->data_automaker) {
+            if (data_maker["name"] == car["maker"]) {
+                static_automaker = &data_maker;
+            }
+        }
+
+        assert(static_automaker);
+
+        json* res_car = 0;
+
+        for (auto& result_car : result) {
+            if (result_car["year"] == car["year"]) {
+                res_car = &result_car;
+            }
+        }
+
+        if (!res_car) {
+            ADD_FAILURE() << "missing car";
+        }
+
+        // compare the result automaker to data_automaker
+        EXPECT_TRUE(
+            equalObjectsIgnoreID(*static_automaker, (*res_car)["automaker"]));
+
+        // compare the car data
+        EXPECT_TRUE(equalObjectsIgnoreID(car, *res_car, {"automaker"}));
+    }
+}
