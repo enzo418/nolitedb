@@ -173,6 +173,10 @@ TYPED_TEST(QueryCarsTest, ShouldSelectAndSuppressEmbedDocumentMembers) {
     EXPECT_EQ(result.size(), 3) << result;
 
     for (auto& car_res : result) {
+        ASSERT_TRUE(car_res.contains("maker")) << car_res;
+        ASSERT_TRUE(car_res.contains("automaker")) << car_res;
+        ASSERT_TRUE(car_res["automaker"].contains("name")) << car_res;
+
         EXPECT_EQ(countMembers(car_res), 2) << car_res;
         EXPECT_EQ(countMembers(car_res["automaker"]), 1)
             << car_res["automaker"];
