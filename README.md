@@ -121,7 +121,7 @@ int main() {
 # Limits
 - Up to 64 properties/members/name value pair per object
     
-    This limit comes from the [sqlite maximum number of tables in a join](https://www.sqlite.org/limits.html#:~:text=Maximum%20Number%20Of%20Tables%20In%20A%20Join) and since we do a new select subquery for each object.
+    This limit comes from the [sqlite maximum number of tables in a join](https://www.sqlite.org/limits.html#:~:text=Maximum%20Number%20Of%20Tables%20In%20A%20Join). When querying an object with `N` members, we make `N` joins to obtain those properties.
 
 - Arrays can only be read and written to
 
