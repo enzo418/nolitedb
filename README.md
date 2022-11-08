@@ -125,7 +125,7 @@ int main() {
 
 - Arrays can only be read and written to
 
-    Because we store them as a string, nowadays [sqlite3 supports](https://www.sqlite.org/json1.html) some operations over it so maybe we add them in the future.
+    Because we store them as a string. But nowadays [sqlite3 supports](https://www.sqlite.org/json1.html) some operations over it so maybe we add them in the future.
 
 # Identifiers
 - Ids are 64 bits long integers with the
