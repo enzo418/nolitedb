@@ -19,8 +19,13 @@ namespace nldb {
 
     std::string QueryRunnerCtx::generateAlias(const Property& prop) {
 #ifdef NLDB_DEBUG_QUERY
-        // `NLDB_DEBUG_QUERY` is vulnerable to sql injection
-        const std::string prefix = prop.getName();
+        std::string prefix = prop.getName();
+
+        // convert name to a valid sql column identifier
+        prefix.erase(std::remove_if(prefix.begin(), prefix.end(),
+                                    [](char c) { return !isalpha(c); }),
+                     prefix.end());
+
 #else
         const std::string prefix = "";
 #endif

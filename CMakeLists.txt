@@ -41,10 +41,6 @@ message(STATUS "NLDB dependencies: ${DEPENDENCY_LIST}")
 message(STATUS "NLDB dependency libs: ${DEPENDENCY_LIBS}")
 message(STATUS "NLDB dependency lib includes: ${DEPENDENCY_INCLUDE_DIR}")
 
-if(${NLDB_DEBUG_QUERY})
-  message(WARNING "NLDB_DEBUG_QUERY is vulnerable to sql injection")
-endif()
-
 include_directories(src/include)
 include_directories(src)
 

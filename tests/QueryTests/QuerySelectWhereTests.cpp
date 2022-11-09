@@ -83,8 +83,8 @@ TYPED_TEST(QueryWhereTests, ShouldSelectWhereNotLike) {
 
     json res = this->q.from("numbers")
                    .select(name, extra)
-                   .where(name ^ "%e%")
-                   .sortBy(numbers["extra.known_since"].asc())
+                   .where(name ^ "%e%" || extra["definition"] == "hello there")
+                   .sortBy(numbers["extra.known_since"].desc())
                    .execute();
 
     ASSERT_EQ(res.size(), 1);

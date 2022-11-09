@@ -331,7 +331,7 @@ namespace nldb {
             if (pos != (int)expr.npos) {
                 name = expr.substr(last_pos, pos - last_pos);
                 last_pos = pos + 1;
-            } else if (last_pos < len - 1) {
+            } else if (last_pos < len) {
                 name = expr.substr(last_pos, last_pos - len);
                 last_pos = len;
             }
