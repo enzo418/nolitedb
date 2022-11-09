@@ -5,7 +5,7 @@
 #include "nldb/DAL/Repositories.hpp"
 #include "nldb/DB/IDB.hpp"
 #include "nldb/Implementation.hpp"
-#include "nldb/Query/QueryPlannerSources.hpp"
+#include "nldb/Query/QueryPlanner.hpp"
 
 namespace nldb {
 
@@ -44,7 +44,7 @@ namespace nldb {
             }
         }
 
-        QueryPlannerSources from(const char* collection1Name) {
+        QueryPlanner from(const char* collection1Name) {
             auto newCtx =
                 QueryPlannerContext {.from = {Collection(collection1Name)},
                                      .queryRunner = QueryRunnerImpl<T>::create(
@@ -53,7 +53,7 @@ namespace nldb {
             return std::move(newCtx);
         }
 
-        QueryPlannerSources from(Collection collection1) {
+        QueryPlanner from(Collection collection1) {
             auto newCtx =
                 QueryPlannerContext {.from = {collection1},
                                      .queryRunner = QueryRunnerImpl<T>::create(
