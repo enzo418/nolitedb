@@ -3,7 +3,12 @@
 #include "QueryBaseCars.hpp"
 #include "nldb/Collection.hpp"
 
-TYPED_TEST(QueryCarsTest, ShouldSelectByPage) {
+template <typename T>
+class QueryPageTests : public QueryCarsTest<T> {};
+
+TYPED_TEST_SUITE(QueryPageTests, TestDBTypes);
+
+TYPED_TEST(QueryPageTests, ShouldSelectByPage) {
     const int nCars = this->data_cars.size();
 
     json results[nCars];
@@ -20,7 +25,7 @@ TYPED_TEST(QueryCarsTest, ShouldSelectByPage) {
     }
 }
 
-TYPED_TEST(QueryCarsTest, ShouldSelectByPageOrdered) {
+TYPED_TEST(QueryPageTests, ShouldSelectByPageOrdered) {
     const int nCars = this->data_cars.size();
 
     Collection cars = this->q.collection("cars");
@@ -44,7 +49,7 @@ TYPED_TEST(QueryCarsTest, ShouldSelectByPageOrdered) {
     }
 }
 
-TYPED_TEST(QueryCarsTest, ShouldSelectNoneIfNoElementsInPage) {
+TYPED_TEST(QueryPageTests, ShouldSelectNoneIfNoElementsInPage) {
     Collection cars = this->q.collection("cars");
     json res1 = this->q.from("cars")
                     .select()

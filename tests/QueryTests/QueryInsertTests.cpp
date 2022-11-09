@@ -2,30 +2,33 @@
 
 using namespace nldb;
 
-TYPED_TEST_SUITE(QueryBaseTest, TestDBTypes);
+template <typename T>
+class QueryInsertTests : public QueryBaseTest<T> {};
 
-TYPED_TEST(QueryBaseTest, ShouldInsertOneConstData) {
-  this->q.from("test").insert({{"name", "pepe"}});
+TYPED_TEST_SUITE(QueryInsertTests, TestDBTypes);
 
-  EXPECT_GT(this->db.getChangesCount(), 0);
+TYPED_TEST(QueryInsertTests, ShouldInsertOneConstData) {
+    this->q.from("test").insert({{"name", "pepe"}});
+
+    EXPECT_GT(this->db.getChangesCount(), 0);
 }
 
-TYPED_TEST(QueryBaseTest, ShouldInsertBulkConstData) {
-  this->q.from("test").insert({{{"name", "pepe"}}, {{"name", "x"}}});
+TYPED_TEST(QueryInsertTests, ShouldInsertBulkConstData) {
+    this->q.from("test").insert({{{"name", "pepe"}}, {{"name", "x"}}});
 
-  EXPECT_GT(this->db.getChangesCount(), 0);
+    EXPECT_GT(this->db.getChangesCount(), 0);
 }
 
-TYPED_TEST(QueryBaseTest, ShouldInsertOneRefData) {
-  json ob = {{{"name", "pepe"}}};
-  this->q.from("test").insert(ob);
+TYPED_TEST(QueryInsertTests, ShouldInsertOneRefData) {
+    json ob = {{{"name", "pepe"}}};
+    this->q.from("test").insert(ob);
 
-  EXPECT_GT(this->db.getChangesCount(), 0);
+    EXPECT_GT(this->db.getChangesCount(), 0);
 }
 
-TYPED_TEST(QueryBaseTest, ShouldInsertBulkRefData) {
-  json ob = {{{"name", "pepe"}}, {{"name", "x"}}};
-  this->q.from("test").insert(ob);
+TYPED_TEST(QueryInsertTests, ShouldInsertBulkRefData) {
+    json ob = {{{"name", "pepe"}}, {{"name", "x"}}};
+    this->q.from("test").insert(ob);
 
-  EXPECT_GT(this->db.getChangesCount(), 0);
+    EXPECT_GT(this->db.getChangesCount(), 0);
 }

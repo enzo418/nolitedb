@@ -24,6 +24,8 @@ class QueryBaseTest : public BaseDBTest<T> {
     Query<T> q;
 };
 
+TYPED_TEST_SUITE(QueryBaseTest, TestDBTypes);
+
 inline bool contains(const std::vector<std::string>& l, std::string s) {
     return std::find(l.begin(), l.end(), s) != l.end();
 }
@@ -53,4 +55,8 @@ inline bool equalObjectsIgnoreID(json& a, json& b,
     }
 
     return true;
+}
+
+inline int countMembers(json& doc) {
+    return std::distance(doc.items().begin(), doc.items().end());
 }

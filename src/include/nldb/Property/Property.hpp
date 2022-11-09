@@ -92,7 +92,7 @@ namespace nldb {
         PropertyExpression operator>=(const LogicConstValue& right);
         PropertyExpression operator<(const LogicConstValue& right);
         PropertyExpression operator<=(const LogicConstValue& right);
-        PropertyExpression operator==(const LogicConstValue& right) const;
+        PropertyExpression operator==(const LogicConstValue& right);
         PropertyExpression operator!=(
             const LogicConstValue& right);  // not equal
         PropertyExpression operator%(const LogicConstValue& right);  // like

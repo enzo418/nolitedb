@@ -50,10 +50,6 @@ TYPED_TEST(QueryCarsTest, ShouldSelectAll) {
     }
 }
 
-inline int countMembers(json& doc) {
-    return std::distance(doc.items().begin(), doc.items().end());
-}
-
 TYPED_TEST(QueryCarsTest, ShouldSelectSome) {
     Collection automaker = this->q.collection("automaker");
     json result = this->q.from("automaker")

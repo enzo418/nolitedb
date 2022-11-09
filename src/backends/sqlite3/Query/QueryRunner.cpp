@@ -613,7 +613,7 @@ namespace nldb {
 
     Object& findOrAddObjectToSelectRecursive(
         std::forward_list<SelectableProperty>& select_value, snowflake coll_id,
-        std::shared_ptr<Repositories> const& repos) {
+        std::shared_ptr<Repositories> const& repos, snowflake from_coll_id) {
         Object* found = findObjectInSelect(select_value, coll_id);
         if (found != nullptr) {
             // this is why we use forward_list, references are not invalidated.
@@ -629,9 +629,10 @@ namespace nldb {
 
         Object composed(root_prop, {}, coll_id);
 
-        if (root_prop.getCollectionId() != NullID) {
+        if (root_prop.getCollectionId() != NullID &&
+            root_prop.getCollectionId() != from_coll_id) {
             Object& parent = findOrAddObjectToSelectRecursive(
-                select_value, root_prop.getCollectionId(), repos);
+                select_value, root_prop.getCollectionId(), repos, from_coll_id);
 
             Object& added =
                 std::get<Object>(parent.addProperty(std::move(composed)));
@@ -669,7 +670,7 @@ namespace nldb {
             }
         } else {
             Object& object = findOrAddObjectToSelectRecursive(
-                select, prop.getCollectionId(), repos);
+                select, prop.getCollectionId(), repos, ctx.getRootCollId());
 
             if (!isPropertyInList(select, prop)) {
                 suppressed.push_back(prop);
@@ -783,7 +784,8 @@ namespace nldb {
                     // the select, then move the property from select to that
                     // object
                     Object& object = findOrAddObjectToSelectRecursive(
-                        select, prop.getCollectionId(), repos);
+                        select, prop.getCollectionId(), repos,
+                        ctx.getRootCollId());
 
                     if (!isPropertyInList(object.getPropertiesRef(), prop)) {
                         object.addProperty(std::move(prop));

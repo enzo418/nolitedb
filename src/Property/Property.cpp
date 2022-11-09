@@ -99,8 +99,7 @@ namespace nldb {
                                   right);
     }
 
-    PropertyExpression Property::operator==(
-        const LogicConstValue& right) const {
+    PropertyExpression Property::operator==(const LogicConstValue& right) {
         return PropertyExpression(PropertyExpressionOperator::EQ, *this, right);
     }
 
