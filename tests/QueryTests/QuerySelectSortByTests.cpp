@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "QueryBaseCars.hpp"
 #include "QueryBaseNumbers.hpp"
 #include "nldb/Collection.hpp"
 #include "nldb/Common.hpp"
@@ -22,6 +23,11 @@ class QuerySortByTest : public QueryBaseTest<T> {
 };
 
 TYPED_TEST_SUITE(QuerySortByTest, TestDBTypes);
+
+template <typename T>
+class QuerySortByTestCars : public QueryCarsTest<T> {};
+
+TYPED_TEST_SUITE(QuerySortByTestCars, TestDBTypes);
 
 TYPED_TEST(QuerySortByTest, ShouldSelectSorted) {
     Collection values = this->q.collection("values");
@@ -55,4 +61,26 @@ TYPED_TEST(QuerySortByTest, ShouldSelectSortedByMultiple) {
             ASSERT_GT(res1["c_v2"], res2["c_v2"]);
         }
     }
+}
+
+TYPED_TEST(QuerySortByTestCars, ShouldSelectSortedByEmbedDocumentField) {
+    Collection automaker = this->q.collection("automaker");
+    Collection cars = this->q.collection("cars");
+
+    json result1 = this->q.from(cars)
+                       .select(cars, automaker)
+                       .where(automaker["name"] == cars["maker"])
+                       .sortBy(automaker["name"].desc())
+                       .execute();
+
+    json result2 = this->q.from(cars)
+                       .select(cars, automaker)
+                       .where(automaker["name"] == cars["maker"])
+                       .sortBy(automaker["name"].asc())
+                       .execute();
+
+    EXPECT_EQ(result1.size(), 3) << result1;
+    EXPECT_EQ(result2.size(), 3) << result1;
+
+    EXPECT_NE(result1[0]["automaker"]["name"], result2[0]["automaker"]["name"]);
 }

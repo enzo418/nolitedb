@@ -394,8 +394,12 @@ namespace nldb {
         obj.setCollId(
             repos->repositoryCollection->findByOwner(prop.getId())->getId());
 
+        auto cb = overloaded {
+            [this](auto& prop) { populateData(prop); },
+            [this](AggregatedProperty& ag) { populateData(ag.property); }};
+
         for (auto& prop : obj.getPropertiesRef()) {
-            std::visit([this](auto& p) { populateData(p); }, prop);
+            std::visit(cb, prop);
         }
     }
 

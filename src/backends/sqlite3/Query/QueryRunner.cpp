@@ -54,7 +54,7 @@ namespace nldb {
     }
 
     /* -------------- FILTER OUT EMPTY OBJECTS -------------- */
-    void filterOutEmptyObjects(std::forward_list<SelectableProperty>& data) {
+    void filterOutEmptyObjects(std::list<SelectableProperty>& data) {
         NLDB_PROFILE_FUNCTION();
 
         auto isEmpty =
@@ -184,7 +184,7 @@ namespace nldb {
     }
 
     void expandObjectProperties(std::shared_ptr<Repositories> const& repos,
-                                std::forward_list<SelectableProperty>& select) {
+                                std::list<SelectableProperty>& select) {
         NLDB_PROFILE_FUNCTION();
         for (auto it = select.begin(); it != select.end(); it++) {
             std::visit(
@@ -196,11 +196,11 @@ namespace nldb {
     }
 
     void expandRootProperty(std::shared_ptr<Repositories> const&,
-                            std::forward_list<SelectableProperty>&, auto&,
-                            auto&, QueryRunnerCtx&) {}
+                            std::list<SelectableProperty>&, auto&, auto&,
+                            QueryRunnerCtx&) {}
 
     void expandRootProperty(std::shared_ptr<Repositories> const& repos,
-                            std::forward_list<SelectableProperty>& select,
+                            std::list<SelectableProperty>& select,
                             Property& prop, auto& it, QueryRunnerCtx& ctx) {
         // If you do select(Collection("coll_name")) then we convert it to
         // Property("coll_name"), which is a root property. If that root
@@ -221,9 +221,8 @@ namespace nldb {
                 auto allProps =
                     repos->repositoryProperty->findAll(ctx.getRootCollId());
 
-                select.insert_after(it,
-                                    std::make_move_iterator(allProps.begin()),
-                                    std::make_move_iterator(allProps.end()));
+                select.insert(it, std::make_move_iterator(allProps.begin()),
+                              std::make_move_iterator(allProps.end()));
 
                 // set it to an empty object so it gets removed
                 // later
@@ -233,7 +232,7 @@ namespace nldb {
     }
 
     void expandRootProperty(std::shared_ptr<Repositories> const& repos,
-                            std::forward_list<SelectableProperty>& select,
+                            std::list<SelectableProperty>& select,
                             QueryRunnerCtx& ctx) {
         for (auto it = select.begin(); it != select.end(); it++) {
             std::visit(
@@ -311,7 +310,7 @@ namespace nldb {
     }
 
     void addSelectClause(std::stringstream& sql,
-                         std::forward_list<SelectableProperty>& props,
+                         std::list<SelectableProperty>& props,
                          QueryRunnerCtx& ctx) {
         NLDB_PROFILE_FUNCTION();
         sql << "select ";
@@ -382,13 +381,16 @@ namespace nldb {
         sql << parseSQL(" from 'object' as @alias ", {{"@alias", alias}},
                         false);
 
-        auto composedCB =
-            overloaded {[&sql, &ctx, &ids, &alias](const Property& prop) {
-                            addFromClause(sql, prop, ids, ctx, alias);
-                        },
-                        [&sql, &ctx, &ids, &alias](Object& composed2) {
-                            addFromClause(sql, composed2, ids, ctx, alias);
-                        }};
+        auto composedCB = overloaded {
+            [&sql, &ctx, &ids, &alias](const Property& prop) {
+                addFromClause(sql, prop, ids, ctx, alias);
+            },
+            [&sql, &ctx, &ids, &alias](Object& composed2) {
+                addFromClause(sql, composed2, ids, ctx, alias);
+            },
+            [&sql, &ctx, &ids, &alias](const AggregatedProperty& prop) {
+                addFromClause(sql, prop.property, ids, ctx, alias);
+            }};
 
         for (auto& p : props) {
             std::visit(composedCB, p);
@@ -409,7 +411,7 @@ namespace nldb {
     }
 
     void addFromClause(std::stringstream& sql,
-                       std::forward_list<SelectableProperty>& props,
+                       std::list<SelectableProperty>& props,
                        std::vector<snowflake>& ids, QueryRunnerCtx& ctx) {
         auto cb = overloaded {
             [&sql, &ctx, &ids](const Property& prop) {
@@ -612,7 +614,7 @@ namespace nldb {
     }
 
     Object& findOrAddObjectToSelectRecursive(
-        std::forward_list<SelectableProperty>& select_value, snowflake coll_id,
+        std::list<SelectableProperty>& select_value, snowflake coll_id,
         std::shared_ptr<Repositories> const& repos, snowflake from_coll_id) {
         Object* found = findObjectInSelect(select_value, coll_id);
         if (found != nullptr) {
@@ -639,9 +641,9 @@ namespace nldb {
 
             return added;
         } else {
-            select_value.push_front(composed);
+            select_value.push_back(composed);
 
-            return std::get<Object>(select_value.front());
+            return std::get<Object>(select_value.back());
         }
     }
 
@@ -660,7 +662,7 @@ namespace nldb {
     }
 
     void addToSelectIfMissingProperty(
-        std::forward_list<SelectableProperty>& select, const Property& prop,
+        std::list<SelectableProperty>& select, const Property& prop,
         std::shared_ptr<Repositories> const& repos, QueryRunnerCtx& ctx,
         std::vector<Property>& suppressed) {
         if (prop.getCollectionId() == ctx.getRootCollId()) {
@@ -682,12 +684,12 @@ namespace nldb {
         }
     }
 
-    void addUsedFields(std::forward_list<SelectableProperty>& select,
+    void addUsedFields(std::list<SelectableProperty>& select,
                        const PropertyExpressionOperand& expr,
                        std::shared_ptr<Repositories> const& repos,
                        QueryRunnerCtx& ctx, std::vector<Property>& suppressed);
 
-    void addUsedFields(std::forward_list<SelectableProperty>& select,
+    void addUsedFields(std::list<SelectableProperty>& select,
                        const PropertyExpression& expr,
                        std::shared_ptr<Repositories> const& repos,
                        QueryRunnerCtx& ctx, std::vector<Property>& suppressed) {
@@ -695,7 +697,7 @@ namespace nldb {
         addUsedFields(select, expr.right, repos, ctx, suppressed);
     }
 
-    void addUsedFields(std::forward_list<SelectableProperty>& select,
+    void addUsedFields(std::list<SelectableProperty>& select,
                        const PropertyExpressionOperand& expr,
                        std::shared_ptr<Repositories> const& repos,
                        QueryRunnerCtx& ctx, std::vector<Property>& suppressed) {
@@ -773,12 +775,15 @@ namespace nldb {
     //     year: 2001
     // }
     // which would cause a name collision if we don't do it.
+    // In addition, when only one field of an internal object is selected, we
+    // have to build the whole object/collection tree in order to get that
+    // field.
 
-    void moveEmbedPropsToSubObjects(
-        std::forward_list<SelectableProperty>& select,
+    void moveInnerPropsToTheirSubObjects(
+        std::list<SelectableProperty>& select,
         std::shared_ptr<Repositories> const& repos, QueryRunnerCtx& ctx) {
         auto wasMoved = overloaded {
-            [&select, &repos, &ctx](const Property& prop) {
+            [&select, &repos, &ctx](Property& prop) {
                 if (prop.getCollectionId() != ctx.getRootCollId()) {
                     // If the parent object was not yet created then add it to
                     // the select, then move the property from select to that
@@ -798,43 +803,65 @@ namespace nldb {
 
                 return false;
             },
-            [](const auto&) { return false; }};
+            [&select, &repos, &ctx](AggregatedProperty& agProp) {
+                Property& prop = agProp.property;
+
+                if (prop.getCollectionId() != ctx.getRootCollId()) {
+                    Object& object = findOrAddObjectToSelectRecursive(
+                        select, prop.getCollectionId(), repos,
+                        ctx.getRootCollId());
+
+                    if (!isPropertyInList(object.getPropertiesRef(), prop)) {
+                        object.addProperty(std::move(agProp));
+                    }
+
+                    return true;
+                }
+
+                return false;
+            },
+            [](auto&) { return false; }};
 
         select.remove_if(
             [&wasMoved](auto& prop) { return std::visit(wasMoved, prop); });
     }
 
     /* ------------------------ READ ------------------------ */
+    inline void read(std::shared_ptr<IDBRowReader> row, PropertyType type,
+                     json& out, const std::string& alias, int i) {
+        switch (type) {
+            case PropertyType::INTEGER:
+                out[alias] = row->readInt64(i);
+                break;
+            case PropertyType::DOUBLE:
+                out[alias] = row->readDouble(i);
+                break;
+            case PropertyType::STRING:
+                out[alias] = row->readString(i);
+                break;
+            case PropertyType::ID:
+                // javascript can't read 64 bits long integers
+                out[common::internal_id_string] =
+                    std::to_string(row->readInt64(i));
+                break;
+            case PropertyType::ARRAY:
+                out[alias] = json::parse(row->readString(i));
+                break;
+            case PropertyType::BOOLEAN:
+                out[alias] = row->readInt32(i) == 1 ? true : false;
+                break;
+            default:
+                throw std::runtime_error(
+                    "Select properties should not hold a reserved "
+                    "property directly!");
+                break;
+        }
+    }
+
     void read(const Property& prop, std::shared_ptr<IDBRowReader> row, int& i,
               json& out, std::vector<Property>& suppressed) {
         if (!row->isNull(i) && !isSuppressed(prop, suppressed)) {
-            switch (prop.getType()) {
-                case PropertyType::INTEGER:
-                    out[prop.getName()] = row->readInt64(i);
-                    break;
-                case PropertyType::DOUBLE:
-                    out[prop.getName()] = row->readDouble(i);
-                    break;
-                case PropertyType::STRING:
-                    out[prop.getName()] = row->readString(i);
-                    break;
-                case PropertyType::ID:
-                    // javascript can't read 64 bits long integers
-                    out[common::internal_id_string] =
-                        std::to_string(row->readInt64(i));
-                    break;
-                case PropertyType::ARRAY:
-                    out[prop.getName()] = json::parse(row->readString(i));
-                    break;
-                case PropertyType::BOOLEAN:
-                    out[prop.getName()] = row->readInt32(i) == 1 ? true : false;
-                    break;
-                default:
-                    throw std::runtime_error(
-                        "Select properties should not hold a reserved "
-                        "property directly!");
-                    break;
-            }
+            read(row, prop.getType(), out, prop.getName(), i);
         }
 
         i++;
@@ -842,7 +869,7 @@ namespace nldb {
 
     void read(const AggregatedProperty& prop, std::shared_ptr<IDBRowReader> row,
               int& i, json& out, std::vector<Property>&) {
-        out[prop.alias] = row->readInt64(i);
+        read(row, prop.property.getType(), out, prop.alias, i);
         i++;
     }
 
@@ -927,7 +954,7 @@ namespace nldb {
         }
     }
 
-    void printSelect(std::forward_list<SelectableProperty>& list) {
+    void printSelect(std::list<SelectableProperty>& list) {
         auto cb = [](auto& p) { printSelect(p, 2); };
 
         std::cout << "\nSelect:\n";
@@ -972,12 +999,12 @@ namespace nldb {
             suppressFields(data.select_value, data.suppress_value);
             filterOutEmptyObjects(data.select_value);
 
+            moveInnerPropsToTheirSubObjects(data.select_value, repos, ctx);
+            addUsedFields(data, repos, ctx, data.suppress_value);
+
 #ifdef NLDB_DEBUG_QUERY
             printSelect(data.select_value);
 #endif
-
-            moveEmbedPropsToSubObjects(data.select_value, repos, ctx);
-            addUsedFields(data, repos, ctx, data.suppress_value);
 
             addSelectClause(sql, data.select_value, ctx);
             addFromClause(sql, data, ctx);

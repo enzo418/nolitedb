@@ -11,7 +11,11 @@ using namespace nldb;
 // case you change it to ==id!!$$::  :)
 const char* idStr = common::internal_id_string;
 
-TYPED_TEST(QueryCarsTest, ShouldSelectAll) {
+template <typename T>
+class QuerySelectTestsCars : public QueryCarsTest<T> {};
+TYPED_TEST_SUITE(QuerySelectTestsCars, TestDBTypes);
+
+TYPED_TEST(QuerySelectTestsCars, ShouldSelectAll) {
     json result = this->q.from("cars").select().execute();
 
     EXPECT_TRUE(result.is_array());
@@ -50,7 +54,7 @@ TYPED_TEST(QueryCarsTest, ShouldSelectAll) {
     }
 }
 
-TYPED_TEST(QueryCarsTest, ShouldSelectSome) {
+TYPED_TEST(QuerySelectTestsCars, ShouldSelectSome) {
     Collection automaker = this->q.collection("automaker");
     json result = this->q.from("automaker")
                       .select(automaker[idStr], automaker["name"])
@@ -68,7 +72,7 @@ TYPED_TEST(QueryCarsTest, ShouldSelectSome) {
     }
 }
 
-TYPED_TEST(QueryCarsTest, ShouldIgnoreSome) {
+TYPED_TEST(QuerySelectTestsCars, ShouldIgnoreSome) {
     auto [id] = this->q.collection("automaker").get(idStr);
     json result = this->q.from("automaker").select().suppress(id).execute();
 
@@ -91,7 +95,7 @@ TYPED_TEST(QueryCarsTest, ShouldIgnoreSome) {
     }
 }
 
-TYPED_TEST(QueryCarsTest, ShouldSelectEmbedDocuments) {
+TYPED_TEST(QuerySelectTestsCars, ShouldSelectEmbedDocuments) {
     Collection automaker = this->q.collection("automaker");
     Collection cars = this->q.collection("cars");
 
@@ -153,7 +157,7 @@ TYPED_TEST(QueryCarsTest, ShouldSelectEmbedDocuments) {
     }
 }
 
-TYPED_TEST(QueryCarsTest, ShouldSelectAndSuppressEmbedDocumentMembers) {
+TYPED_TEST(QuerySelectTestsCars, ShouldSelectAndSuppressEmbedDocumentMembers) {
     Collection automaker = this->q.collection("automaker");
     Collection cars = this->q.collection("cars");
 
@@ -177,5 +181,22 @@ TYPED_TEST(QueryCarsTest, ShouldSelectAndSuppressEmbedDocumentMembers) {
         EXPECT_EQ(countMembers(car_res["automaker"]), 1)
             << car_res["automaker"];
         EXPECT_EQ(car_res["maker"], car_res["automaker"]["name"]);
+    }
+}
+
+TYPED_TEST(QuerySelectTestsCars, ShouldSelectInnerObjectMember) {
+    Collection cars = this->q.collection("cars");
+
+    json result = this->q.from(cars).select(cars["technical.weight"]).execute();
+
+    // there is only 1 car that has technical.weight
+    EXPECT_EQ(result.size(), 1) << result;
+
+    for (auto& car_res : result) {
+        ASSERT_TRUE(car_res.contains("technical")) << car_res;
+        ASSERT_TRUE(car_res["technical"].contains("weight")) << car_res;
+
+        EXPECT_EQ(countMembers(car_res), 1) << car_res;
+        EXPECT_EQ(countMembers(car_res["technical"]), 1) << car_res;
     }
 }

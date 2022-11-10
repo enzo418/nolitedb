@@ -4,12 +4,14 @@
 #include <string>
 #include <vector>
 
+#include "nldb/Property/AggregatedProperty.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/typedef.hpp"
 
 namespace nldb {
 
-    typedef std::variant<class Object, Property> SubProperty;
+    typedef std::variant<class Object, Property, AggregatedProperty>
+        SubProperty;
 
     class ObjectExpression {
        public:

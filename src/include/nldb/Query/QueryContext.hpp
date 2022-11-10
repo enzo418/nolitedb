@@ -1,5 +1,6 @@
 #pragma once
 
+#include <list>
 #include <optional>
 #include <variant>
 #include <vector>
@@ -34,7 +35,7 @@ namespace nldb {
         QueryPlannerContextSelect(QueryPlannerContext&& ctx)
             : QueryPlannerContext(std::move(ctx)) {}
 
-        std::forward_list<SelectableProperty> select_value;
+        std::list<SelectableProperty> select_value;
         std::optional<PropertyExpression> where_value;
         std::optional<QueryPagination> pagination_value;
         std::vector<Property> groupBy_value;

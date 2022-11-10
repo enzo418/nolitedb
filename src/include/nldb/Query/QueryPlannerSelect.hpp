@@ -32,7 +32,7 @@ namespace nldb {
         QueryPlannerSelect& page(int pageNumber, int elementsPerPage);
 
         template <IsProperty... PR>
-        QueryPlannerSelect& groupBy(PR&... cols) {
+        QueryPlannerSelect& groupBy(const PR&... cols) {
             this->context.groupBy_value = {cols...};
 
             return *this;
