@@ -1,4 +1,4 @@
-// c++ implentation of Rust box
+// c++ implementation of Rust box
 // TL;DR; Recursive data structures requires heap allocations to compile
 // see https://www.foonathan.net/2022/05/recursive-variant-box/ for more details
 #include <iostream>

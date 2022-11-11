@@ -3,7 +3,6 @@
 #include <array>
 #include <stdexcept>
 
-#include "nldb/CommonConcepts.hpp"
 #include "nldb/Exceptions.hpp"
 #include "nldb/Object.hpp"
 #include "nldb/Property/Property.hpp"

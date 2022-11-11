@@ -44,12 +44,14 @@ namespace nldb {
          * You can update every property and sub-property of the document.
          *
          * Updating sub-properties
+         * -----------------------
          *  make sure to indicate the parent property that if it's a
-         *  sub-property, e.g. from the collection user {name, contact:
-         *  {address}} to update the address you must pass
+         *  sub-property, e.g. to update the address from the collection user
+         * {name, contact: {address}}you must pass
          *  {{"contact", {{"address", "new_value"}}}}.
          *
          * If a property doesn't exists
+         * ----------------------------
          *  In this case a new property (and all its sub-properties if it's an
          *  object) for the document collection is added
          *

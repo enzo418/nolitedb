@@ -20,7 +20,6 @@ namespace nldb {
     typedef std::variant<Property, AggregatedProperty, Object>
         SelectableProperty;
 
-    // TODO: Rename to QueryContext
     struct QueryPlannerContext {
         std::vector<Collection> from;
         std::unique_ptr<IQueryRunner> queryRunner;

@@ -22,7 +22,7 @@ namespace utils::paramsbind {
     /**
      * @brief Replaces all the parameters in the string.
      *
-     * @param encloseQuotesInString should enclose/replace the quoutes of the
+     * @param encloseQuotesInString should enclose/replace the quotes of the
      * parameters values? This is an option since you could have called
      * `encloseQuotes` before.
      *
