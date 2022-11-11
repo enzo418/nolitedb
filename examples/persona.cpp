@@ -28,7 +28,7 @@ int main() {
 
     DBSL3 db;
 
-    // remove("./tests.db");
+    remove("./tests.db");
     if (!db.open("./tests.db" /*":memory:"*/)) {
         std::cerr << "Could not open the database \n";
         db.throwLastError();
