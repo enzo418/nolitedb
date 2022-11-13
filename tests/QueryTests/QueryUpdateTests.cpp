@@ -127,7 +127,7 @@ TYPED_TEST(QueryUpdateTestsCars, ShouldSetNonExistingInnerField) {
     json newestCars =
         this->q.from("cars").select().where(cars["year"] == 2015).execute();
 
-    const std::string id =
+    std::string id =
         newestCars[0][common::internal_id_string].get<std::string>();
 
     json newFields = {
@@ -140,8 +140,10 @@ TYPED_TEST(QueryUpdateTestsCars, ShouldSetNonExistingInnerField) {
 
     this->q.from("cars").update(id, newFields);
 
-    json updated =
-        this->q.from("cars").select().where(cars["year"] == 2015).execute();
+    json updated = this->q.from("cars")
+                       .select()
+                       .where(cars[common::internal_id_string] == id)
+                       .execute();
 
     ASSERT_EQ(updated.size(), 1);
 
