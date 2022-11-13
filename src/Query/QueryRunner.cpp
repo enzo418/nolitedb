@@ -281,7 +281,7 @@ namespace nldb {
                                                     valueString);
                 }
             } else {
-                // If the object property points has a value, update that
+                // If this document has this object, then update that
                 // sub-document. Else a new value object should be added.
 
                 auto childObjectID =
@@ -291,8 +291,7 @@ namespace nldb {
                         repos->repositoryCollection->findByOwner(propID);
 
                     updateDocumentRecursive(childObjectID.value(),
-                                            chilCollection.value(),
-                                            valueJson[propName]);
+                                            chilCollection.value(), valueJson);
                 } else {
                     // is a new object (sub-collection) of propID
                     // to get the collection we use the same format as the
@@ -312,7 +311,7 @@ namespace nldb {
                     // add the new properties/values and update the existing
                     updateDocumentRecursive(childObjID,
                                             Collection(subCollID, subCollName),
-                                            valueJson[propName]);
+                                            valueJson);
                 }
             }
         }

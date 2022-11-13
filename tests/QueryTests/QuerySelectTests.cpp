@@ -18,16 +18,16 @@ TYPED_TEST_SUITE(QuerySelectTestsCars, TestDBTypes);
 TYPED_TEST(QuerySelectTestsCars, ShouldSelectAll) {
     json result = this->q.from("cars").select().execute();
 
-    EXPECT_TRUE(result.is_array());
-    EXPECT_EQ(result.size(), this->data_cars.size());
+    ASSERT_TRUE(result.is_array());
+    ASSERT_EQ(result.size(), this->data_cars.size());
 
     for (auto& car : result) {
-        EXPECT_TRUE(car.contains("maker"));
-        EXPECT_TRUE(car.contains("model"));
-        EXPECT_TRUE(car.contains("year"));
-        EXPECT_TRUE(car.contains("categories"));
-        EXPECT_TRUE(car.contains("technical"));
-        EXPECT_TRUE(car.contains(common::internal_id_string));
+        ASSERT_TRUE(car.contains("maker"));
+        ASSERT_TRUE(car.contains("model"));
+        ASSERT_TRUE(car.contains("year"));
+        ASSERT_TRUE(car.contains("categories"));
+        ASSERT_TRUE(car.contains("technical"));
+        ASSERT_TRUE(car.contains(common::internal_id_string));
     }
 
     // check if it has all the properties with the same value
@@ -49,7 +49,7 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectAll) {
 
         json& car = *found;
         for (auto& [k, v] : data_car.items()) {
-            EXPECT_TRUE(equalObjectsIgnoreID(car, data_car));
+            ASSERT_TRUE(equalObjectsIgnoreID(car, data_car));
         }
     }
 }
@@ -60,14 +60,14 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectSome) {
                       .select(automaker[idStr], automaker["name"])
                       .execute();
 
-    EXPECT_TRUE(result.is_array());
-    EXPECT_EQ(result.size(), this->data_automaker.size());
+    ASSERT_TRUE(result.is_array());
+    ASSERT_EQ(result.size(), this->data_automaker.size());
 
     for (auto& maker : this->data_automaker) {
         for (auto& result_maker : result) {
-            EXPECT_TRUE(result_maker.contains(idStr));
-            EXPECT_TRUE(result_maker.contains("name"));
-            EXPECT_EQ(countMembers(result_maker), 2);
+            ASSERT_TRUE(result_maker.contains(idStr));
+            ASSERT_TRUE(result_maker.contains("name"));
+            ASSERT_EQ(countMembers(result_maker), 2);
         }
     }
 }
@@ -76,7 +76,7 @@ TYPED_TEST(QuerySelectTestsCars, ShouldIgnoreSome) {
     auto [id] = this->q.collection("automaker").get(idStr);
     json result = this->q.from("automaker").select().suppress(id).execute();
 
-    EXPECT_EQ(result.size(), this->data_automaker.size());
+    ASSERT_EQ(result.size(), this->data_automaker.size());
 
     for (auto& maker : this->data_automaker) {
         json* found;
@@ -91,7 +91,7 @@ TYPED_TEST(QuerySelectTestsCars, ShouldIgnoreSome) {
             ADD_FAILURE() << "missing automaker";
         }
 
-        EXPECT_EQ(*found, maker);
+        ASSERT_EQ(*found, maker);
     }
 }
 
@@ -107,7 +107,7 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectEmbedDocuments) {
                       .where(automaker["name"] == cars["maker"])
                       .execute();
 
-    EXPECT_EQ(result.size(), 3) << result;
+    ASSERT_EQ(result.size(), 3) << result;
 
     for (auto& car : result) {
         ASSERT_TRUE(car.contains(idStr));
@@ -149,11 +149,11 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectEmbedDocuments) {
         }
 
         // compare the result automaker to data_automaker
-        EXPECT_TRUE(
+        ASSERT_TRUE(
             equalObjectsIgnoreID(*static_automaker, (*res_car)["automaker"]));
 
         // compare the car data
-        EXPECT_TRUE(equalObjectsIgnoreID(car, *res_car, {"automaker"}));
+        ASSERT_TRUE(equalObjectsIgnoreID(car, *res_car, {"automaker"}));
     }
 }
 
@@ -170,17 +170,17 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectAndSuppressEmbedDocumentMembers) {
                       .suppress(automaker["_id"])  // should not matter
                       .execute();
 
-    EXPECT_EQ(result.size(), 3) << result;
+    ASSERT_EQ(result.size(), 3) << result;
 
     for (auto& car_res : result) {
         ASSERT_TRUE(car_res.contains("maker")) << car_res;
         ASSERT_TRUE(car_res.contains("automaker")) << car_res;
         ASSERT_TRUE(car_res["automaker"].contains("name")) << car_res;
 
-        EXPECT_EQ(countMembers(car_res), 2) << car_res;
-        EXPECT_EQ(countMembers(car_res["automaker"]), 1)
+        ASSERT_EQ(countMembers(car_res), 2) << car_res;
+        ASSERT_EQ(countMembers(car_res["automaker"]), 1)
             << car_res["automaker"];
-        EXPECT_EQ(car_res["maker"], car_res["automaker"]["name"]);
+        ASSERT_EQ(car_res["maker"], car_res["automaker"]["name"]);
     }
 }
 
@@ -190,13 +190,13 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectInnerObjectMember) {
     json result = this->q.from(cars).select(cars["technical.weight"]).execute();
 
     // there is only 1 car that has technical.weight
-    EXPECT_EQ(result.size(), 1) << result;
+    ASSERT_EQ(result.size(), 1) << result;
 
     for (auto& car_res : result) {
         ASSERT_TRUE(car_res.contains("technical")) << car_res;
         ASSERT_TRUE(car_res["technical"].contains("weight")) << car_res;
 
-        EXPECT_EQ(countMembers(car_res), 1) << car_res;
-        EXPECT_EQ(countMembers(car_res["technical"]), 1) << car_res;
+        ASSERT_EQ(countMembers(car_res), 1) << car_res;
+        ASSERT_EQ(countMembers(car_res["technical"]), 1) << car_res;
     }
 }

@@ -37,7 +37,7 @@ namespace nldb {
             return QueryPlannerSelect(std::move(ctx));
         }
 
-        void insert(json object);
+        void insert(const json& object);
 
         /**
          * @brief Update a document.
@@ -58,8 +58,29 @@ namespace nldb {
          * @param docId
          * @param newValue
          */
-        void update(snowflake docId, json newValue);
+        void update(snowflake docId, const json& newValue);
+
+        /**
+         * @brief overload of the function above
+         *
+         * @param docId
+         * @param newValue
+         */
+        void update(const std::string& docId, const json& newValue);
+
+        /**
+         * @brief Remove a document
+         *
+         * @param docId
+         */
         void remove(snowflake docId);
+
+        /**
+         * @brief overload of the function above
+         *
+         * @param docId
+         */
+        void remove(const std::string& docId);
 
        protected:
         QueryPlannerContext context;
