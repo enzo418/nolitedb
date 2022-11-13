@@ -50,6 +50,14 @@ namespace nldb {
         return collName->find_first_of(".") != collName->npos;
     }
 
+    Property Property::operator[](const std::string& pName) {
+        const std::string thisPropParent =
+            this->getParentCollName() ? this->getParentCollName().value() + "."
+                                      : "";
+
+        return Property(pName, thisPropParent + this->name);
+    }
+
     // aggregate functions
     AggregatedProperty Property::countAs(const char* alias) {
         return AggregatedProperty(*this, AggregationType::COUNT, alias);

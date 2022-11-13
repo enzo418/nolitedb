@@ -31,7 +31,7 @@ TYPED_TEST(QuerySelectAggregatedTests, ShouldSelectMaxInnerObject) {
     json res =
         this->q.from("numbers")
             .select(numbers["name"],
-                    numbers["extra.known_since"].maxAs("max_known_since"))
+                    numbers["extra"]["known_since"].maxAs("max_known_since"))
             .execute();
 
     ASSERT_EQ(res.size(), 1) << res;
@@ -125,9 +125,10 @@ TYPED_TEST(QuerySelectAggregatedTestsCars, ShouldSelectCountWithNull) {
     Collection cars = this->q.collection("cars");
 
     // only 1 car has the weight field != null
-    json res = this->q.from("cars")
-                   .select(cars["technical.weight"].countAs("cars_with_weight"))
-                   .execute();
+    json res =
+        this->q.from("cars")
+            .select(cars["technical"]["weight"].countAs("cars_with_weight"))
+            .execute();
 
     ASSERT_EQ(res.size(), 1);
     ASSERT_EQ(countMembers(res[0]), 1);

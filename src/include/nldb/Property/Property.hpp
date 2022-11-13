@@ -76,6 +76,9 @@ namespace nldb {
          */
         std::optional<std::string> getParentCollName();
 
+       public:
+        Property operator[](const std::string& name);
+
        public:  // aggregate functions
         AggregatedProperty countAs(const char* alias);
         AggregatedProperty maxAs(const char* alias);

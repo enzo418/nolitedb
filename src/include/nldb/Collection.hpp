@@ -70,7 +70,7 @@ namespace nldb {
         std::optional<std::string> getAlias() const;
 
        public:
-        Property operator[](const std::string& expr);
+        Property operator[](const std::string& name);
 
        protected:
         template <StringLike F>

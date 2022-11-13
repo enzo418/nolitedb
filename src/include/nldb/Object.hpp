@@ -73,13 +73,7 @@ namespace nldb {
                                         const std::string& collName);
 
        public:
-        /**
-         * @brief Evaluates an expression an return the corresponding property.
-         *
-         * @param expr
-         * @return Property
-         */
-        Property operator[](const std::string& expr);
+        Property operator[](const std::string& name);
 
        private:
         Property prop;

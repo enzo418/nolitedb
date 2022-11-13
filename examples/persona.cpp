@@ -108,12 +108,20 @@ int main() {
     std::cout << "all but _id, name: " << result.dump(2) << std::endl;
 
     /* ------- suppress fields in embedded documents ------ */
-    result = query.from("persona")
-                 .select()
-                 .where(persona["contact.phone"] != "12344" && name != "hola")
-                 .sortBy(persona["contact.location._id"].asc())
-                 .suppress(_id, persona["contact.phone"], persona["aliases"])
-                 .execute();
+    // to use a property from a collection by:
+    // collection["sub collection name"]["property name"]
+    //  or
+    // collection["sub collection name.property name"]
+    // with as many sub-collections between the main and the property as
+    // necessary
+
+    result =
+        query.from("persona")
+            .select()
+            .where(persona["contact"]["phone"] != "12344" && name != "hola")
+            .sortBy(persona["contact"]["location"]["_id"].asc())
+            .suppress(_id, persona["contact"]["phone"], persona["aliases"])
+            .execute();
 
     std::cout << "all but _id and contact phone " << result.dump(2)
               << std::endl;

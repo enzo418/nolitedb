@@ -41,7 +41,7 @@ TYPED_TEST(QueryWhereTests, ShouldSelectWhereGreater) {
 
     json res = this->q.from("numbers")
                    .select()
-                   .where(numbers["extra.known_since"] >= 23)
+                   .where(numbers["extra"]["known_since"] >= 23)
                    .execute();
 
     ASSERT_EQ(res.size(), 1);
@@ -67,7 +67,7 @@ TYPED_TEST(QueryWhereTests, ShouldSelectWhereLike) {
     json res = this->q.from("numbers")
                    .select()
                    .where(numbers["name"] % "%e%")
-                   .sortBy(numbers["extra.known_since"].asc())
+                   .sortBy(numbers["extra"]["known_since"].asc())
                    .execute();
 
     ASSERT_EQ(res.size(), 2);
@@ -84,7 +84,7 @@ TYPED_TEST(QueryWhereTests, ShouldSelectWhereNotLike) {
     json res = this->q.from("numbers")
                    .select(name, extra)
                    .where(name ^ "%e%" || extra["definition"] == "hello there")
-                   .sortBy(numbers["extra.known_since"].desc())
+                   .sortBy(numbers["extra"]["known_since"].desc())
                    .execute();
 
     ASSERT_EQ(res.size(), 1);

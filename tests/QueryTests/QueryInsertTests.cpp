@@ -1,4 +1,5 @@
 #include "QueryBase.hpp"
+#include "nldb/Common.hpp"
 
 using namespace nldb;
 
@@ -32,3 +33,16 @@ TYPED_TEST(QueryInsertTests, ShouldInsertBulkRefData) {
 
     EXPECT_GT(this->db.getChangesCount(), 0);
 }
+
+// TYPED_TEST(QueryInsertTests, ShouldInsertWithId) {
+//     auto id = common::internal_id_string;
+
+//     json ob = {{{
+//                     id,
+//                 },
+//                 {"name", "pepe"}},
+//                {{"name", "x"}}};
+//     this->q.from("test").insert(ob);
+
+//     EXPECT_GT(this->db.getChangesCount(), 0);
+// }

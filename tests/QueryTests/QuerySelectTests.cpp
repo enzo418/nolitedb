@@ -187,7 +187,8 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectAndSuppressEmbedDocumentMembers) {
 TYPED_TEST(QuerySelectTestsCars, ShouldSelectInnerObjectMember) {
     Collection cars = this->q.collection("cars");
 
-    json result = this->q.from(cars).select(cars["technical.weight"]).execute();
+    json result =
+        this->q.from(cars).select(cars["technical"]["weight"]).execute();
 
     // there is only 1 car that has technical.weight
     ASSERT_EQ(result.size(), 1) << result;

@@ -43,10 +43,11 @@ TYPED_TEST(QuerySortByTest, ShouldSelectSorted) {
 
 TYPED_TEST(QuerySortByTest, ShouldSelectSortedByMultiple) {
     Collection values = this->q.collection("values");
-    json result = this->q.from("values")
-                      .select(values["c"])
-                      .sortBy(values["c.c_v"].asc(), values["c.c_v2"].desc())
-                      .execute();
+    json result =
+        this->q.from("values")
+            .select(values["c"])
+            .sortBy(values["c"]["c_v"].asc(), values["c"]["c_v2"].desc())
+            .execute();
 
     ASSERT_EQ(result.size(), this->data_values.size());
 

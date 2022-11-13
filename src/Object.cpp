@@ -47,26 +47,13 @@ namespace nldb {
                                              collName);
     }
 
-    Property Object::operator[](const std::string& expr) {
-        // We can't know how the parent collection name is stored
-        // snowflakeernally, imagine this scenario: expr =
-        // users.contact.phones.mobile we are sure the first collection name
-        // users is users but the database may have choosen to name the
-        // subcollection user.contact as __user_contact or r_user_contact. Do we
-        // create another Property type? modify its parent member? The easier
-        // solution is to make the query runner evaluate the string to get the
-        // parent collection.
-        std::string parents = this->prop.getParentCollName().has_value()
-                                  ? (this->prop.getParentCollName().value() +
-                                     "." + this->prop.getName())
-                                  : this->prop.getName();
-        auto pos = expr.find_last_of('.');
-        if (pos != expr.npos) {
-            std::string propName = expr.substr(pos + 1, expr.length() - pos);
-            std::string parentExpr = expr.substr(0, pos);
-            return Property(propName, parents + "." + parentExpr);
-        } else {
-            return Property(expr, parents);
-        }
+    Property Object::operator[](const std::string& pName) {
+        const std::string parents =
+            this->prop.getParentCollName().has_value()
+                ? (this->prop.getParentCollName().value() + "." +
+                   this->prop.getName())
+                : this->prop.getName();
+
+        return Property(pName, parents);
     }
 }  // namespace nldb
