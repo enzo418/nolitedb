@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -30,67 +31,12 @@ namespace nldb {
                              std::shared_ptr<Repositories> repos)
         : connection(pConnection), repos(repos) {}
 
-    void QueryRunner::populateData(Collection& coll) {
-        auto found = repos->repositoryCollection->find(coll.getName());
-        if (found)
-            coll = found.value();
-        else
-            throw CollectionNotFound(coll.getName());
-    }
-
-    void QueryRunner::populateData(Property& prop) {
-        if (!prop.getParentCollName().has_value()) {
-            // its a root property of a root collection, the name of the
-            // property is the same as the root collection name
-            auto coll = repos->repositoryCollection->find(prop.getName());
-            if (!coll) {
-                throw CollectionNotFound(prop.getName());
-            }
-
-            // all the collections have an owner id
-            auto ownerID =
-                repos->repositoryCollection->getOwnerId(coll->getId()).value();
-
-            auto found = repos->repositoryProperty->find(ownerID);
-
-            if (!found) {
-                throw PropertyNotFound(prop.getName());
-            }
-
-            prop = found.value();
-        } else {
-            auto collName = prop.getParentCollName().value();
-            snowflake parentID;
-
-            if (prop.isParentNameAnExpression()) {
-                // first parse the expression and get the parent coll id
-                parentID = getLastCollectionIdFromExpression(collName);
-            } else {
-                // find the collection by its name
-                auto found = repos->repositoryCollection->find(collName);
-
-                if (found)
-                    parentID = found.value().getId();
-                else
-                    throw CollectionNotFound(collName);
-            }
-
-            auto found =
-                repos->repositoryProperty->find(parentID, prop.getName());
-
-            if (found)
-                prop = found.value();
-            else
-                throw PropertyNotFound(prop.getName());
-        }
-    }
-
     void QueryRunner::update(QueryPlannerContextUpdate&& data) {
         NLDB_PROFILE_BEGIN_SESSION("update", "nldb-profile-update.json");
 
         {
             NLDB_PROFILE_FUNCTION();
-            populateData(data);
+            populateData<DoThrow>(data);
 
             // check if doc exists
             snowflake& docID = data.documentID;
@@ -121,11 +67,7 @@ namespace nldb {
                 NLDB_WARN("multiple collections given in an insert clause");
             }
 
-            try {
-                populateData(data);
-            } catch (CollectionNotFound& e) {
-                // expected, do nothing
-            }
+            populateData<DoNotThrow>(data);
 
             Collection& from = *data.from.begin();
 
@@ -147,7 +89,7 @@ namespace nldb {
     }
 
     void QueryRunner::remove(QueryPlannerContextRemove&& data) {
-        populateData(data);
+        populateData<DoThrow>(data);
 
         repos->valuesDAO->removeObject(data.documentID);
     }
@@ -173,6 +115,30 @@ namespace nldb {
         return std::array<snowflake, 2> {newCollId, rootPropID};
     }
 
+    inline auto getUserSpecifiedId(json& doc) {
+        std::optional<snowflake> userSpecifiedID = std::nullopt;
+        if (doc.contains(internal_id_string)) {
+            auto& jsonID = doc[internal_id_string];
+            PropertyType type = JsonTypeToPropertyType((int)jsonID.type());
+            if (type == PropertyType::INTEGER) {
+                userSpecifiedID = doc[internal_id_string].get<snowflake>();
+            } else if (type == PropertyType::STRING) {
+                try {
+                    userSpecifiedID =
+                        std::stoll(doc[internal_id_string].get<std::string>());
+                } catch (...) {
+                    NLDB_WARN("INVALID USER-SPECIFIED ID VALUE");
+                }
+            } else {
+                NLDB_WARN(
+                    "INVALID USER-SPECIFIED ID TYPE (must be an integer or a "
+                    "string convertible to integer)");
+            }
+        }
+
+        return userSpecifiedID;
+    }
+
     void QueryRunner::insertDocumentRecursive(
         json& doc, const std::string& collName,
         std::optional<snowflake> parentObjID,
@@ -195,13 +161,19 @@ namespace nldb {
         auto [collID, rootPropID] =
             GetCollIdOrCreateIt(collName, repos.get(), pRootPropID);
 
+        // check if the document already has an id
+        std::optional<snowflake> userSpecifiedID = getUserSpecifiedId(doc);
+
         //  - Create document/object
         snowflake objID =
-            parentObjID ?  //
-                repos->valuesDAO->addObject(rootPropID, parentObjID.value())
-                        : repos->valuesDAO->addObject(rootPropID);
+            userSpecifiedID.has_value()
+                ? repos->valuesDAO->addObjectWithID(userSpecifiedID.value(),
+                                                    rootPropID, parentObjID)
+                : repos->valuesDAO->addObject(rootPropID, parentObjID);
 
         for (auto& [propertyName, value] : doc.items()) {
+            if (propertyName == internal_id_string) continue;
+
             snowflake propID = -1;
             PropertyType type = JsonTypeToPropertyType((int)value.type());
 
@@ -245,6 +217,8 @@ namespace nldb {
                                               json& object) {
         NLDB_PROFILE_FUNCTION();
         for (auto& [propName, valueJson] : object.items()) {
+            if (propName == internal_id_string) continue;
+
             std::optional<Property> found =
                 repos->repositoryProperty->find(collection.getId(), propName);
 
@@ -365,84 +339,5 @@ namespace nldb {
         }
 
         return id;
-    }
-
-    void QueryRunner::populateData(QueryPlannerContext& data) {
-        for (auto& coll : data.from) {
-            populateData(coll);
-        }
-    }
-
-    void QueryRunner::populateData(QueryPlannerContextInsert& data) {
-        populateData((QueryPlannerContext&)data);
-    }
-
-    void QueryRunner::populateData(QueryPlannerContextRemove& data) {
-        populateData((QueryPlannerContext&)data);
-    }
-
-    void QueryRunner::populateData(QueryPlannerContextUpdate& data) {
-        populateData((QueryPlannerContext&)data);
-    }
-
-    void QueryRunner::populateData(Object& obj) {
-        auto& prop = obj.getPropertyRef();
-
-        populateData(prop);
-
-        obj.setCollId(
-            repos->repositoryCollection->findByOwner(prop.getId())->getId());
-
-        auto cb = overloaded {
-            [this](auto& prop) { populateData(prop); },
-            [this](AggregatedProperty& ag) { populateData(ag.property); }};
-
-        for (auto& prop : obj.getPropertiesRef()) {
-            std::visit(cb, prop);
-        }
-    }
-
-    void QueryRunner::populateData(PropertyExpression& obj) {
-        auto cbConst =
-            overloaded {[this](Property& p) { populateData(p); }, [](auto&) {}};
-
-        auto cb = overloaded {
-            [this](box<PropertyExpression>& exp) { populateData(*exp); },
-            [&cbConst](auto& cv) { std::visit(cbConst, cv); }};
-
-        std::visit(cb, obj.left);
-        std::visit(cb, obj.right);
-    }
-
-    void QueryRunner::populateData(QueryPlannerContextSelect& data) {
-        NLDB_PROFILE_FUNCTION();
-
-        populateData((QueryPlannerContext&)data);
-        auto cb = overloaded {
-            [this](auto& prop) { populateData(prop); },
-            [this](AggregatedProperty& ag) { populateData(ag.property); }};
-
-        /// select
-        for (auto& prop : data.select_value) {
-            std::visit(cb, prop);
-        }
-
-        // where
-        if (data.where_value) cb(data.where_value.value());
-
-        // group
-        for (auto& prop : data.groupBy_value) {
-            populateData(prop);
-        }
-
-        // sort
-        for (auto& s : data.sortBy_value) {
-            populateData(s.property);
-        }
-
-        // suppress
-        for (auto& prop : data.suppress_value) {
-            populateData(prop);
-        }
     }
 }  // namespace nldb

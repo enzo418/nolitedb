@@ -17,9 +17,11 @@ namespace nldb {
         void addStringLike(snowflake propID, snowflake objID, PropertyType type,
                            std::string value) override;
 
-        snowflake addObject(snowflake propID) override;
+        snowflake addObject(snowflake propID,
+                            std::optional<snowflake> objID) override;
 
-        snowflake addObject(snowflake propID, snowflake objID) override;
+        snowflake addObjectWithID(snowflake id, snowflake propID,
+                                  std::optional<snowflake> objID) override;
 
         void updateStringLike(snowflake propID, snowflake objID,
                               PropertyType type, std::string value) override;

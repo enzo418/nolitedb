@@ -28,31 +28,57 @@ namespace nldb {
                             {"@value", value}});
     }
 
-    snowflake ValuesDAO::addObject(snowflake propID) {
-        const std::string sql =
-            "insert into @table (prop_id) "
-            "values (@prop_id);";
+    snowflake ValuesDAO::addObject(snowflake propID,
+                                   std::optional<snowflake> objID) {
+        if (objID.has_value()) {
+            const std::string sql =
+                "insert into @table (prop_id, obj_id) "
+                "values (@prop_id, @obj_id);";
 
-        conn->execute(
-            sql,
-            {{"@table", tables::getPropertyTypesTable()[PropertyType::OBJECT]},
-             {"@prop_id", propID}});
+            conn->execute(
+                sql, {{"@table",
+                       tables::getPropertyTypesTable()[PropertyType::OBJECT]},
+                      {"@prop_id", propID},
+                      {"@obj_id", objID.value()}});
+        } else {
+            const std::string sql =
+                "insert into @table (prop_id) "
+                "values (@prop_id);";
+
+            conn->execute(
+                sql, {{"@table",
+                       tables::getPropertyTypesTable()[PropertyType::OBJECT]},
+                      {"@prop_id", propID}});
+        }
 
         return conn->getLastInsertedRowId();
     }
 
-    snowflake ValuesDAO::addObject(snowflake propID, snowflake objID) {
-        const std::string sql =
-            "insert into @table (prop_id, obj_id) "
-            "values (@prop_id, @obj_id);";
+    snowflake ValuesDAO::addObjectWithID(snowflake id, snowflake propID,
+                                         std::optional<snowflake> objID) {
+        if (objID.has_value()) {
+            const std::string sql =
+                "insert into @table (id, prop_id, obj_id) "
+                "values (@id, @prop_id, @obj_id);";
 
-        conn->execute(
-            sql,
-            {{"@table", tables::getPropertyTypesTable()[PropertyType::OBJECT]},
-             {"@prop_id", propID},
-             {"@obj_id", objID}});
+            conn->execute(
+                sql, {{"@table",
+                       tables::getPropertyTypesTable()[PropertyType::OBJECT]},
+                      {"@prop_id", propID},
+                      {"@obj_id", objID.value()},
+                      {"@id", id}});
+        } else {
+            const std::string sql =
+                "insert into @table (id, prop_id) values (@id, @prop_id);";
 
-        return conn->getLastInsertedRowId();
+            conn->execute(
+                sql, {{"@table",
+                       tables::getPropertyTypesTable()[PropertyType::OBJECT]},
+                      {"@prop_id", propID},
+                      {"@id", id}});
+        }
+
+        return id;
     }
 
     void ValuesDAO::updateStringLike(snowflake propID, snowflake objID,

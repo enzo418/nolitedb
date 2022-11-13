@@ -21,23 +21,26 @@ namespace nldb {
                                    PropertyType type, std::string value) = 0;
 
         /**
-         * @brief adds a new object to a property.
-         * This means that the object is not a value of another object, instead
-         * it's value of a collection (a document).
+         * @brief Adds a new object.
+         * If objID is not present then it's a document.
          *
          * @param propID
          * @param objID
+         * @param id use this id as the object id
          */
-        virtual snowflake addObject(snowflake propID) = 0;
+        virtual snowflake addObject(snowflake propID,
+                                    std::optional<snowflake> objID) = 0;
 
         /**
-         * @brief adds a new object to an object
+         * @brief Adds a new object with a defined id.
          *
+         * @param id defined id
          * @param propID
-         * @param docID
-         * @param objID
+         * @param objID parent object id
+         * @return snowflake
          */
-        virtual snowflake addObject(snowflake propID, snowflake objID) = 0;
+        virtual snowflake addObjectWithID(snowflake id, snowflake propID,
+                                          std::optional<snowflake> objID) = 0;
 
         /**
          * @brief Updates a document property value.

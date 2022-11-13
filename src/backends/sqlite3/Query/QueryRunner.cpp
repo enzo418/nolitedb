@@ -975,7 +975,7 @@ namespace nldb {
         {
             NLDB_PROFILE_FUNCTION();
 
-            populateData(data);
+            populateData<DoThrow>(data);
 
             selectAllOnEmpty(data, repos);
 

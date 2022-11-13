@@ -27,17 +27,31 @@ namespace nldb {
             .propID = propID, .objID = objID, .type = type, .value = value});
     }
 
-    snowflake BufferedValuesDAO::addObject(snowflake propID) {
-        snowflake id = SnowflakeGenerator::generate(0);
-        bufferData->add(
-            BufferValueIndependentObject {.id = id, .prop_id = propID});
-        return id;
+    snowflake BufferedValuesDAO::addObject(snowflake propID,
+                                           std::optional<snowflake> objID) {
+        snowflake newId = SnowflakeGenerator::generate(0);
+
+        if (objID.has_value()) {
+            bufferData->add(BufferValueDependentObject {
+                .id = newId, .prop_id = propID, .obj_id = objID.value()});
+        } else {
+            bufferData->add(
+                BufferValueIndependentObject {.id = newId, .prop_id = propID});
+        }
+
+        return newId;
     }
 
-    snowflake BufferedValuesDAO::addObject(snowflake propID, snowflake objID) {
-        snowflake id = SnowflakeGenerator::generate(0);
-        bufferData->add(BufferValueDependentObject {
-            .id = id, .prop_id = propID, .obj_id = objID});
+    snowflake BufferedValuesDAO::addObjectWithID(
+        snowflake id, snowflake propID, std::optional<snowflake> objID) {
+        if (objID.has_value()) {
+            bufferData->add(BufferValueDependentObject {
+                .id = id, .prop_id = propID, .obj_id = objID.value()});
+        } else {
+            bufferData->add(
+                BufferValueIndependentObject {.id = id, .prop_id = propID});
+        }
+
         return id;
     }
 
