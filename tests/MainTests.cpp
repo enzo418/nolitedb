@@ -1,7 +1,9 @@
 #include "gtest/gtest.h"
-#include "logger/Logger.h"
+#include "nldb/LOG/log.hpp"
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
+    nldb::LogManager::Initialize();
+
     return RUN_ALL_TESTS();
 }

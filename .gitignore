@@ -3,6 +3,7 @@
 !src/
 !src/**/
 !tests/
+!tests/**/
 !.vscode/
 
 !.gitignore
@@ -14,10 +15,21 @@
 !*.h
 !README.md
 !CMakeLists.txt
+!*.cmake
 
 !vendor/
+!vendor/*
 !vendor/**/
 !LICENSE*
 
 !queries/
 !queries/*.sql
+
+!*.plantuml
+!docs/
+!docs/**/
+!docs/**/*.svg
+
+!examples/
+!examples/**/
+!examples/**/*.sql

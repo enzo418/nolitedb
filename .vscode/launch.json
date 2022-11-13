@@ -8,10 +8,10 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/build/noLiteDb",
+            "program": "${workspaceFolder}/build/twitter",
             "args": [],
             "preLaunchTask": "build",
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}/build"
         },
         {
             "type": "lldb",
@@ -20,7 +20,7 @@
             "program": "${workspaceFolder}/build/tests",
             "args": [],
             "preLaunchTask": "build",
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}/build"
         }
     ]
 }

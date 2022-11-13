@@ -9,7 +9,7 @@
             "options": {
                 "cwd": "${workspaceFolder}/build"
             },
-            "command": "make -j4"
+            "command": "make -j"
         }
     ]
 }
