@@ -26,8 +26,8 @@ namespace nldb {
     };
 
     struct QueryPagination {
-        int pageNumber;
-        int elementsPerPage;
+        int pageNumber {1};
+        int elementsPerPage {10};
     };
 
     struct QueryPlannerContextSelect : public QueryPlannerContext {

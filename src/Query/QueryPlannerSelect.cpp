@@ -20,13 +20,12 @@ namespace nldb {
     }
 
     QueryPlannerSelect& QueryPlannerSelect::page(int pageNumber) {
-        if (this->context.pagination_value.has_value()) {
-            this->context.pagination_value->pageNumber = pageNumber;
-        } else {
-            this->context.pagination_value = {.pageNumber = pageNumber,
-                                              .elementsPerPage = 10};
-        }
-
+        this->context.pagination_value = {
+            .pageNumber = pageNumber,
+            .elementsPerPage =
+                this->context.pagination_value.has_value()
+                    ? this->context.pagination_value->elementsPerPage
+                    : 10};
         return *this;
     }
 
