@@ -31,7 +31,8 @@ TYPED_TEST(QueryRemoveTestsCars, ShouldRemoveInnerDocument) {
     Collection cars = this->q.collection("cars");
     json result = this->q.from("cars")
                       .select()
-                      .page(1, 1)
+                      .page(1)
+                      .limit(1)
                       .sortBy(cars["year"].asc())
                       .execute();
 
@@ -42,7 +43,8 @@ TYPED_TEST(QueryRemoveTestsCars, ShouldRemoveInnerDocument) {
 
     json afterRemove = this->q.from("cars")
                            .select()
-                           .page(1, 1)
+                           .page(1)
+                           .limit(1)
                            .sortBy(cars["year"].asc())
                            .execute();
 

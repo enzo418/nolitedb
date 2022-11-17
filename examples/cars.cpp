@@ -82,7 +82,8 @@ int main() {
     json all = query.from("cars")
                    .select(id, model, maker, year, automakers)
                    .where(year > 1990 && automakers["name"] == maker)
-                   .page(1, 10)
+                   .page(1)
+                   .limit(10)
                    .suppress(automakers["_id"])
                    .execute();
 
@@ -96,7 +97,8 @@ int main() {
                     .select(id, model, maker, year.maxAs("year_newest_model"),
                             automaker)
                     .where(year > 1990 && automaker["name"] == maker)
-                    .page(1, 10)
+                    .page(1)
+                    .limit(10)
                     .groupBy(model, maker)
                     .execute();
 
@@ -108,8 +110,12 @@ int main() {
     snowflake id0 = std::stoll(res1[0]["_id"].get<std::string>());
     query.from("cars").update(id0, {{"year", 2100}, {"price", 50000}});
 
-    auto res2 =
-        query.from("cars").select().page(1, 10).sortBy(year.desc()).execute();
+    auto res2 = query.from("cars")
+                    .select()
+                    .page(1)
+                    .limit(10)
+                    .sortBy(year.desc())
+                    .execute();
 
     std::cout << "\n\nUpdated: " << res2.dump(2) << std::endl;
 

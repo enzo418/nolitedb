@@ -19,10 +19,23 @@ namespace nldb {
         return *this;
     }
 
-    QueryPlannerSelect& QueryPlannerSelect::page(int pageNumber,
-                                                 int elementsPerPage) {
-        this->context.pagination_value = {.pageNumber = pageNumber,
-                                          .elementsPerPage = elementsPerPage};
+    QueryPlannerSelect& QueryPlannerSelect::page(int pageNumber) {
+        if (this->context.pagination_value.has_value()) {
+            this->context.pagination_value->pageNumber = pageNumber;
+        } else {
+            this->context.pagination_value = {.pageNumber = pageNumber,
+                                              .elementsPerPage = 10};
+        }
+
+        return *this;
+    }
+
+    QueryPlannerSelect& QueryPlannerSelect::limit(int elementsPerPage) {
+        this->context.pagination_value = {
+            .pageNumber = this->context.pagination_value.has_value()
+                              ? this->context.pagination_value->pageNumber
+                              : 1,
+            .elementsPerPage = elementsPerPage};
 
         return *this;
     }

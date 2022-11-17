@@ -14,7 +14,7 @@ TYPED_TEST(QueryPageTests, ShouldSelectByPage) {
     json results[nCars];
 
     for (int i = 0; i < nCars; i++) {
-        json res = this->q.from("cars").select().page(i + 1, 1).execute();
+        json res = this->q.from("cars").select().page(i + 1).limit(1).execute();
 
         ASSERT_EQ(res.size(), 1) << res;
         results[i] = res[0];
@@ -35,7 +35,8 @@ TYPED_TEST(QueryPageTests, ShouldSelectByPageOrdered) {
     for (int i = 0; i < nCars; i++) {
         json res = this->q.from("cars")
                        .select()
-                       .page(i + 1, 1)
+                       .page(i + 1)
+                       .limit(1)
                        .sortBy(cars["year"].desc())
                        .execute();
 
@@ -54,7 +55,8 @@ TYPED_TEST(QueryPageTests, ShouldSelectNoneIfNoElementsInPage) {
     json res1 = this->q.from("cars")
                     .select()
                     .where(cars["year"] == (int)this->data_cars[0]["year"])
-                    .page(1, 1)
+                    .page(1)
+                    .limit(1)
                     .execute();
 
     ASSERT_EQ(res1.size(), 1) << res1;
@@ -62,7 +64,8 @@ TYPED_TEST(QueryPageTests, ShouldSelectNoneIfNoElementsInPage) {
     json res2 = this->q.from("cars")
                     .select()
                     .where(cars["year"] == (int)this->data_cars[0]["year"])
-                    .page(2, 1)
+                    .page(2)
+                    .limit(1)
                     .execute();
 
     ASSERT_EQ(res2.size(), 0) << res2;

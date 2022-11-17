@@ -65,7 +65,8 @@ int main() {
     auto res =
         query.from("tweets")
             .select()
-            .page(1, 5)
+            .page(1)
+            .limit(5)
             //    try and compare:
             //    .suppress(tweets["user"], tweets["retweeted_status.user"])
             .execute();

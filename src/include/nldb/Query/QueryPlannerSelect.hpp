@@ -29,7 +29,16 @@ namespace nldb {
          */
         QueryPlannerSelect& where(const PropertyExpression&);
 
-        QueryPlannerSelect& page(int pageNumber, int elementsPerPage);
+        /**
+         * @brief Get elements starting from this page.
+         * First page is 1. If you don't set `limit` it will default to 10.
+         *
+         * @param pageNumber
+         * @return QueryPlannerSelect&
+         */
+        QueryPlannerSelect& page(int pageNumber);
+
+        QueryPlannerSelect& limit(int elementsPerPage);
 
         template <IsProperty... PR>
         QueryPlannerSelect& groupBy(const PR&... cols) {
