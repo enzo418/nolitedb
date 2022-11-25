@@ -132,7 +132,7 @@ namespace nldb {
                                 std::shared_ptr<Repositories> const& repos);
 
     template <typename IT>
-    requires std::output_iterator<IT, Object>
+        requires std::output_iterator<IT, Object>
     void expandObjectProperties(const Property& prop, IT& it,
                                 std::shared_ptr<Repositories> const& repos) {
         if (prop.getType() == PropertyType::OBJECT) {
@@ -569,21 +569,33 @@ namespace nldb {
     }
 
     /**
+     * @tparam bool IsInner is the call coming from a composed object or the
+     * root document
      * @tparam T container
      */
-    template <typename T>
-    void suppressFields(T& select, std::vector<Property>& fields) {
+    template <bool IsInner = false, typename T>
+    void suppressFields(T& select, std::vector<Property>& fields,
+                        bool removeInnerIDs) {
         auto cb = overloaded {
-            [&fields](Object& composed) {
+            [&fields, removeInnerIDs](Object& composed) {
                 // Check if there is a property of type Object == root of object
                 if (isSuppressed(composed.getPropertyRef(), fields)) {
                     return true;
                 }
 
-                suppressFields(composed.getPropertiesRef(), fields);
+                suppressFields<true>(composed.getPropertiesRef(), fields,
+                                     removeInnerIDs);
                 return false;
             },
-            [&fields](Property& prop) { return isSuppressed(prop, fields); },
+            [&fields, removeInnerIDs](Property& prop) {
+                if (prop.getType() == PropertyType::ID && removeInnerIDs) {
+                    if constexpr (IsInner) {  // well... i know... shh
+                        return true;
+                    }
+                }
+
+                return isSuppressed(prop, fields);
+            },
             [](AggregatedProperty&) { return false; }};
 
         select.remove_if([&cb](auto& prop) { return std::visit(cb, prop); });
@@ -876,7 +888,6 @@ namespace nldb {
     void read(Object& composed, std::shared_ptr<IDBRowReader> row, int& i,
               json& out, std::vector<Property>& suppressed) {
         const std::string& name = composed.getProperty().getName();
-        // out[name] = json::object();  // an object
 
         json temp;
 
@@ -996,7 +1007,8 @@ namespace nldb {
 
             expandRootProperty(repos, data.select_value, ctx);
             expandObjectProperties(repos, data.select_value);
-            suppressFields(data.select_value, data.suppress_value);
+            suppressFields(data.select_value, data.suppress_value,
+                           data.removeInnerIDs);
             filterOutEmptyObjects(data.select_value);
 
             moveInnerPropsToTheirSubObjects(data.select_value, repos, ctx);

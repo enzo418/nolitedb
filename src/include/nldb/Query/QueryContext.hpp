@@ -40,6 +40,7 @@ namespace nldb {
         std::vector<Property> groupBy_value;
         std::vector<SortedProperty> sortBy_value;
         std::vector<Property> suppress_value;
+        bool removeInnerIDs {true};
     };
 
     struct QueryPlannerContextRemove : public QueryPlannerContext {

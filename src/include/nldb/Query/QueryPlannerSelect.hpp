@@ -40,6 +40,16 @@ namespace nldb {
 
         QueryPlannerSelect& limit(int elementsPerPage);
 
+        /**
+         * @brief This will make each document inside the collection document
+         * also show its own _id.
+         * Because by default we return the document with the data plus ONLY its
+         * _id.
+         *
+         * @return QueryPlannerSelect&
+         */
+        QueryPlannerSelect& includeInnerIds();
+
         template <IsProperty... PR>
         QueryPlannerSelect& groupBy(const PR&... cols) {
             this->context.groupBy_value = {cols...};

@@ -105,6 +105,7 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectEmbedDocuments) {
     json result = this->q.from(cars)
                       .select(cars, automaker)
                       .where(automaker["name"] == cars["maker"])
+                      .includeInnerIds()
                       .execute();
 
     ASSERT_EQ(result.size(), 3) << result;

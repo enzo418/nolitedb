@@ -34,6 +34,7 @@ TYPED_TEST(QueryRemoveTestsCars, ShouldRemoveInnerDocument) {
                       .page(1)
                       .limit(1)
                       .sortBy(cars["year"].asc())
+                      .includeInnerIds()
                       .execute();
 
     ASSERT_EQ(result.size(), 1);

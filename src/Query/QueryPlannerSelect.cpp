@@ -39,6 +39,11 @@ namespace nldb {
         return *this;
     }
 
+    QueryPlannerSelect& QueryPlannerSelect::includeInnerIds() {
+        this->context.removeInnerIDs = false;
+        return *this;
+    }
+
     json QueryPlannerSelect::execute() {
         return context.queryRunner->select(std::move(context));
     }
