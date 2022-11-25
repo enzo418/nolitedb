@@ -1,4 +1,5 @@
 #include "QueryBase.hpp"
+#include "nldb/Collection.hpp"
 #include "nldb/Common.hpp"
 
 using namespace nldb;
@@ -44,7 +45,10 @@ TYPED_TEST(QueryInsertTests, ShouldInsertWithId) {
     Collection test = this->q.collection("test");
 
     json ob = {{{id, 42}, {"name", "pepe"}}, {{id, 45}, {"name", "x"}}};
-    this->q.from("test").insert(ob);
+    std::vector<std::string> insertedIDs = this->q.from("test").insert(ob);
+
+    ASSERT_EQ(insertedIDs[0], "42");
+    ASSERT_EQ(insertedIDs[1], "45");
 
     EXPECT_GT(this->db.getChangesCount(), 0);
 
@@ -54,4 +58,24 @@ TYPED_TEST(QueryInsertTests, ShouldInsertWithId) {
     ASSERT_EQ(selected.size(), 2);
     ASSERT_EQ(selected[0][id], "42");
     ASSERT_EQ(selected[1][id], "45");
+}
+
+TYPED_TEST(QueryInsertTests, ShouldInsertAndReturnId) {
+    auto id = common::internal_id_string;
+
+    json data = {{{"name", "pepe"}}, {{"name", "x"}}};
+    std::vector<std::string> insertedIDs = this->q.from("test").insert(data);
+
+    ASSERT_EQ(insertedIDs.size(), 2);
+    ASSERT_NE(insertedIDs[0], insertedIDs[1]);
+
+    Collection col = this->q.collection("test");
+    json selected = this->q.from("test")
+                        .select()
+                        .where(col[id] == insertedIDs[0])
+                        .execute();
+
+    ASSERT_EQ(selected.size(), 1);
+    ASSERT_EQ(selected[0][id], insertedIDs[0]);
+    ASSERT_EQ(selected[0]["name"], "pepe");
 }

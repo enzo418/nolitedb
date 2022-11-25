@@ -55,8 +55,10 @@ namespace nldb {
         NLDB_PROFILE_END_SESSION();
     }
 
-    void QueryRunner::insert(QueryPlannerContextInsert&& data) {
+    std::vector<std::string> QueryRunner::insert(
+        QueryPlannerContextInsert&& data) {
         NLDB_PROFILE_BEGIN_SESSION("insert", "nldb-profile-insert.json");
+        std::vector<std::string> ids;
 
         {
             NLDB_PROFILE_FUNCTION();
@@ -72,20 +74,27 @@ namespace nldb {
             Collection& from = *data.from.begin();
 
             if (data.documents.is_array()) {
+                ids.reserve(data.documents.size());
+
                 for (auto& doc : data.documents) {
 #ifdef NLDB_DEBUG_QUERY
                     NLDB_TRACE("INSERTING {}", doc.dump(2));
 #endif
-                    insertDocumentRecursive(doc, from.getName());
+                    const snowflake insertedID =
+                        insertDocumentRecursive(doc, from.getName());
+                    ids.push_back(std::to_string(insertedID));
                 }
             } else {
-                insertDocumentRecursive(data.documents, from.getName());
+                const snowflake insertedID =
+                    insertDocumentRecursive(data.documents, from.getName());
+                ids.push_back(std::to_string(insertedID));
             }
 
             repos->pushPendingData();
         }
 
         NLDB_PROFILE_END_SESSION();
+        return ids;
     }
 
     void QueryRunner::remove(QueryPlannerContextRemove&& data) {
@@ -139,7 +148,7 @@ namespace nldb {
         return userSpecifiedID;
     }
 
-    void QueryRunner::insertDocumentRecursive(
+    snowflake QueryRunner::insertDocumentRecursive(
         json& doc, const std::string& collName,
         std::optional<snowflake> parentObjID,
         std::optional<snowflake> pRootPropID) {
@@ -210,6 +219,8 @@ namespace nldb {
                                                 ValueToString(value));
             }
         }
+
+        return objID;
     }
 
     void QueryRunner::updateDocumentRecursive(snowflake objID,

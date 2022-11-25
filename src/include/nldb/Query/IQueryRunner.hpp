@@ -14,7 +14,8 @@ namespace nldb {
        public:
         virtual json select(QueryPlannerContextSelect&& data) = 0;
         virtual void update(QueryPlannerContextUpdate&& data) = 0;
-        virtual void insert(QueryPlannerContextInsert&& data) = 0;
+        virtual std::vector<std::string> insert(
+            QueryPlannerContextInsert&& data) = 0;
         virtual void remove(QueryPlannerContextRemove&& data) = 0;
 
         virtual ~IQueryRunner() = default;

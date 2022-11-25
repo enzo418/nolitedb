@@ -7,7 +7,8 @@
 
 #include "nldb/typedef.hpp"
 
-typedef std::variant<std::string_view, std::string, int, snowflake, double>
+typedef std::variant<std::string_view, std::string, int, nldb::snowflake,
+                     double>
     ParamsBindValue;
 
 typedef std::vector<std::pair<std::string, ParamsBindValue>>

@@ -25,7 +25,10 @@ namespace nldb {
        public:
         // virtual json select(QueryPlannerContextSelect&& data) override;
         virtual void update(QueryPlannerContextUpdate&& data) override;
-        virtual void insert(QueryPlannerContextInsert&& data) override;
+
+        // inserts the documents and returns their ids
+        virtual std::vector<std::string> insert(
+            QueryPlannerContextInsert&& data) override;
         virtual void remove(QueryPlannerContextRemove&& data) override;
 
        protected:  // helpers runners
@@ -38,7 +41,7 @@ namespace nldb {
          * @param rootPropID the parent property id for the new collection (if
          * missing).
          */
-        virtual void insertDocumentRecursive(
+        virtual snowflake insertDocumentRecursive(
             json& doc, const std::string& collName,
             std::optional<snowflake> parentObjID = std::nullopt,
             std::optional<snowflake> rootPropID = std::nullopt);

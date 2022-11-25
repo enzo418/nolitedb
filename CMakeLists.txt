@@ -25,7 +25,7 @@ file(GLOB_RECURSE SOURCES src/*.cpp)
 
 # Set std version 
 # Note: I do it this way because otherwise export compile commands doesn't export it
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++20")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 
 # clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

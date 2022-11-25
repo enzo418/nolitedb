@@ -6,11 +6,11 @@ namespace nldb {
     QueryPlanner::QueryPlanner(QueryPlannerContext&& ctx)
         : context(std::move(ctx)) {}
 
-    void QueryPlanner::insert(const json& object) {
+    std::vector<std::string> QueryPlanner::insert(const json& object) {
         QueryPlannerContextInsert ctx(std::move(this->context));
         ctx.documents = std::move(object);
 
-        ctx.queryRunner->insert(std::move(ctx));
+        return ctx.queryRunner->insert(std::move(ctx));
     }
 
     void QueryPlanner::update(snowflake docId, const json& newValue) {

@@ -37,7 +37,18 @@ namespace nldb {
             return QueryPlannerSelect(std::move(ctx));
         }
 
-        void insert(const json& object);
+        /**
+         * @brief Inserts the documents and returns their ids.
+         * The id of the first document will be the first element of the
+         * returned list.
+         *
+         * Note: we return std::string instead of `snowflake` (long) because
+         * LogicConstValue in Property.hpp can't use it.
+         *
+         * @param object
+         * @return std::vector<std::string>
+         */
+        std::vector<std::string> insert(const json& object);
 
         /**
          * @brief Update a document.
