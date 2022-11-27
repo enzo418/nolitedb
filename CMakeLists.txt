@@ -6,9 +6,6 @@ option(BUILD_EXAMPLES "Build examples" OFF)
 
 # -------------------- CONFIGURATION ------------------- #
 
-# A string used to differentiate between a user id and a document id.
-set(NLDB_INTERNAL_ID "_id")
-
 option(NLDB_SHOW_ID_WARNING "Prints a warning if the requested is not the internal identifier." ON)
 
 # ------------------ CONFIGURATION DEV ----------------- #
@@ -69,12 +66,6 @@ foreach(_VAR IN ITEMS
         target_compile_definitions(noLitedb_lb PUBLIC "${_VAR}")
     endif()
 endforeach()
-
-# valued definitions
-target_compile_definitions(noLitedb_lb 
-    PUBLIC 
-    "NLDB_INTERNAL_ID=\"${NLDB_INTERNAL_ID}\"" 
-)
 
 target_link_libraries(noLitedb_lb PUBLIC ${DEPENDENCY_LIBS})
 target_link_directories(noLitedb_lb PUBLIC ${DEPENDENCY_LIB_DIR})
