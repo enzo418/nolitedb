@@ -45,15 +45,15 @@ include_directories(src/include)
 include_directories(src)
 
 # --------------------- NOLITE --------------------- #
-add_library(noLitedb_lb ${SOURCES})
+add_library(nolitedb STATIC ${SOURCES})
 
-add_dependencies(noLitedb_lb ${DEPENDENCY_LIST})
-target_include_directories(noLitedb_lb PUBLIC ${DEPENDENCY_INCLUDE_DIR} ${DEPENDENCY_INCLUDE_LIST})
+add_dependencies(nolitedb ${DEPENDENCY_LIST})
+target_include_directories(nolitedb PUBLIC ${DEPENDENCY_INCLUDE_DIR} ${DEPENDENCY_INCLUDE_LIST})
 
-target_compile_options(noLitedb_lb PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_compile_options(nolitedb PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
 # optional flags, e.g. -DNLDB_LIB_OPTIONAL_FLAGS:STRING="-w"
-target_compile_options(noLitedb_lb PRIVATE "${NLDB_LIB_OPTIONAL_FLAGS}")
+target_compile_options(nolitedb PRIVATE "${NLDB_LIB_OPTIONAL_FLAGS}")
 
 # in c++20 the expression Property == Property warns about something we don't care.
 add_compile_options(-Wno-ambiguous-reversed-operator)
@@ -66,18 +66,18 @@ foreach(_VAR IN ITEMS
     NLDB_PROFILE
 )
     if(${_VAR})
-        target_compile_definitions(noLitedb_lb PUBLIC "${_VAR}")
+        target_compile_definitions(nolitedb PUBLIC "${_VAR}")
     endif()
 endforeach()
 
 # valued definitions
-target_compile_definitions(noLitedb_lb 
+target_compile_definitions(nolitedb 
     PUBLIC 
     "NLDB_INTERNAL_ID=\"${NLDB_INTERNAL_ID}\"" 
 )
 
-target_link_libraries(noLitedb_lb PUBLIC ${DEPENDENCY_LIBS})
-target_link_directories(noLitedb_lb PUBLIC ${DEPENDENCY_LIB_DIR})
+target_link_libraries(nolitedb PUBLIC ${DEPENDENCY_LIBS})
+target_link_directories(nolitedb PUBLIC ${DEPENDENCY_LIB_DIR})
 
 # ------------------ NOLITE EXECUTABLE ----------------- #
 if (NLDB_SANITIZE_EXAMPLES)
@@ -85,7 +85,7 @@ if (NLDB_SANITIZE_EXAMPLES)
   message(STATUS "Using sanitizer options: ${NLDB_SANITIZER_ARGS}")
 endif()
 
-if(BUILD_EXAMPLES OR PROJECT_IS_TOP_LEVEL)
+if(BUILD_EXAMPLES)
     file(GLOB nldb_example_files 
         "examples/*.cpp")
 
@@ -95,7 +95,7 @@ if(BUILD_EXAMPLES OR PROJECT_IS_TOP_LEVEL)
         "\\2" nldb_exec_name ${filename}) # get exec output name
     
         add_executable(${nldb_exec_name} ${filename})
-        target_link_libraries(${nldb_exec_name} noLitedb_lb "-lz")
+        target_link_libraries(${nldb_exec_name} nolitedb "-lz")
         
         if(NLDB_SANITIZE_EXAMPLES)
           target_compile_options(${nldb_exec_name} PRIVATE ${NLDB_SANITIZER_ARGS})
@@ -105,29 +105,49 @@ if(BUILD_EXAMPLES OR PROJECT_IS_TOP_LEVEL)
 endif()
 
 # ------------------------ TESTS ----------------------- #
-add_subdirectory(vendor/googletest)
-include_directories(vendor/googletest/googletest/include)
+if (NLDB_TEST)
+  add_subdirectory(vendor/googletest)
+  include_directories(vendor/googletest/googletest/include)
 
-enable_testing()
+  enable_testing()
 
-file(GLOB_RECURSE TESTS_SRC tests/*.cpp)
+  file(GLOB_RECURSE TESTS_SRC tests/*.cpp)
 
-add_executable(
-  tests
-  ${TESTS_SRC}
-)
+  add_executable(
+    tests
+    ${TESTS_SRC}
+  )
 
-target_link_libraries(
-  tests
-  noLitedb_lb
-  GTest::gtest
-)
+  target_link_libraries(
+    tests
+    nolitedb
+    GTest::gtest
+  )
 
-if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
-  add_definitions( -DLOGGER_MAX_LOG_LEVEL_PRINTED=6 ) # trace
-else ()
-  add_definitions( -DLOGGER_MAX_LOG_LEVEL_PRINTED=1 ) # error
+  if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
+    add_definitions( -DLOGGER_MAX_LOG_LEVEL_PRINTED=6 ) # trace
+  else ()
+    add_definitions( -DLOGGER_MAX_LOG_LEVEL_PRINTED=1 ) # error
+  endif()
+
+  include(GoogleTest)
+  gtest_discover_tests(tests)
 endif()
 
-include(GoogleTest)
-gtest_discover_tests(tests)
+# ------------------------ INSTALL ----------------------- #
+include(GNUInstallDirs)
+set(cmake_package_name nolitedb CACHE INTERNAL "")
+
+# Create the CMake package file descriptors.
+if (NLDB_INSTALL)  
+  install(
+    TARGETS nolitedb
+    EXPORT nolitedb
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  
+  install(DIRECTORY src/include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+
+  # TODO: pkg, config, version ...
+endif()
