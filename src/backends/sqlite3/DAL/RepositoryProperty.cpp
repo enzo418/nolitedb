@@ -1,4 +1,4 @@
-#include "RepositoryProperty.hpp"
+#include "nldb/backends/sqlite3/DAL/RepositoryProperty.hpp"
 
 #include "nldb/Property/Property.hpp"
 

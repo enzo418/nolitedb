@@ -1,13 +1,13 @@
-#include "BufferDataSQ3.hpp"
+#include "nldb/backends/sqlite3/DAL/BufferDataSQ3.hpp"
 
 #include <map>
 #include <sstream>
 
-#include "backends/sqlite3/DAL/Definitions.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Profiling/Profiler.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
+#include "nldb/backends/sqlite3/DAL//Definitions.hpp"
 
 namespace nldb {
     using namespace definitions;

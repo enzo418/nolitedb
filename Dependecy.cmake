@@ -9,6 +9,11 @@ function(add_dep dep)
 endfunction()
 
 function(add_include include_dir)
+    # add / at the end or else cmake will think that we want to copy the parent folder
+    if (NOT (${include_dir} MATCHES ".*/$"))
+        set(include_dir "${include_dir}/")
+    endif()
+
     set(DEPENDENCY_INCLUDE_LIST ${DEPENDENCY_INCLUDE_LIST} ${include_dir} PARENT_SCOPE)
 endfunction()
 
@@ -59,6 +64,3 @@ add_include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/magic_enum/include)
 
 # ---------------------- LRU CACHE --------------------- #
 add_include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/lrucache11/include)
-
-# ----------------------- OTHERS ----------------------- #
-add_include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/others)

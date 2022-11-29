@@ -1,4 +1,4 @@
-#include "QueryRunner.hpp"
+#include "nldb/backends/sqlite3/Query/QueryRunner.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -10,7 +10,6 @@
 #include <unordered_map>
 #include <variant>
 
-#include "backends/sqlite3/DAL/Definitions.hpp"
 #include "magic_enum.hpp"
 #include "nldb/Collection.hpp"
 #include "nldb/Common.hpp"
@@ -27,6 +26,7 @@
 #include "nldb/Utils/Enums.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 #include "nldb/Utils/Variant.hpp"
+#include "nldb/backends/sqlite3/DAL/Definitions.hpp"
 #include "nldb/nldb_json.hpp"
 #include "nldb/typedef.hpp"
 #include "signal.h"

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "backends/sqlite3/DB/DB.hpp"
 #include "gtest/gtest.h"
 #include "nldb/Query/Query.hpp"
 #include "nldb/SQL3Implementation.hpp"
+#include "nldb/backends/sqlite3/DB/DB.hpp"
 
 using namespace nldb;
 

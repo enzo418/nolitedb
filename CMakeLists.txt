@@ -41,8 +41,7 @@ message(STATUS "NLDB dependencies: ${DEPENDENCY_LIST}")
 message(STATUS "NLDB dependency libs: ${DEPENDENCY_LIBS}")
 message(STATUS "NLDB dependency lib includes: ${DEPENDENCY_INCLUDE_DIR}")
 
-include_directories(src/include)
-include_directories(src)
+add_include(${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 
 # --------------------- NOLITE --------------------- #
 add_library(nolitedb STATIC ${SOURCES})
@@ -64,6 +63,7 @@ foreach(_VAR IN ITEMS
     NLDB_DEBUG_CACHE_BUFFER
     NLDB_SHOW_ID_WARNING
     NLDB_PROFILE
+    NLDB_INSTALL
 )
     if(${_VAR})
         target_compile_definitions(nolitedb PUBLIC "${_VAR}")
@@ -147,7 +147,12 @@ if (NLDB_INSTALL)
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
   
-  install(DIRECTORY src/include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+  # copy the vendors includes
+  foreach(vendor_include_dir ${DEPENDENCY_INCLUDE_LIST})
+    install(DIRECTORY "${vendor_include_dir}" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+  endforeach()
 
+  configure_file("${CMAKE_CURRENT_LIST_DIR}/nldb_config.h.in" "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/nldb/nldb_config.h")
+  
   # TODO: pkg, config, version ...
 endif()

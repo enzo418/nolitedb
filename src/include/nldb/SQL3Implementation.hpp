@@ -21,6 +21,10 @@
 #include "nldb/DAL/IValuesDAO.hpp"
 #include "nldb/Query/Query.hpp"
 
+#ifdef NLDB_INSTALL
+#include "nldb_config.h"
+#endif
+
 /**
  * This is the default implementation for the sqlite 3 backend.
  * Include this file to use this implementation.

@@ -1,4 +1,4 @@
-#include "DBQueryReader.hpp"
+#include "nldb/backends/sqlite3/DB/DBQueryReader.hpp"
 
 #include <iostream>
 #include <memory>

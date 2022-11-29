@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "DBBaseTest.hpp"
-#include "backends/sqlite3/DB/DB.hpp"
+#include "nldb/backends/sqlite3/DB/DB.hpp"
 
 using namespace nldb;
 
@@ -20,22 +20,23 @@ inline const char* getTemplateDB<DBSL3>() {
            "'user2','user2@email.com');";
 }
 
-template <typename T> class DBTest : public BaseDBTest<T> {
-public:
-  void SetUp() override {
-    BaseDBTest<T>::SetUp();
+template <typename T>
+class DBTest : public BaseDBTest<T> {
+   public:
+    void SetUp() override {
+        BaseDBTest<T>::SetUp();
 
-    this->db.execute(getTemplateDB<T>(), {{}});
+        this->db.execute(getTemplateDB<T>(), {{}});
 
-    EXPECT_EQ(this->db.getLastInsertedRowId(), 2);
+        EXPECT_EQ(this->db.getLastInsertedRowId(), 2);
 
-    EXPECT_EQ(this->db
-                  .executeAndGetFirstInt(
-                      "SELECT id from user where name = @name order by id;",
-                      {{"@name", std::string("user1")}})
-                  .value_or(-1),
-              1);
-  }
+        EXPECT_EQ(this->db
+                      .executeAndGetFirstInt(
+                          "SELECT id from user where name = @name order by id;",
+                          {{"@name", std::string("user1")}})
+                      .value_or(-1),
+                  1);
+    }
 };
 
 // Templated suit test

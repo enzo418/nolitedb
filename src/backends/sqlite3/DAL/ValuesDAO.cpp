@@ -1,15 +1,15 @@
-#include "ValuesDAO.hpp"
+#include "nldb/backends/sqlite3/DAL/ValuesDAO.hpp"
 
 #include <map>
 #include <optional>
 #include <sstream>
 #include <unordered_map>
 
-#include "backends/sqlite3/DAL/Definitions.hpp"
 #include "magic_enum.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
+#include "nldb/backends/sqlite3/DAL/Definitions.hpp"
 
 namespace nldb {
     using namespace definitions;

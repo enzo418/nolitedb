@@ -1,14 +1,14 @@
-#include "DB.hpp"
+#include "nldb/backends/sqlite3/DB/DB.hpp"
 
 #include <filesystem>
 #include <memory>
 #include <optional>
 #include <stdexcept>
 
-#include "DBInitializer.hpp"
 #include "nldb/DB/IDBQueryReader.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
+#include "nldb/backends/sqlite3/DB/DBInitializer.hpp"
 #include "nldb/typedef.hpp"
 
 #define SQL3_EXEC_ERR_HNDL(db, SQL_STR, ERROR_MSG)  \

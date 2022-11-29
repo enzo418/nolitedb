@@ -1,4 +1,4 @@
-#include "DBInitializer.hpp"
+#include "nldb/backends/sqlite3/DB/DBInitializer.hpp"
 
 #include "nldb/LOG/log.hpp"
 
