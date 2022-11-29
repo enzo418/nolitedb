@@ -11,10 +11,15 @@
 #include "spdlog/spdlog.h"
 
 namespace nldb {
+
+    typedef spdlog::level::level_enum log_level;
+
     class LogManager {
        public:
         static void Initialize();
         static void Shutdown();
+
+        static void SetLevel(log_level level_enum);
 
         static std::shared_ptr<spdlog::logger> GetLogger() { return logger; }
 

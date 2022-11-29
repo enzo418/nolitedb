@@ -11,6 +11,8 @@ set(NLDB_INTERNAL_ID "_id")
 
 option(NLDB_SHOW_ID_WARNING "Prints a warning if the requested is not the internal identifier." ON)
 
+option(NLDB_LOGGING "Enable/Disable loggin" ON)
+
 # ------------------ CONFIGURATION DEV ----------------- #
 option(NLDB_DEBUG_CACHE_BUFFER "Shows cache hit/miss and buffer warnings" OFF)
 
@@ -140,12 +142,15 @@ set(cmake_package_name nolitedb CACHE INTERNAL "")
 
 # Create the CMake package file descriptors.
 if (NLDB_INSTALL)  
-  install(
-    TARGETS nolitedb
-    EXPORT nolitedb
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  # TODO: BUILD SHARED
+
+  # instead of exporting NLDB_Libs we export a combined static library
+  add_custom_target(nolitedb_full ALL
+  COMMAND ar crsT ${CMAKE_CURRENT_BINARY_DIR}/libnolitedb_full.a \"$<TARGET_FILE:nolitedb>\" \"$<TARGET_FILE:xsqllite3>\")
+  #       ^^ which is it on windows?
+
+  
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libnolitedb_full.a" DESTINATION "${CMAKE_INSTALL_LIBDIR}/")
   
   # copy the vendors includes
   foreach(vendor_include_dir ${DEPENDENCY_INCLUDE_LIST})

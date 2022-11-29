@@ -13,7 +13,7 @@
 
 #endif
 
-#ifndef DISABLE_LOGGING
+#if NLDB_LOGGING
 #define NLDB_TRACE(...) nldb::LogManager::GetLogger()->trace(__VA_ARGS__)
 #define NLDB_INFO(...) nldb::LogManager::GetLogger()->info(__VA_ARGS__)
 #define NLDB_WARN(...) nldb::LogManager::GetLogger()->warn(__VA_ARGS__)
@@ -36,13 +36,11 @@
 #endif
 
 #else
-#define
 #define NLDB_TRACE(...) (void)0
 #define NLDB_INFO(...) (void)0
-#define NLDB_WARN(...) Observer::LogManager::GetLogger()->warn(__VA_ARGS__)
-#define NLDB_ERROR(...) Observer::LogManager::GetLogger()->error(__VA_ARGS__)
-#define NLDB_CRITICAL(...) \
-    Observer::LogManager::GetLogger()->critical(__VA_ARGS__)
+#define NLDB_WARN(...) (void)0
+#define NLDB_ERROR(...) (void)0
+#define NLDB_CRITICAL(...) (void)0
 #define NLDB_ASSERT(x, msg) (void)0
 
 #define NLDB_PERF_SUCCESS(...) (void)0

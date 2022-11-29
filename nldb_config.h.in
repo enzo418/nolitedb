@@ -1,12 +1,14 @@
 #pragma once
 
-#cmakedefine NLDB_INSTALL
+#cmakedefine01 NLDB_INSTALL
 
-#ifndef NLDB_INSTALL
+#if !(NLDB_INSTALL)
 #error "This file should only be used externally"
 #endif
 
 #define NLDB_INTERNAL_ID "${NLDB_INTERNAL_ID}"
+
+#cmakedefine01 NLDB_LOGGING
 
 #cmakedefine01 NLDB_SHOW_ID_WARNING
 
