@@ -13,6 +13,7 @@
 !*.hpp
 !*.c
 !*.h
+!*.h.in
 !README.md
 !CMakeLists.txt
 !*.cmake

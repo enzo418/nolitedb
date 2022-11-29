@@ -1,0 +1,15 @@
+#pragma once
+
+#ifdef NLDB_INSTALL
+#define NLDB_INTERNAL_ID "${NLDB_INTERNAL_ID}"
+
+#cmakedefine01 NLDB_SHOW_ID_WARNING
+
+#cmakedefine01 NLDB_DEBUG_CACHE_BUFFER
+
+#cmakedefine01 NLDB_DEBUG_QUERY
+
+#cmakedefine01 NLDB_PROFILE
+
+#cmakedefine01 NLDB_SANITIZE_EXAMPLES
+#endif
