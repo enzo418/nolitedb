@@ -152,7 +152,8 @@ if (NLDB_INSTALL)
     install(DIRECTORY "${vendor_include_dir}" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
   endforeach()
 
-  configure_file("${CMAKE_CURRENT_LIST_DIR}/nldb_config.h.in" "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/nldb/nldb_config.h")
+  configure_file("${CMAKE_CURRENT_LIST_DIR}/nldb_config.h.in" "${CMAKE_INSTALL_PREFIX}/tmp/nldb_config.h")
+  install(FILES "${CMAKE_INSTALL_PREFIX}/tmp/nldb_config.h" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/nldb/")
   
   # TODO: pkg, config, version ...
 endif()

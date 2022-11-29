@@ -9,7 +9,6 @@
 #include <variant>
 #include <vector>
 
-#include "backends/sqlite3/DB/DB.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/LOG/managers/LogManagerSPD.hpp"
 #include "nldb/Property/Property.hpp"
@@ -17,6 +16,7 @@
 #include "nldb/SQL3Implementation.hpp"
 #include "nldb/Utils/Enums.hpp"
 #include "nldb/Utils/Variant.hpp"
+#include "nldb/backends/sqlite3/DB/DB.hpp"
 #include "nldb/nldb_json.hpp"
 
 using namespace nldb;

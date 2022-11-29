@@ -2,6 +2,12 @@
 
 #include <memory>
 
+// Library configuration file:
+#ifdef NLDB_INSTALL
+#include "nldb_config.h"
+#endif
+
+// Implementation files:
 #include "DAL/Repositories.hpp"
 #include "DB/IDB.hpp"
 #include "Implementation.hpp"
@@ -20,10 +26,6 @@
 #include "nldb/DAL/IRepositoryCollection.hpp"
 #include "nldb/DAL/IValuesDAO.hpp"
 #include "nldb/Query/Query.hpp"
-
-#ifdef NLDB_INSTALL
-#include "nldb_config.h"
-#endif
 
 /**
  * This is the default implementation for the sqlite 3 backend.
