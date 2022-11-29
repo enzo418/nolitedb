@@ -3,9 +3,7 @@
 #include <memory>
 
 // Library configuration file:
-#ifdef NLDB_INSTALL
 #include "nldb_config.h"
-#endif
 
 // Implementation files:
 #include "DAL/Repositories.hpp"
