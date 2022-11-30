@@ -19,7 +19,7 @@ namespace nldb {
 
         static void SetLevel(log_level::log_level_enum level_enum);
 
-        static std::shared_ptr<spdlog::logger> GetLogger() { return logger; }
+        static std::shared_ptr<spdlog::logger> GetLogger();
 
        private:
         static std::shared_ptr<spdlog::logger> logger;

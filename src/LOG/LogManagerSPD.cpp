@@ -36,4 +36,12 @@ namespace nldb {
     void LogManager::SetLevel(log_level::log_level_enum level_enum) {
         logger->set_level((spdlog::level::level_enum)level_enum);
     }
+
+    std::shared_ptr<spdlog::logger> LogManager::GetLogger() {
+        if (!logger) {
+            LogManager::Initialize();
+        }
+
+        return logger;
+    }
 }  // namespace nldb

@@ -136,7 +136,17 @@ If you disable the buffer the ids will be the ones assigned by the database, inc
     - 14 bits thread element counter
 
 # How to use it in your project
+Clone the repo
+1. `git submodule add https://github.com/enzo418/nolitedb`
+
+Download dependencies
+
+2. `git submodule update --init --recursive`
+
+include it to your cmake file
 ```cmake
+include(ExternalProject)
+
 # Helper directories
 set(DEPENDENCY_INSTALL_DIR ${PROJECT_BINARY_DIR}/install) 
 set(DEPENDENCY_INCLUDE_DIR ${DEPENDENCY_INSTALL_DIR}/include) 
@@ -160,11 +170,11 @@ ExternalProject_Add(
 # nolitedb puts the headers in the install/include directory
 include_directories(${DEPENDENCY_INSTALL_DIR}/include/)
 
-add_dependencies(webRecognize nolitedb-dep)
+add_dependencies(YOUR_TARGET nolitedb-dep)
 
 # Linker 
 # - Add the install dir and link the libs needed
-target_link_directories(webRecognize PUBLIC ${DEPENDENCY_LIB_DIR})
+target_link_directories(YOUR_TARGET PUBLIC ${DEPENDENCY_LIB_DIR})
 
 # - If NLDB_BUILD_SHARED=ON all the dependencies of nolitedb are included in the shared library
 target_link_libraries(YOUR_TARGET PUBLIC [...] nolitedb)
