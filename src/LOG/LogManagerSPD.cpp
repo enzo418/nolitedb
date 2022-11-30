@@ -36,14 +36,16 @@ namespace nldb {
     void LogManager::Shutdown() { spdlog::shutdown(); }
 
     void LogManager::SetLevel(log_level::log_level_enum level_enum) {
+        if (!logger) {
+            LogManager::Initialize();
+        }
+
         logger->set_level((spdlog::level::level_enum)level_enum);
     }
 
     std::shared_ptr<spdlog::logger> LogManager::GetLogger() {
         if (!logger) {
-            throw std::runtime_error(
-                "Please, first initialize the logger: "
-                "nldb::LogManager::Initialize();");
+            LogManager::Initialize();
         }
 
         return logger;
