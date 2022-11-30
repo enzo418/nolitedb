@@ -13,7 +13,6 @@
 #include "nldb/backends/sqlite3/DB/DB.hpp"
 // #include "Enums.hpp"
 #include "nldb/LOG/log.hpp"
-#include "nldb/LOG/managers/LogManagerSPD.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Query/Query.hpp"
 // #include "nlohmann/json.hpp"

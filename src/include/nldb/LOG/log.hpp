@@ -1,7 +1,11 @@
 #pragma once
 
 // use spdlog implementation
+#if NLDB_LOGGING
 #include "managers/LogManagerSPD.hpp"
+#else
+#include "managers/NullLogManager.hpp"
+#endif
 
 #ifdef __MINGW32__
 #define NLDB_BREAK __debugbreak();

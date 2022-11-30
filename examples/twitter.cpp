@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "nldb/LOG/log.hpp"
-#include "nldb/LOG/managers/LogManagerSPD.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Query/Query.hpp"
 #include "nldb/SQL3Implementation.hpp"

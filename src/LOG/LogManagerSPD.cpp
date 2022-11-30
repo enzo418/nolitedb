@@ -33,7 +33,7 @@ namespace nldb {
 
     void LogManager::Shutdown() { spdlog::shutdown(); }
 
-    void LogManager::SetLevel(spdlog::level::level_enum level_enum) {
-        logger->set_level(level_enum);
+    void LogManager::SetLevel(log_level::log_level_enum level_enum) {
+        logger->set_level((spdlog::level::level_enum)level_enum);
     }
 }  // namespace nldb

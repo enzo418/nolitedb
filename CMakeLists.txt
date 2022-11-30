@@ -53,7 +53,7 @@ if(NLDB_BUILD_SHARED OR BUILD_SHARED_LIBS)
 
   add_library(nolitedb SHARED ${SOURCES})
 else()
-add_library(nolitedb STATIC ${SOURCES})
+  add_library(nolitedb STATIC ${SOURCES})
 endif()
 
 add_dependencies(nolitedb ${DEPENDENCY_LIST})
@@ -74,6 +74,7 @@ foreach(_VAR IN ITEMS
     NLDB_SHOW_ID_WARNING
     NLDB_PROFILE
     NLDB_INSTALL
+    NLDB_LOGGING
 )
     if(${_VAR})
         target_compile_definitions(nolitedb PUBLIC "${_VAR}")
@@ -86,7 +87,12 @@ target_compile_definitions(nolitedb
     "NLDB_INTERNAL_ID=\"${NLDB_INTERNAL_ID}\"" 
 )
 
-target_link_libraries(nolitedb PUBLIC ${DEPENDENCY_LIBS})
+target_link_libraries(nolitedb PUBLIC xsqllite3)
+
+if(NLDB_LOGGING)
+  target_link_libraries(nolitedb PUBLIC spdlog)
+endif()
+
 target_link_directories(nolitedb PUBLIC ${DEPENDENCY_LIB_DIR})
 
 # ------------------ NOLITE EXECUTABLE ----------------- #
@@ -134,12 +140,6 @@ if (NLDB_TEST)
     GTest::gtest
   )
 
-  if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
-    add_definitions( -DLOGGER_MAX_LOG_LEVEL_PRINTED=6 ) # trace
-  else ()
-    add_definitions( -DLOGGER_MAX_LOG_LEVEL_PRINTED=1 ) # error
-  endif()
-
   include(GoogleTest)
   gtest_discover_tests(tests)
 endif()
@@ -154,7 +154,7 @@ if (NLDB_INSTALL)
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  
+
   # copy the vendors includes
   foreach(vendor_include_dir ${DEPENDENCY_INCLUDE_LIST})
     install(DIRECTORY "${vendor_include_dir}" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
