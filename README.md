@@ -135,5 +135,42 @@ If you disable the buffer the ids will be the ones assigned by the database, inc
     - 7 bits for the thread/process id
     - 14 bits thread element counter
 
+# How to use it in your project
+```cmake
+# Helper directories
+set(DEPENDENCY_INSTALL_DIR ${PROJECT_BINARY_DIR}/install) 
+set(DEPENDENCY_INCLUDE_DIR ${DEPENDENCY_INSTALL_DIR}/include) 
+set(DEPENDENCY_LIB_DIR ${DEPENDENCY_INSTALL_DIR}/lib) # GNUInstallDirs
+
+# Add the project
+# Suppose `nolitedb` source is in the vendor directory
+ExternalProject_Add(
+    nolitedb-dep
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/nolitedb
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
+	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEPENDENCY_INSTALL_DIR} # includes and libraries will be here
+		-DCMAKE_BUILD_TYPE=RELEASE
+		-DNLDB_INSTALL=ON
+		-DNLDB_LOGGING=ON
+		-DNLDB_BUILD_SHARED=OFF
+    TEST_COMMAND ""
+)
+
+# nolitedb puts the headers in the install/include directory
+include_directories(${DEPENDENCY_INSTALL_DIR}/include/)
+
+add_dependencies(webRecognize nolitedb-dep)
+
+# Linker 
+# - Add the install dir and link the libs needed
+target_link_directories(webRecognize PUBLIC ${DEPENDENCY_LIB_DIR})
+
+# - If NLDB_BUILD_SHARED=ON all the dependencies of nolitedb are included in the shared library
+target_link_libraries(YOUR_TARGET PUBLIC [...] nolitedb)
+# - if NLDB_BUILD_SHARED=OFF you also need to link sqlite3:
+target_link_libraries(webRecognize PUBLIC [...] nolitedb xsqllite3)
+```
+
 ## *Note*
 You can read more about this project, the process of generating identifiers, performance tests and the inner workings  of it in my [~~devlog~~ 🚧]()

@@ -4,6 +4,8 @@ project(noLiteDb)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 
+option(NLDB_BUILD_SHARED "Build shared library" OFF)
+
 # -------------------- CONFIGURATION ------------------- #
 
 # A string used to differentiate between a user id and a document id.
@@ -32,8 +34,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 # clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if(NOT CMAKE_BUILD_TYPE )
-  # Compilation type
+# CMAKE_BUILD_TYPE = RELEASE | DEBUG <default>
+if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE DEBUG)
 endif()
 
@@ -46,7 +48,13 @@ message(STATUS "NLDB dependency lib includes: ${DEPENDENCY_INCLUDE_DIR}")
 add_include(${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 
 # --------------------- NOLITE --------------------- #
+if(NLDB_BUILD_SHARED OR BUILD_SHARED_LIBS)
+  set_property(TARGET xsqllite3 PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+  add_library(nolitedb SHARED ${SOURCES})
+else()
 add_library(nolitedb STATIC ${SOURCES})
+endif()
 
 add_dependencies(nolitedb ${DEPENDENCY_LIST})
 target_include_directories(nolitedb PUBLIC ${DEPENDENCY_INCLUDE_DIR} ${DEPENDENCY_INCLUDE_LIST})
@@ -142,15 +150,10 @@ set(cmake_package_name nolitedb CACHE INTERNAL "")
 
 # Create the CMake package file descriptors.
 if (NLDB_INSTALL)  
-  # TODO: BUILD SHARED
-
-  # instead of exporting NLDB_Libs we export a combined static library
-  add_custom_target(nolitedb_full ALL
-  COMMAND ar crsT ${CMAKE_CURRENT_BINARY_DIR}/libnolitedb_full.a \"$<TARGET_FILE:nolitedb>\" \"$<TARGET_FILE:xsqllite3>\")
-  #       ^^ which is it on windows?
-
-  
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libnolitedb_full.a" DESTINATION "${CMAKE_INSTALL_LIBDIR}/")
+  install(TARGETS nolitedb xsqllite3
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
   
   # copy the vendors includes
   foreach(vendor_include_dir ${DEPENDENCY_INCLUDE_LIST})
@@ -160,5 +163,5 @@ if (NLDB_INSTALL)
   configure_file("${CMAKE_CURRENT_LIST_DIR}/nldb_config.h.in" "${CMAKE_INSTALL_PREFIX}/tmp/nldb_config.h")
   install(FILES "${CMAKE_INSTALL_PREFIX}/tmp/nldb_config.h" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/nldb/")
   
-  # TODO: pkg, config, version ...
+  # TODO: pc, pkg, config, version ...
 endif()
