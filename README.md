@@ -169,7 +169,7 @@ target_link_directories(webRecognize PUBLIC ${DEPENDENCY_LIB_DIR})
 # - If NLDB_BUILD_SHARED=ON all the dependencies of nolitedb are included in the shared library
 target_link_libraries(YOUR_TARGET PUBLIC [...] nolitedb)
 # - if NLDB_BUILD_SHARED=OFF you also need to link sqlite3:
-target_link_libraries(webRecognize PUBLIC [...] nolitedb xsqllite3)
+target_link_libraries(YOUR_TARGET PUBLIC [...] nolitedb xsqllite3)
 ```
 
 ## *Note*
