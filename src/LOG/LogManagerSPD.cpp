@@ -1,5 +1,7 @@
 #include "nldb/LOG/managers/LogManagerSPD.hpp"
 
+#include <stdexcept>
+
 #include "spdlog/common.h"
 
 namespace nldb {
@@ -39,7 +41,9 @@ namespace nldb {
 
     std::shared_ptr<spdlog::logger> LogManager::GetLogger() {
         if (!logger) {
-            LogManager::Initialize();
+            throw std::runtime_error(
+                "Please, first initialize the logger: "
+                "nldb::LogManager::Initialize();");
         }
 
         return logger;
