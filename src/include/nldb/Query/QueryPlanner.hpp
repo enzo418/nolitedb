@@ -43,7 +43,8 @@ namespace nldb {
          * returned list.
          *
          * Note: we return std::string instead of `snowflake` (long) because
-         * LogicConstValue in Property.hpp can't use it.
+         * LogicConstValue in Property.hpp can't use it. Plus javascript can't
+         * handle int64.
          *
          * @param object
          * @return std::vector<std::string>
