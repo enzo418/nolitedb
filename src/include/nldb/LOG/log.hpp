@@ -2,9 +2,20 @@
 
 // use spdlog implementation
 #if NLDB_LOGGING
+
 #include "managers/LogManagerSPD.hpp"
+
+namespace nldb {
+    // this avoids wrong auto imports
+    using LogManager = nldb::SPDLogManager;
+}  // namespace nldb
+
 #else
 #include "managers/NullLogManager.hpp"
+
+namespace nldb {
+    using LogManager = nldb::NullLogManager;
+}
 #endif
 
 #ifdef __MINGW32__

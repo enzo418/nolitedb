@@ -7,7 +7,7 @@
 #include "log_constants.hpp"
 
 namespace nldb {
-    class LogManager {
+    class NullLogManager {
        public:
         static void Initialize() {}
         static void Shutdown() {}
@@ -20,9 +20,7 @@ namespace nldb {
         }
 
        private:
-        static std::shared_ptr<void*> logger;
-
-        LogManager() = default;
-        ~LogManager() = default;
+        NullLogManager() = default;
+        ~NullLogManager() = default;
     };
 }  // namespace nldb

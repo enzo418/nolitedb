@@ -5,9 +5,9 @@
 #include "spdlog/common.h"
 
 namespace nldb {
-    std::shared_ptr<spdlog::logger> LogManager::logger;
+    std::shared_ptr<spdlog::logger> SPDLogManager::logger;
 
-    void LogManager::Initialize() {
+    void SPDLogManager::Initialize() {
         // console sink
         auto console_sink =
             std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -33,19 +33,19 @@ namespace nldb {
         spdlog::register_logger(logger);
     }
 
-    void LogManager::Shutdown() { spdlog::shutdown(); }
+    void SPDLogManager::Shutdown() { spdlog::shutdown(); }
 
-    void LogManager::SetLevel(log_level::log_level_enum level_enum) {
+    void SPDLogManager::SetLevel(log_level::log_level_enum level_enum) {
         if (!logger) {
-            LogManager::Initialize();
+            SPDLogManager::Initialize();
         }
 
         logger->set_level((spdlog::level::level_enum)level_enum);
     }
 
-    std::shared_ptr<spdlog::logger> LogManager::GetLogger() {
+    std::shared_ptr<spdlog::logger> SPDLogManager::GetLogger() {
         if (!logger) {
-            LogManager::Initialize();
+            SPDLogManager::Initialize();
         }
 
         return logger;

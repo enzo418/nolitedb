@@ -12,7 +12,7 @@
 
 namespace nldb {
 
-    class LogManager {
+    class SPDLogManager {
        public:
         static void Initialize();
         static void Shutdown();
@@ -24,7 +24,7 @@ namespace nldb {
        private:
         static std::shared_ptr<spdlog::logger> logger;
 
-        LogManager() = default;
-        ~LogManager() = default;
+        SPDLogManager() = default;
+        ~SPDLogManager() = default;
     };
 }  // namespace nldb
