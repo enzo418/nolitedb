@@ -165,11 +165,13 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectAndSuppressEmbedDocumentMembers) {
     // Select should look like [{maker: "ford"}, automaker: {name: "ford"}, ...]
     // we always get all the objects that are not form the source (from)
     // collection as object to avoid name collisions
-    json result = this->q.from(cars)
-                      .select(cars["maker"], automaker["name"])
-                      .where(automaker["name"] == cars["maker"])
-                      .suppress(automaker["_id"])  // should not matter
-                      .execute();
+    json result =
+        this->q.from(cars)
+            .select(cars["maker"], automaker["name"])
+            .where(automaker["name"] == cars["maker"])
+            .suppress(
+                automaker[common::internal_id_string])  // should not matter
+            .execute();
 
     ASSERT_EQ(result.size(), 3) << result;
 
