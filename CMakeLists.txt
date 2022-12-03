@@ -9,7 +9,7 @@ option(NLDB_BUILD_SHARED "Build shared library" OFF)
 # -------------------- CONFIGURATION ------------------- #
 
 # A string used to differentiate between a user id and a document id.
-set(NLDB_INTERNAL_ID "_id")
+set(NLDB_INTERNAL_ID "_id" CACHE STRING "string to use internaly as the id")
 
 option(NLDB_SHOW_ID_WARNING "Prints a warning if the requested is not the internal identifier." ON)
 
