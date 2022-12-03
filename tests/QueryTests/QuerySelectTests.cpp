@@ -4,6 +4,8 @@
 #include "QueryBaseCars.hpp"
 #include "nldb/Collection.hpp"
 #include "nldb/Common.hpp"
+#include "nldb/Property/Property.hpp"
+#include "nldb/nldb_json.hpp"
 
 using namespace nldb;
 
@@ -203,4 +205,11 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectInnerObjectMember) {
         ASSERT_EQ(countMembers(car_res), 1) << car_res;
         ASSERT_EQ(countMembers(car_res["technical"]), 1) << car_res;
     }
+}
+
+TYPED_TEST(QuerySelectTestsCars, ShouldSelectEmptyOnNonExistingRootCollection) {
+    json result = this->q.from("non existing collection").select().execute();
+
+    ASSERT_TRUE(result.is_array()) << result;
+    ASSERT_EQ(result.size(), 0) << result;
 }

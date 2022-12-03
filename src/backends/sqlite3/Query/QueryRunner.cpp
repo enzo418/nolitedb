@@ -986,14 +986,18 @@ namespace nldb {
         {
             NLDB_PROFILE_FUNCTION();
 
+            // Check if the root collection exists
+            const std::string rootCollName = data.from.begin()->getName();
+            auto rootColFound = repos->repositoryCollection->find(rootCollName);
+            if (!rootColFound) return res = json::array();  // empty array
+
             populateData<DoThrow>(data);
 
             selectAllOnEmpty(data, repos);
 
             std::stringstream sql;
 
-            auto rootColl =
-                repos->repositoryCollection->find(data.from.begin()->getName());
+            auto rootColl = repos->repositoryCollection->find(rootCollName);
 
             if (!rootColl) {
                 return {};  // the collection doesn't even exists
