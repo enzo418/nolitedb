@@ -133,8 +133,15 @@ namespace nldb {
                 userSpecifiedID = doc[internal_id_string].get<snowflake>();
             } else if (type == PropertyType::STRING) {
                 try {
-                    userSpecifiedID =
-                        std::stoll(doc[internal_id_string].get<std::string>());
+                    const std::string idStr =
+                        doc[internal_id_string].get<std::string>();
+
+                    // check if empty else it will fail.
+                    if (!idStr.empty()) {
+                        userSpecifiedID = std::stoll(idStr);
+                    }
+
+                    // if it's empty then continue as if no id was provided.
                 } catch (...) {
                     NLDB_WARN("INVALID USER-SPECIFIED ID VALUE");
                 }
