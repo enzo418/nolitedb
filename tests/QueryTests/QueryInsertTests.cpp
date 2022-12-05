@@ -1,6 +1,9 @@
+#include <gtest/gtest.h>
+
 #include "QueryBase.hpp"
 #include "nldb/Collection.hpp"
 #include "nldb/Common.hpp"
+#include "nldb/Exceptions.hpp"
 
 using namespace nldb;
 
@@ -78,4 +81,28 @@ TYPED_TEST(QueryInsertTests, ShouldInsertAndReturnId) {
     ASSERT_EQ(selected.size(), 1);
     ASSERT_EQ(selected[0][id], insertedIDs[0]);
     ASSERT_EQ(selected[0]["name"], "pepe");
+}
+
+TYPED_TEST(QueryInsertTests, ShouldNotThrowOnIntegerIntoDouble) {
+    this->q.from("test").insert({{"magic", 20.15}});
+
+    std::vector<std::string> ids;
+    EXPECT_NO_THROW(ids = this->q.from("test").insert({{"magic", 1}}));
+}
+
+TYPED_TEST(QueryInsertTests, ShouldMaybeNotThrowOnIntegerIntoDouble) {
+    this->q.from("test").insert({{"magic", 20}});
+
+#if NLDB_ENABLE_DOUBLE_DOWNCASTING
+    EXPECT_NO_THROW(this->q.from("test").insert({{"magic", 3.141516}}));
+#else
+    try {
+        this->q.from("test").insert({{"magic", 3.141516}});
+    } catch (const WrongPropertyType& t) {
+        EXPECT_EQ(t.expected, "INTEGER");
+        EXPECT_EQ(t.actual, "DOUBLE");
+    } catch (...) {
+        ADD_FAILURE() << "Unexpected exception thrown";
+    }
+#endif
 }

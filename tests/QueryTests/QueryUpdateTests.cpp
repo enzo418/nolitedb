@@ -154,3 +154,59 @@ TYPED_TEST(QueryUpdateTestsCars, ShouldSetNonExistingInnerField) {
     ASSERT_TRUE(
         equalObjectsIgnoreID(updated[0]["pressure"], newFields["pressure"]));
 }
+
+TYPED_TEST(QueryUpdateTestsCars, ShouldNotThrowOnIntegerIntoDouble) {
+    Collection cars = this->q.collection("cars");
+    json car =
+        this->q.from("cars").select().where(cars["year"] == 2003).execute();
+
+    ASSERT_GE(car.size(), 1);
+
+    const std::string id = car[0][common::internal_id_string];
+
+    EXPECT_NO_THROW(
+        this->q.from("cars").update(id, {{"technical", {{"0-60 mph", 99}}}}));
+
+    std::cout << this->q.from("cars")
+                     .select()
+                     .where(cars[common::internal_id_string] == id)
+                     .execute()[0]
+                     .dump(2)
+              << std::endl;
+
+    EXPECT_NEAR(this->q.from("cars")
+                    .select()
+                    .where(cars[common::internal_id_string] == id)
+                    .execute()[0]["technical"]["0-60 mph"],
+                99, 1e-2);
+}
+
+TYPED_TEST(QueryUpdateTestsCars, ShouldMaybeNotThrowOnIntegerIntoDouble) {
+    Collection cars = this->q.collection("cars");
+    json car =
+        this->q.from("cars").select().where(cars["year"] == 2003).execute();
+
+    ASSERT_GE(car.size(), 1);
+
+    const std::string id = car[0][common::internal_id_string];
+
+#if NLDB_ENABLE_DOUBLE_DOWNCASTING
+    EXPECT_NO_THROW(this->q.from("cars").update(id, {{"year", 2007.02}}));
+
+    EXPECT_EQ(this->q.from("cars")
+                  .select()
+                  .where(cars[common::internal_id_string] == id)
+                  .execute()[0]["year"],
+              2007);
+#else
+    // EXPECT_THROW(..., WrongPropertyType) // pure virtual method???????
+    try {
+        this->q.from("cars").update(id, {{"year", 2003.02}});
+    } catch (const WrongPropertyType& t) {
+        EXPECT_EQ(t.expected, "INTEGER");
+        EXPECT_EQ(t.actual, "DOUBLE");
+    } catch (...) {
+        ADD_FAILURE() << "Unexpected exception thrown";
+    }
+#endif
+}

@@ -14,5 +14,7 @@ namespace nldb {
         void pushIndependentObjects() override;
         void pushDependentObjects() override;
         void pushStringLikeValues() override;
+
+        ~BufferDataSQ3();
     };
 }  // namespace nldb

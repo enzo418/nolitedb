@@ -22,6 +22,8 @@ class QueryBaseTest : public BaseDBTest<T> {
     }
 
     Query<T> q;
+
+    virtual ~QueryBaseTest() = default;
 };
 
 TYPED_TEST_SUITE(QueryBaseTest, TestDBTypes);

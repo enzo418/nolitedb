@@ -15,6 +15,9 @@ option(NLDB_SHOW_ID_WARNING "Prints a warning if the requested is not the intern
 
 option(NLDB_LOGGING "Enable/Disable loggin" ON)
 
+# TODO: maybe make this a database level option
+option(NLDB_ENABLE_DOUBLE_DOWNCASTING "Enable conversion from double to int with possible data loss. This happens when you try to set a double value into a integer property. Else it will throw an error." OFF)
+
 # ------------------ CONFIGURATION DEV ----------------- #
 option(NLDB_DEBUG_CACHE_BUFFER "Shows cache hit/miss and buffer warnings" OFF)
 
@@ -75,6 +78,7 @@ foreach(_VAR IN ITEMS
     NLDB_PROFILE
     NLDB_INSTALL
     NLDB_LOGGING
+    NLDB_ENABLE_DOUBLE_DOWNCASTING
 )
     if(${_VAR})
         target_compile_definitions(nolitedb PUBLIC "${_VAR}")

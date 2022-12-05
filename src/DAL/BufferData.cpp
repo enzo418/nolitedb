@@ -104,6 +104,6 @@ namespace nldb {
         _add(val, bufferIndependentObject);
     }
 
-    BufferData::~BufferData() { this->pushPendingData(); }
+    BufferData::~BufferData() {}
 
 }  // namespace nldb

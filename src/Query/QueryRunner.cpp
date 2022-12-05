@@ -200,12 +200,25 @@ namespace nldb {
             //  - Create missing collection properties
             if (auto prop =
                     repos->repositoryProperty->find(collID, propertyName)) {
-                if (prop->getType() != type) {
+                const PropertyType storedType = prop->getType();
+
+                if (storedType != type
+                    // Always allow integers into doubles, we do not lose data.
+                    && !(storedType == DOUBLE && type == INTEGER)
+#if NLDB_ENABLE_DOUBLE_DOWNCASTING
+                    // Possible data loss, check the configuration
+                    && !(storedType == INTEGER && type == DOUBLE)
+#endif
+                ) {
                     throw WrongPropertyType(
                         propertyName,
-                        std::string(magic_enum::enum_name(prop->getType())),
+                        std::string(magic_enum::enum_name(storedType)),
                         std::string(magic_enum::enum_name(type)));
                 }
+
+                // if a "logic conversion" took place, force the type to behave
+                // as the stored type.
+                type = storedType;
 
                 propID = prop->getId();
             } else {
@@ -248,12 +261,25 @@ namespace nldb {
             snowflake propID;
 
             if (found.has_value()) {
-                if (found->getType() != type) {
+                const PropertyType storedType = found->getType();
+
+                if (storedType != type
+                    // Always allow integers into doubles, we do not lose data.
+                    && !(storedType == DOUBLE && type == INTEGER)
+#if NLDB_ENABLE_DOUBLE_DOWNCASTING
+                    // Possible data loss, check the configuration
+                    && !(storedType == INTEGER && type == DOUBLE)
+#endif
+                ) {
                     throw WrongPropertyType(
                         propName,
-                        std::string(magic_enum::enum_name(found->getType())),
+                        std::string(magic_enum::enum_name(storedType)),
                         std::string(magic_enum::enum_name(type)));
                 }
+
+                // if a "logic conversion" took place, force the type to behave
+                // as the stored type.
+                type = storedType;
 
                 propID = found->getId();
             } else {

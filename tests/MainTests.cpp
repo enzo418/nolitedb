@@ -5,7 +5,7 @@
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     nldb::LogManager::Initialize();
-    nldb::LogManager::SetLevel(nldb::log_level::err);
+    nldb::LogManager::SetLevel(nldb::log_level::warn);
 
     return RUN_ALL_TESTS();
 }

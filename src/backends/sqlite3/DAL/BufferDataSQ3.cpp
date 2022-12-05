@@ -179,4 +179,16 @@ namespace nldb {
         bufferStringLike.Reset();
     }
 
+    BufferDataSQ3::~BufferDataSQ3() {
+        // if we didn't loose the connection
+        if (this->conn) {
+            this->pushPendingData();
+        } else {
+            NLDB_WARN(
+                "Database was destroyed before we could push pending data! "
+                "Make sure the Query object gets destroyed before the database "
+                "object.");
+        }
+    }
+
 }  // namespace nldb

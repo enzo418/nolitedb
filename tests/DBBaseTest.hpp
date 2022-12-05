@@ -16,7 +16,11 @@ class BaseDBTest : public ::testing::Test,
    public:
     virtual void SetUp() override { ASSERT_TRUE(db.open(":memory:")); }
 
-    virtual void TearDown() override { db.close(); }
+    virtual void TearDown() override {
+        // db.close();
+    }
 
     T db;
+
+    virtual ~BaseDBTest() = default;
 };
