@@ -44,7 +44,8 @@ namespace nldb {
     std::optional<Property> CachedRepositoryProperty::find(
         snowflake collectionID, const std::string& propName) {
         if (propName == common::internal_id_string)
-            return Property(-1, "_id", PropertyType::ID, collectionID);
+            return Property(-1, common::internal_id_string, PropertyType::ID,
+                            collectionID);
 
         if (cache.contains({collectionID, propName})) {
             // NLDB_PERF_SUCCESS("-- PROP -- cache HIT");

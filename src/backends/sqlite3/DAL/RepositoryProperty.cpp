@@ -47,7 +47,8 @@ namespace nldb {
     std::optional<Property> RepositoryProperty::find(
         snowflake collectionID, const std::string& propName) {
         if (propName == common::internal_id_string)
-            return Property(-1, "_id", PropertyType::ID, collectionID);
+            return Property(-1, common::internal_id_string, PropertyType::ID,
+                            collectionID);
 
         auto reader = conn->executeReader(
             "SELECT id, type FROM property where coll_id = @colid and name = "
@@ -83,7 +84,8 @@ namespace nldb {
         }
 
         if (!props.empty())
-            props.push_back(Property(-1, "id", PropertyType::ID, collectionId));
+            props.push_back(Property(-1, common::internal_id_string,
+                                     PropertyType::ID, collectionId));
 
         return props;
     }
