@@ -16,6 +16,11 @@ namespace nldb {
         : collName(pCollName), name(pName) {
         if (pName == common::internal_id_string) {
             type = PropertyType::ID;
+        } else {
+            // it doesn't matter to which type we set it because we later try to
+            // find it by its name, but is useful that it won't be an id by
+            // default
+            type = PropertyType::STRING;
         }
 #ifdef NLDB_SHOW_ID_WARNING
         if (pName != common::internal_id_string && pName == "id") {

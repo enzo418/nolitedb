@@ -106,7 +106,7 @@ namespace nldb {
 
         std::string name;
         PropertyType type;
-        snowflake id;
+        snowflake id {NullID};
         snowflake collectionId;
     };
 }  // namespace nldb

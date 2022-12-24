@@ -21,6 +21,11 @@ namespace nldb {
 
         // reuse cached repositories
         std::shared_ptr<Repositories> cachedRepositories = nullptr;
+
+        // throw if a property is missing (only on select operation)
+        // if you use a missing property in a where, the conditions where that
+        // property appear will be erased.
+        bool ThrowOnSelectMissingProperty = false;
     };
 
     template <typename T>
@@ -33,8 +38,8 @@ namespace nldb {
          * @param pConnection
          */
         Query(T* pConnection,
-              const QueryConfiguration& cfg = QueryConfiguration {})
-            : connection(pConnection) {
+              const QueryConfiguration& pCfg = QueryConfiguration {})
+            : connection(pConnection), cfg(pCfg) {
             if (!cfg.cachedRepositories) {
                 // having the repositories initialized here and passing it to
                 // every query runner instance gives us a better cache.
@@ -48,7 +53,9 @@ namespace nldb {
             auto newCtx =
                 QueryPlannerContext {.from = {Collection(collection1Name)},
                                      .queryRunner = QueryRunnerImpl<T>::create(
-                                         connection, repositories)};
+                                         connection, repositories),
+                                     .ThrowOnSelectMissingProperty =
+                                         cfg.ThrowOnSelectMissingProperty};
 
             return std::move(newCtx);
         }
@@ -57,7 +64,9 @@ namespace nldb {
             auto newCtx =
                 QueryPlannerContext {.from = {collection1},
                                      .queryRunner = QueryRunnerImpl<T>::create(
-                                         connection, repositories)};
+                                         connection, repositories),
+                                     .ThrowOnSelectMissingProperty =
+                                         cfg.ThrowOnSelectMissingProperty};
 
             return std::move(newCtx);
         }
@@ -75,5 +84,6 @@ namespace nldb {
        private:
         T* connection;
         std::shared_ptr<Repositories> repositories;
+        QueryConfiguration cfg;
     };
 }  // namespace nldb

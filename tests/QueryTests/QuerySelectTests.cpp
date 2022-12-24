@@ -4,6 +4,7 @@
 #include "QueryBaseCars.hpp"
 #include "nldb/Collection.hpp"
 #include "nldb/Common.hpp"
+#include "nldb/Exceptions.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/nldb_json.hpp"
 
@@ -212,4 +213,122 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectEmptyOnNonExistingRootCollection) {
 
     ASSERT_TRUE(result.is_array()) << result;
     ASSERT_EQ(result.size(), 0) << result;
+}
+
+TYPED_TEST(QuerySelectTestsCars, ShouldThrowOnMissingIfConfigured) {
+    QueryConfiguration defaultCfg;
+
+    defaultCfg.ThrowOnSelectMissingProperty = true;
+
+    auto newQ = Query(&this->db, defaultCfg);
+
+    Collection cars = this->q.collection("cars");
+
+    ASSERT_THROW(newQ.from("cars")
+                     .select(cars["non existing field"])
+                     .where(cars["non existing field 2"] != 2)
+                     .execute(),
+                 PropertyNotFound);
+}
+
+TYPED_TEST(QuerySelectTestsCars, ShouldNotThrowOnMissingIfConfigured) {
+    QueryConfiguration defaultCfg;
+
+    defaultCfg.ThrowOnSelectMissingProperty = false;
+
+    auto newQ = Query(&this->db, defaultCfg);
+
+    Collection cars = this->q.collection("cars");
+
+    nldb::json result;
+    ASSERT_NO_THROW({
+        result = newQ.from("cars")
+                     .select(cars["non existing field"])
+                     .where(cars["non existing field 2"] != 33)
+                     .execute();
+    });
+
+    ASSERT_TRUE(result.empty());
+}
+
+TYPED_TEST(QuerySelectTestsCars, ShouldSelectNormallyOnMissingIfConfigured) {
+    QueryConfiguration defaultCfg;
+
+    defaultCfg.ThrowOnSelectMissingProperty = false;
+
+    auto newQ = Query(&this->db, defaultCfg);
+
+    Collection cars = this->q.collection("cars");
+
+    nldb::json result;
+    ASSERT_NO_THROW({
+        // expected behaviour:
+        //  - delete cars["non existing field"] entry from select
+        //  - simplify where condition to cars["year"] == 2011
+
+        result = newQ.from("cars")
+                     .select(cars["non existing field"], cars["year"],
+                             cars["technical"]["length"])
+                     .groupBy(cars["maker"])
+                     .where(cars["non existing field 2"] != 33 &&
+                            cars["year"] == 2011)
+                     .execute();
+    });
+
+    nldb::json expectedResult =
+        this->q.from("cars")
+            .select(cars["year"], cars["technical"]["length"])
+            .groupBy(cars["maker"])
+            .where(cars["year"] == 2011)
+            .execute();
+
+    ASSERT_EQ(result.size(), 1);
+    ASSERT_EQ(expectedResult.size(), 1);
+
+    ASSERT_EQ(result[0], expectedResult[0]);
+
+    ASSERT_EQ(result[0]["year"], 2011);
+
+    ASSERT_TRUE(result[0].contains("technical"));
+    ASSERT_EQ(result[0]["technical"]["length"], 4);
+}
+
+TYPED_TEST(QuerySelectTestsCars,
+           ShouldSelectWithEmptyWhereOnMissingIfConfigured) {
+    QueryConfiguration defaultCfg;
+
+    defaultCfg.ThrowOnSelectMissingProperty = false;
+
+    auto newQ = Query(&this->db, defaultCfg);
+
+    Collection cars = this->q.collection("cars");
+
+    nldb::json result;
+    ASSERT_NO_THROW({
+        result = newQ.from("cars")
+                     .select(cars["technical"], cars["some missing field"])
+                     .groupBy(cars["maker"])
+                     .where(cars["non existing field 2"] != 33 &&
+                                cars["non existing field 2"] == 2011 ||
+                            cars["non existing field 99"] == "test")
+                     .limit(1)
+                     .execute();
+    });
+
+    nldb::json expectedResult = this->q.from("cars")
+                                    .select(cars["technical"])
+                                    .groupBy(cars["maker"])
+                                    // .where()
+                                    .sortBy(cars["year"].desc())
+                                    .limit(1)
+                                    .execute();
+
+    ASSERT_EQ(result.size(), 1);
+    ASSERT_EQ(expectedResult.size(), 1);
+
+    ASSERT_TRUE(result[0].contains("technical"));
+
+    ASSERT_FALSE(result[0]["technical"].empty());
+
+    ASSERT_EQ(result[0], expectedResult[0]);
 }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iterator>
 #include <map>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -23,6 +24,7 @@
 #include "nldb/Property/PropertyExpression.hpp"
 #include "nldb/Property/SortedProperty.hpp"
 #include "nldb/Query/QueryContext.hpp"
+#include "nldb/Query/QueryRunner.hpp"
 #include "nldb/Utils/Enums.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
 #include "nldb/Utils/Variant.hpp"
@@ -601,6 +603,143 @@ namespace nldb {
         select.remove_if([&cb](auto& prop) { return std::visit(cb, prop); });
     }
 
+    /* -------------- REMOVE MISSING PROPERTIES ------------- */
+    template <typename T>
+    void removeMissingProperties(T& list) {
+        auto isMissing =
+            overloaded {[](Object&) { return false; },
+                        [](const Property& prop) {
+                            return prop.getId() == NullID &&
+                                   prop.getType() != PropertyType::ID;
+                        },
+                        [](const AggregatedProperty& a) {
+                            return a.property.getId() == NullID &&
+                                   a.property.getType() != PropertyType::ID;
+                        }};
+
+        list.remove_if(
+            [&isMissing](auto& prop) { return std::visit(isMissing, prop); });
+    }
+
+    void removeMissingProperties(std::vector<Property>& props) {
+        props.erase(std::remove_if(props.begin(), props.end(),
+                                   [](Property& p) {
+                                       return p.getId() == NullID &&
+                                              p.getType() != PropertyType::ID;
+                                   }),
+                    props.end());
+    }
+
+    void removeMissingProperties(std::vector<SortedProperty>& props) {
+        props.erase(std::remove_if(props.begin(), props.end(),
+                                   [](SortedProperty& s) {
+                                       return s.property.getId() == NullID &&
+                                              s.property.getType() !=
+                                                  PropertyType::ID;
+                                   }),
+                    props.end());
+    }
+
+    namespace MissingType {
+        enum { None = 0, Property, Expression };
+    }
+
+    int removeMissingPropertiesWhere(PropertyExpressionOperand& expr);
+
+    int removeMissingPropertiesWhere(PropertyExpression& expr) {
+        const int resultLeft = removeMissingPropertiesWhere(expr.left);
+        const int resultRight = removeMissingPropertiesWhere(expr.right);
+
+        // Both exists, continue
+        if (resultLeft == MissingType::None && resultRight == MissingType::None)
+            return MissingType::None;
+
+        // We are a leaf expression, mark ourself as "to delete"
+        if (resultLeft == MissingType::Property ||
+            resultRight == MissingType::Property)
+            return MissingType::Expression;
+
+        // else we are a expression of expressions
+
+        // if only the left is missing then set the right as the root and stop
+        // the deletion
+        if (resultLeft == MissingType::Expression &&
+            resultRight == MissingType::None) {
+            expr = *std::get<box<struct PropertyExpression>>(expr.right);
+            return MissingType::None;
+        }
+
+        // same for the right
+        if (resultLeft == MissingType::None &&
+            resultRight == MissingType::Expression) {
+            expr = *std::get<box<struct PropertyExpression>>(expr.left);
+            return MissingType::None;
+        }
+
+        NLDB_ASSERT(
+            resultLeft == MissingType::Expression &&
+                resultRight == MissingType::Expression,
+            "Both should be a expression, did you added boolean support?");
+
+        // and if both are missing mark this expression to delete
+        return MissingType::Expression;
+    }
+
+    int removeMissingPropertiesWhere(PropertyExpressionOperand& expr) {
+        auto cbConstVal =
+            overloaded {[](const Property& prop) {
+                            return prop.getId() == NullID &&
+                                   prop.getType() != PropertyType::ID;
+                        },
+                        [](const auto&) { return false; }};
+
+        auto cbOperand = overloaded {
+            [&cbConstVal](LogicConstValue const& prop) {
+                // expr is a const value
+                if (std::visit(cbConstVal, prop)) {
+                    return MissingType::Property;
+                }
+
+                return MissingType::None;
+            },
+            [](box<struct PropertyExpression>& agProp) {
+                // expr can have multiple expressions, let them
+                // delete it there
+                if (removeMissingPropertiesWhere(*agProp) !=
+                    MissingType::None) {
+                    return MissingType::Expression;
+                }
+
+                return MissingType::None;
+            },
+            [](PropertyExpressionOperand& agProp) {
+                if (removeMissingPropertiesWhere(agProp) != MissingType::None) {
+                    return MissingType::Expression;
+                }
+
+                return MissingType::None;
+            }};
+
+        return std::visit(cbOperand, expr);
+    }
+
+    void removeMissingProperties(QueryPlannerContextSelect& data) {
+        removeMissingProperties(data.select_value);
+        removeMissingProperties(data.groupBy_value);
+        removeMissingProperties(data.sortBy_value);
+
+        if (data.where_value) {
+            if (removeMissingPropertiesWhere(data.where_value.value()) ==
+                MissingType::Expression) {
+                // it's a simple expression and it's missing the prop or
+                // both, left and right exp, are missing all it's properties
+                data.where_value = std::nullopt;
+            }
+        }
+
+        removeMissingProperties(data.suppress_value);
+    }
+
     /* ------------------- ADD USED FIELDS ------------------ */
     template <typename T>
     inline Object* findObjectInSelect(T& data, snowflake coll_id) {
@@ -991,9 +1130,24 @@ namespace nldb {
             auto rootColFound = repos->repositoryCollection->find(rootCollName);
             if (!rootColFound) return res = json::array();  // empty array
 
-            populateData<DoThrow>(data);
+            printSelect(data.select_value);
+
+            if (data.ThrowOnSelectMissingProperty) {
+                populateData<DoThrow>(data);
+            } else {
+                populateData<DoNotThrow>(data);
+            }
 
             selectAllOnEmpty(data, repos);
+
+            // don't do it before selectAllOnEmpty because we might remove all
+            if (!data.ThrowOnSelectMissingProperty) {
+                removeMissingProperties(data);
+            }
+
+            // there are no properties for this collection yet
+            if (data.select_value.empty())
+                return res = json::array();  // empty array
 
             std::stringstream sql;
 

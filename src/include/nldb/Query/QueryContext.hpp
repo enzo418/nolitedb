@@ -23,6 +23,9 @@ namespace nldb {
     struct QueryPlannerContext {
         std::vector<Collection> from;
         std::unique_ptr<IQueryRunner> queryRunner;
+
+        // tweak query
+        bool ThrowOnSelectMissingProperty;
     };
 
     struct QueryPagination {
