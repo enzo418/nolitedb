@@ -263,12 +263,14 @@ TYPED_TEST(QuerySelectTestsCars, ShouldSelectNormallyOnMissingIfConfigured) {
     nldb::json result;
     ASSERT_NO_THROW({
         // expected behaviour:
-        //  - delete cars["non existing field"] entry from select
+        //  - delete cars["non existing field"] and
+        //    cars["technical"]["non existing on tech"] entries from select
         //  - simplify where condition to cars["year"] == 2011
 
         result = newQ.from("cars")
                      .select(cars["non existing field"], cars["year"],
-                             cars["technical"]["length"])
+                             cars["technical"]["length"],
+                             cars["technical"]["non existing on tech"])
                      .groupBy(cars["maker"])
                      .where(cars["non existing field 2"] != 33 &&
                             cars["year"] == 2011)
