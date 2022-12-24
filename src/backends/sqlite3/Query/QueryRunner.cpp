@@ -1130,8 +1130,6 @@ namespace nldb {
             auto rootColFound = repos->repositoryCollection->find(rootCollName);
             if (!rootColFound) return res = json::array();  // empty array
 
-            printSelect(data.select_value);
-
             if (data.ThrowOnSelectMissingProperty) {
                 populateData<DoThrow>(data);
             } else {
