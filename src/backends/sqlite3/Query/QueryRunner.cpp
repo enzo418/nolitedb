@@ -1123,6 +1123,8 @@ namespace nldb {
         json res;
 
         {
+            this->repos->pushPendingData();
+
             NLDB_PROFILE_FUNCTION();
 
             // Check if the root collection exists
