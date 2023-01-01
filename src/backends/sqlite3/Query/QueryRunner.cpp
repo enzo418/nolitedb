@@ -459,7 +459,10 @@ namespace nldb {
                 sql << ctx.getContextualizedAlias(prop, ctx.getRootCollId());
             },
             [&sql](const std::string& str) { sql << encloseQuotesConst(str); },
-            [&sql](int val) { sql << val; }, [&sql](double val) { sql << val; },
+            [&sql](int val) { sql << val; },
+            [&sql](double val) { sql << val; },
+            [&sql](long val) { sql << val; },
+            [&sql](long long val) { sql << val; },
             [&sql](const char* str) { sql << encloseQuotesConst(str); }};
 
         auto cbOperand = overloaded {

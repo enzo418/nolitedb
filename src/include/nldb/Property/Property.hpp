@@ -21,7 +21,8 @@ namespace nldb {
     struct SortedProperty;
     struct PropertyExpression;
 
-    typedef std::variant<class Property, std::string, int, double, const char*>
+    typedef std::variant<class Property, std::string, int, double, const char*,
+                         long, long long>
         LogicConstValue;
 
     class Property {
