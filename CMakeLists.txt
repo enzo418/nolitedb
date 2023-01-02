@@ -27,6 +27,9 @@ option(NLDB_PROFILE "Profile query execution time." OFF)
 
 option(NLDB_SANITIZE_EXAMPLES "Use the compiler sanitizer in the examples." OFF)
 
+# disabled by default, compilers change warnings over time
+option(WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+
 # ----------------------- SOURCES ---------------------- #
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
@@ -62,7 +65,11 @@ endif()
 add_dependencies(nolitedb ${DEPENDENCY_LIST})
 target_include_directories(nolitedb PUBLIC ${DEPENDENCY_INCLUDE_DIR} ${DEPENDENCY_INCLUDE_LIST})
 
-target_compile_options(nolitedb PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_compile_options(nolitedb PRIVATE -Wall -Wextra -Wpedantic)
+
+if(WARNINGS_AS_ERRORS)
+  target_compile_options(nolitedb PRIVATE -Werror)
+endif()
 
 # optional flags, e.g. -DNLDB_LIB_OPTIONAL_FLAGS:STRING="-w"
 target_compile_options(nolitedb PRIVATE "${NLDB_LIB_OPTIONAL_FLAGS}")
