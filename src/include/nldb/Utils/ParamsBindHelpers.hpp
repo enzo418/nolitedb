@@ -30,4 +30,4 @@ namespace utils::paramsbind {
      */
     std::string parseSQL(const std::string&, const Paramsbind&,
                          bool encloseQuotesInString = true);
-};  // namespace utils::paramsbind
+}  // namespace utils::paramsbind

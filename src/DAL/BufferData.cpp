@@ -11,12 +11,12 @@ namespace nldb {
     template <typename T>
     constexpr int bufferSize(int bytes) {
         return (int)(bytes / sizeof(T));
-    };
+    }
 
     template <typename T>
     inline double bufferOccupancy(Buffer<T>& buffer) {
         return (double)buffer.Size() * 100.0 / (double)buffer.Capacity();
-    };
+    }
 
     BufferData::BufferData(IDB* pDb, int pSmallBufferSize,
                            int pMediumBufferSize, int pLargeBufferSize)
@@ -29,7 +29,7 @@ namespace nldb {
               bufferSize<BufferValueDependentObject>(pMediumBufferSize)),
           bufferIndependentObject(
               bufferSize<BufferValueIndependentObject>(pSmallBufferSize)),
-          conn(pDb) {};
+          conn(pDb) {}
 
     void BufferData::pushPendingData() {
         NLDB_PROFILE_SCOPE("Flush data");
