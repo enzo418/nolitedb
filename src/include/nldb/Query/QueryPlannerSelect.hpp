@@ -80,6 +80,22 @@ namespace nldb {
             return *this;
         }
 
+        /**
+         * @brief Rename a property, it only affects the returned object.
+         * Therefore in the select, where and so on you should refer to the
+         * property by its original name.
+         *
+         * @param prop
+         * @param name
+         * @return QueryPlannerSelect&
+         */
+        QueryPlannerSelect& rename(const Property& prop,
+                                   const std::string& name) {
+            this->context.renamed_value.push_back({prop, name});
+
+            return *this;
+        }
+
         json execute();
 
        protected:

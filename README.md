@@ -70,7 +70,10 @@ int main() {
     json all = query.from("cars")
                    .select(id, model, maker, year, automaker)
                    .where(year > 1990 && automaker["name"] == maker)
-                   .page(1).limit(10)
+                   .page(1)
+                   .limit(10)
+                   .rename(maker, "car_maker") // it won't affect the query
+                   .rename(automaker["country"], "automaker_country")
                    .execute();
 
     std::cout << "\n\nCars with automaker: " << all.dump(2) << std::endl
@@ -82,11 +85,11 @@ int main() {
     //       "_id": 3495450966444999936,
     //       "automaker": {
     //          "_id": 3495450965218165120,
-    //          "country": "United States",
+    //          "automaker_country": "United States",
     //          "founded": "June 16, 1903",
     //          "name": "ford"
     //       },
-    //       "maker": "ford",
+    //       "car_maker": "ford",
     //       "model": "focus",
     //       "year": 2011
     //   },
@@ -94,11 +97,11 @@ int main() {
     //       "_id": 3495450966447097600,
     //       "automaker": {
     //          "_id": 3495450965218165120,
-    //          "country": "United States",
+    //          "automaker_country": "United States",
     //          "founded": "June 16, 1903",
     //          "name": "ford"
     //       },
-    //       "maker": "ford",
+    //       "car_maker": "ford",
     //       "model": "focus",
     //       "year": 2015
     //   },
@@ -106,11 +109,11 @@ int main() {
     //       "_id": 3495450966447097728,
     //       "automaker": {
     //          "_id": 3495450965220262784,
-    //          "country": "Japan",
+    //          "automaker_country": "Japan",
     //          "founded": "July 15, 1953",
     //          "name": "subaru"
     //       },
-    //       "maker": "subaru",
+    //       "car_maker": "subaru",
     //       "model": "impreza",
     //       "year": 2003
     //   }

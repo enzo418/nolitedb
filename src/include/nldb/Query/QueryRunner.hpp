@@ -225,6 +225,11 @@ namespace nldb {
             for (auto& prop : data.suppress_value) {
                 populateData<Throw>(prop);
             }
+
+            // renamed
+            for (auto& renamed : data.renamed_value) {
+                populateData<Throw>(renamed.prop);
+            }
         }
 
        protected:

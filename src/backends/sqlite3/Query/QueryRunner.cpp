@@ -989,6 +989,16 @@ namespace nldb {
     }
 
     /* ------------------------ READ ------------------------ */
+    const std::string renameTo(const Property& prop,
+                               std::vector<RenamedProperty>& renamed) {
+        // PERFORMANCE: it would be better to modify the prop name once
+        const auto found = std::find_if(
+            renamed.begin(), renamed.end(),
+            [&prop](RenamedProperty& a) { return equal(prop, a.prop); });
+
+        return found != renamed.end() ? found->alias : prop.getName();
+    }
+
     inline void read(std::shared_ptr<IDBRowReader> row, PropertyType type,
                      json& out, const std::string& alias, int i) {
         switch (type) {
@@ -1003,8 +1013,7 @@ namespace nldb {
                 break;
             case PropertyType::ID:
                 // javascript can't read 64 bits long integers
-                out[common::internal_id_string] =
-                    std::to_string(row->readInt64(i));
+                out[alias] = std::to_string(row->readInt64(i));
                 break;
             case PropertyType::ARRAY:
                 out[alias] = json::parse(row->readString(i));
@@ -1021,34 +1030,38 @@ namespace nldb {
     }
 
     void read(const Property& prop, std::shared_ptr<IDBRowReader> row, int& i,
-              json& out, std::vector<Property>& suppressed) {
+              json& out, std::vector<Property>& suppressed,
+              std::vector<RenamedProperty>& rename) {
         if (!row->isNull(i) && !isSuppressed(prop, suppressed)) {
-            read(row, prop.getType(), out, prop.getName(), i);
+            read(row, prop.getType(), out, renameTo(prop, rename), i);
         }
 
         i++;
     }
 
     void read(const AggregatedProperty& prop, std::shared_ptr<IDBRowReader> row,
-              int& i, json& out, std::vector<Property>&) {
+              int& i, json& out, std::vector<Property>&,
+              std::vector<RenamedProperty>&) {
         read(row, prop.property.getType(), out, prop.alias, i);
         i++;
     }
 
     void read(Object& composed, std::shared_ptr<IDBRowReader> row, int& i,
-              json& out, std::vector<Property>& suppressed) {
-        const std::string& name = composed.getProperty().getName();
-
+              json& out, std::vector<Property>& suppressed,
+              std::vector<RenamedProperty>& rename) {
         json temp;
 
         auto& propsRef = composed.getPropertiesRef();
         for (auto& prop : propsRef) {
-            std::visit([&row, &i, &temp, &suppressed](
-                           auto& t) { read(t, row, i, temp, suppressed); },
-                       prop);
+            std::visit(
+                [&row, &i, &temp, &suppressed, &rename](auto& t) {
+                    read(t, row, i, temp, suppressed, rename);
+                },
+                prop);
         }
 
-        if (!temp.is_null()) out[name] = std::move(temp);
+        if (!temp.is_null())
+            out[renameTo(composed.getProperty(), rename)] = std::move(temp);
     }
 
     json readQuery(std::stringstream& sql, nldb::IDB* connection,
@@ -1080,7 +1093,8 @@ namespace nldb {
                 for (auto it = begin; it != end; it++) {
                     std::visit(
                         [&row, &i, &rowValue, &data](auto& val) {
-                            read(val, row, i, rowValue, data.suppress_value);
+                            read(val, row, i, rowValue, data.suppress_value,
+                                 data.renamed_value);
                         },
                         *it);
                 }

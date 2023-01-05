@@ -33,6 +33,11 @@ namespace nldb {
         int elementsPerPage {10};
     };
 
+    struct RenamedProperty {
+        Property prop;
+        const std::string alias;
+    };
+
     struct QueryPlannerContextSelect : public QueryPlannerContext {
         QueryPlannerContextSelect(QueryPlannerContext&& ctx)
             : QueryPlannerContext(std::move(ctx)) {}
@@ -43,6 +48,7 @@ namespace nldb {
         std::vector<Property> groupBy_value;
         std::vector<SortedProperty> sortBy_value;
         std::vector<Property> suppress_value;
+        std::vector<RenamedProperty> renamed_value;
         bool removeInnerIDs {true};
     };
 

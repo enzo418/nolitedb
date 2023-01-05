@@ -46,6 +46,9 @@ namespace nldb {
          * of the 'coll' collection, being B composed only by the field t and A
          * with all its fields if it is an object or with its value otherwise.
          *
+         * Note: You cannot use this to get properties from a property of type
+         * Object. But you can get a property and then acces it with [].
+         *
          * @tparam F
          * @param names can be a string, indicating the property name from the
          * collection, or an ComposedPropertyPlaceholder, which is a placeholder
