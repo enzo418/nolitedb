@@ -481,13 +481,21 @@ namespace nldb {
 
     void addWhereClause(std::stringstream& sql, PropertyExpression const& expr,
                         QueryRunnerCtx& ctx) {
-        if (expr.type != PropertyExpressionOperator::NOT) {
+        if (expr.type == PropertyExpressionOperator::AND ||
+            expr.type == PropertyExpressionOperator::OR) {
+            sql << " (";
+            addWhereExpression(sql, expr.left, ctx);
+            sql << ") " << utils::OperatorToString(expr.type) << " (";
+            addWhereExpression(sql, expr.right, ctx);
+            sql << ") ";
+        } else if (expr.type != PropertyExpressionOperator::NOT) {
             addWhereExpression(sql, expr.left, ctx);
             sql << " " << utils::OperatorToString(expr.type) << " ";
             addWhereExpression(sql, expr.right, ctx);
         } else {
-            sql << " " << utils::OperatorToString(expr.type) << " ";
+            sql << " " << utils::OperatorToString(expr.type) << " (";
             addWhereExpression(sql, expr.left, ctx);
+            sql << ") ";
         }
     }
 

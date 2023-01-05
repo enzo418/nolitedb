@@ -23,6 +23,14 @@ namespace nldb {
     typedef std::variant<LogicConstValue, box<struct PropertyExpression>>
         PropertyExpressionOperand;
 
+    /**
+     * @brief A expression of one or more expressions.
+     * Change the order by using parentheses, for example
+     * p && (q || t) && k will not be equal to p && q || t && k
+     * p, q, t and k being any kind of property expression.
+     * Another example,
+     *  p || q || t && k != (p || q || t) && k
+     */
     struct PropertyExpression {
         PropertyExpression();
 
