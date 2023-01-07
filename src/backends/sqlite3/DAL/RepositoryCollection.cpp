@@ -73,4 +73,23 @@ namespace nldb {
 
         return conn->executeAndGetFirstInt(sql, {{"@coll_id", collID}});
     }
+
+    std::vector<Collection> RepositoryCollection::getAll(
+        bool onlyRootCollection) {
+        std::string sql =
+            "select c.id, c.name FROM collection as c join property as p on "
+            "(p.id == c.owner_id)";
+        sql += onlyRootCollection ? "where p.coll_id is NULL" : "";
+
+        std::vector<Collection> colls;
+
+        auto reader = conn->executeReader(sql, {});
+
+        std::shared_ptr<IDBRowReader> row;
+        while (reader->readRow(row)) {
+            colls.push_back(Collection(row->readInt64(0), row->readString(1)));
+        }
+
+        return colls;
+    }
 }  // namespace nldb

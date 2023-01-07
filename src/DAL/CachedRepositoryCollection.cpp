@@ -87,4 +87,9 @@ namespace nldb {
 
         return found;
     }
+
+    std::vector<Collection> CachedRepositoryCollection::getAll(
+        bool onlyRootCollection) {
+        return repo->getAll(onlyRootCollection);
+    }
 }  // namespace nldb

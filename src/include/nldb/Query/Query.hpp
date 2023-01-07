@@ -81,6 +81,10 @@ namespace nldb {
 
         std::shared_ptr<Repositories> getRepositories() { return repositories; }
 
+        std::vector<Collection> getCollections() {
+            return repositories->repositoryCollection->getAll(true);
+        }
+
        private:
         T* connection;
         std::shared_ptr<Repositories> repositories;

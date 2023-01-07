@@ -70,4 +70,9 @@ namespace nldb {
 
         return repo->getOwnerId(collID);
     }
+
+    std::vector<Collection> BufferedRepositoryCollection::getAll(
+        bool onlyRootCollection) {
+        return repo->getAll(onlyRootCollection);
+    }
 }  // namespace nldb

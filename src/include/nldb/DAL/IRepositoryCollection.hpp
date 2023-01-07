@@ -24,6 +24,7 @@ namespace nldb {
         virtual bool exists(snowflake id) = 0;
         virtual std::optional<Collection> findByOwner(snowflake ownerID) = 0;
         virtual std::optional<snowflake> getOwnerId(snowflake collID) = 0;
+        virtual std::vector<Collection> getAll(bool onlyRootCollection) = 0;
 
         virtual ~IRepositoryCollection() = default;
     };

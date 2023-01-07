@@ -25,6 +25,7 @@ namespace nldb {
         bool exists(snowflake id) override;
         std::optional<Collection> findByOwner(snowflake ownerID) override;
         std::optional<snowflake> getOwnerId(snowflake collID) override;
+        std::vector<Collection> getAll(bool onlyRootCollection) override;
 
        private:
         std::unique_ptr<IRepositoryCollection> repo;
