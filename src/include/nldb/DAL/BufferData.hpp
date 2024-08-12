@@ -67,8 +67,8 @@ namespace nldb {
         virtual ~BufferData();
 
        protected:
-        template <typename T>
-        void inline _add(const T& val, Buffer<T>& buff) {
+        template <typename T, typename L>
+        void inline _add(const T& val, Buffer<T, L>& buff) {
             if (!buff.Add(val)) {
                 this->pushPendingData();
                 buff.Add(val);
@@ -77,18 +77,19 @@ namespace nldb {
 
        protected:
         // Property collection
-        Buffer<BufferValueCollection> bufferCollection;
+        Buffer<BufferValueCollection, std::mutex> bufferCollection;
 
         // Property repo
-        Buffer<BufferValueRootProperty> bufferRootProperty;
-        Buffer<BufferValueProperty> bufferProperty;
+        Buffer<BufferValueRootProperty, std::mutex> bufferRootProperty;
+        Buffer<BufferValueProperty, std::mutex> bufferProperty;
 
         // Values DAO
-        Buffer<BufferValueStringLike> bufferStringLike;
-        Buffer<BufferValueDependentObject> bufferDependentObject;
-        Buffer<BufferValueIndependentObject> bufferIndependentObject;
+        Buffer<BufferValueStringLike, std::mutex> bufferStringLike;
+        Buffer<BufferValueDependentObject, std::mutex> bufferDependentObject;
+        Buffer<BufferValueIndependentObject, std::mutex>
+            bufferIndependentObject;
 
-        NullLock lock;
+        std::mutex lock;
 
         IDB* conn;
 

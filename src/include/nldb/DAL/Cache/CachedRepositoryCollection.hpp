@@ -21,9 +21,12 @@ namespace nldb {
 
        private:
         std::unique_ptr<IRepositoryCollection> repo;
-        lru11::Cache<std::pair<snowflake, std::string>, Collection, pairhash>
+        lru11::Cache<std::pair<snowflake, std::string>, Collection, pairhash,
+                     std::mutex>
             cache_find;
-        lru11::Cache<snowflake, Collection> cache_by_owner;
-        lru11::Cache<snowflake, snowflake> cache_owner_id;
+        lru11::Cache<snowflake, Collection, std::hash<snowflake>, std::mutex>
+            cache_by_owner;
+        lru11::Cache<snowflake, snowflake, std::hash<snowflake>, std::mutex>
+            cache_owner_id;
     };
 }  // namespace nldb

@@ -14,7 +14,7 @@ namespace nldb {
 
         console_sink->set_level(spdlog::level::trace);
 
-        console_sink->set_pattern("%^[%l] %T %D %v%$");
+        console_sink->set_pattern("%^[%l] [%t] %T %D %v%$");
 
         // file sink for errors
         auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(

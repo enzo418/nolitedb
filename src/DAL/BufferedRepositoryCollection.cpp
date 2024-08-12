@@ -6,6 +6,7 @@
 #include "nldb/DAL/IRepositoryCollection.hpp"
 #include "nldb/LOG/log.hpp"
 #include "nldb/Property/Property.hpp"
+#include "nldb/Utils/Thread.hpp"
 #include "nldb/typedef.hpp"
 
 namespace nldb {
@@ -16,7 +17,7 @@ namespace nldb {
 
     snowflake BufferedRepositoryCollection::add(const std::string& name,
                                                 snowflake ownerID) {
-        snowflake id = SnowflakeGenerator::generate(0);
+        snowflake id = SnowflakeGenerator::generate(getThreadID());
 
         bufferData->add(BufferValueCollection {
             .id = id, .name = name, .owner_id = ownerID});
@@ -28,7 +29,7 @@ namespace nldb {
         const std::string& name) {
         if (bufferData) {
             NLDB_PERF_FAIL("-- BUFFERED COLL -- cache MISBEHAVING");
-            // bufferData->pushPendingData();
+            bufferData->pushPendingData();
         }
 
         return repo->find(name);
@@ -41,7 +42,7 @@ namespace nldb {
     std::optional<Collection> BufferedRepositoryCollection::find(snowflake id) {
         if (bufferData) {
             NLDB_PERF_FAIL("-- BUFFERED COLL -- cache MISBEHAVING");
-            // bufferData->pushPendingData();
+            bufferData->pushPendingData();
         }
 
         return repo->find(id);
@@ -55,7 +56,7 @@ namespace nldb {
         snowflake ownerID) {
         if (bufferData) {
             NLDB_PERF_FAIL("-- BUFFERED COLL -- cache MISBEHAVING");
-            // bufferData->pushPendingData();
+            bufferData->pushPendingData();
         }
 
         return repo->findByOwner(ownerID);
@@ -65,7 +66,7 @@ namespace nldb {
         snowflake collID) {
         if (bufferData) {
             NLDB_PERF_FAIL("-- BUFFERED COLL -- cache MISBEHAVING");
-            // bufferData->pushPendingData();
+            bufferData->pushPendingData();
         }
 
         return repo->getOwnerId(collID);

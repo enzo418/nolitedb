@@ -36,6 +36,9 @@ namespace nldb {
 
         {
             NLDB_PROFILE_FUNCTION();
+
+            std::lock_guard<std::mutex> lock(repos->mtx);
+
             populateData<DoThrow>(data);
 
             // check if doc exists
@@ -62,6 +65,8 @@ namespace nldb {
 
         {
             NLDB_PROFILE_FUNCTION();
+
+            std::lock_guard<std::mutex> lock(repos->mtx);
 
             NLDB_ASSERT(data.from.size() > 0, "missing target collection");
 
@@ -98,6 +103,8 @@ namespace nldb {
     }
 
     void QueryRunner::remove(QueryPlannerContextRemove&& data) {
+        std::lock_guard<std::mutex> lock(repos->mtx);
+
         populateData<DoThrow>(data);
 
         repos->valuesDAO->removeObject(data.documentID);

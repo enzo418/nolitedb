@@ -3,6 +3,7 @@
 #include "nldb/LOG/log.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/SnowflakeGenerator.hpp"
+#include "nldb/Utils/Thread.hpp"
 #include "nldb/typedef.hpp"
 
 namespace nldb {
@@ -12,7 +13,7 @@ namespace nldb {
         : repo(std::move(pRepo)), bufferData(bufferData) {}
 
     snowflake BufferedRepositoryProperty::add(const std::string& name) {
-        snowflake id = SnowflakeGenerator::generate(0);
+        snowflake id = SnowflakeGenerator::generate(getThreadID());
 
         bufferData->add(BufferValueRootProperty {.id = id, .name = name});
 
@@ -22,7 +23,7 @@ namespace nldb {
     snowflake BufferedRepositoryProperty::add(const std::string& name,
                                               snowflake collectionID,
                                               PropertyType type) {
-        snowflake id = SnowflakeGenerator::generate(0);
+        snowflake id = SnowflakeGenerator::generate(getThreadID());
 
         bufferData->add(BufferValueProperty {
             .id = id, .name = name, .coll_id = collectionID, .type = type});

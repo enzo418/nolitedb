@@ -36,7 +36,8 @@ namespace nldb {
          * if a it's a root property (collection id == NULL), then insert it as
          * [-1, prop name]
          */
-        lru11::Cache<std::pair<snowflake, std::string>, Property, pairhash>
+        lru11::Cache<std::pair<snowflake, std::string>, Property, pairhash,
+                     std::mutex>
             cache;
     };
 }  // namespace nldb

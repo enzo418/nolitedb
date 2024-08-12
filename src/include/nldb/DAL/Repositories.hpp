@@ -22,6 +22,8 @@ namespace nldb {
         std::unique_ptr<IRepositoryProperty> repositoryProperty;
         std::unique_ptr<IValuesDAO> valuesDAO;
 
+        std::mutex mtx;
+
        protected:
         std::shared_ptr<BufferData> buffered;
 

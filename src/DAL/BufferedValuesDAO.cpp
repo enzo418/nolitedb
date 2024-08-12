@@ -11,6 +11,7 @@
 #include "nldb/LOG/log.hpp"
 #include "nldb/Property/Property.hpp"
 #include "nldb/Utils/ParamsBindHelpers.hpp"
+#include "nldb/Utils/Thread.hpp"
 
 #define USE_BUFFER
 
@@ -29,7 +30,7 @@ namespace nldb {
 
     snowflake BufferedValuesDAO::addObject(snowflake propID,
                                            std::optional<snowflake> objID) {
-        snowflake newId = SnowflakeGenerator::generate(0);
+        snowflake newId = SnowflakeGenerator::generate(getThreadID());
 
         if (objID.has_value()) {
             bufferData->add(BufferValueDependentObject {

@@ -13,8 +13,8 @@ namespace nldb {
         return (int)(bytes / sizeof(T));
     }
 
-    template <typename T>
-    inline double bufferOccupancy(Buffer<T>& buffer) {
+    template <typename T, typename L>
+    inline double bufferOccupancy(Buffer<T, L>& buffer) {
         return (double)buffer.Size() * 100.0 / (double)buffer.Capacity();
     }
 
@@ -35,7 +35,16 @@ namespace nldb {
         NLDB_PROFILE_SCOPE("Flush data");
 
         NLDB_PERF_SUCCESS("FLUSHING PENDING DATA");
-        lock.lock();  // next push should wait
+
+#if NLDB_LOGGING
+        if (!lock.try_lock()) {
+            NLDB_TRACE("Someone else is flushing the data");
+        } else {
+            lock.unlock();
+        }
+#endif
+
+        std::lock_guard<std::mutex> guard(lock);
 
         if (bufferRootProperty.Size() > 0) {
             NLDB_PERF_SUCCESS("RootProperty: {}%",
@@ -77,7 +86,7 @@ namespace nldb {
             this->pushStringLikeValues();
         }
 
-        lock.unlock();
+        NLDB_TRACE("Flushing done");
     }
 
     void BufferData::add(const BufferValueCollection& val) {

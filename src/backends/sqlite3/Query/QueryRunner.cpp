@@ -213,6 +213,8 @@ namespace nldb {
                 repos->repositoryCollection->findByOwner(prop.getId());
 
             if (!subColl) {
+                NLDB_ERROR("Couldn't expand property with id " +
+                           std::to_string(prop.getId()));
                 throw std::runtime_error("Couldn't expand property with id " +
                                          std::to_string(prop.getId()));
             }
@@ -1148,6 +1150,8 @@ namespace nldb {
         json res;
 
         {
+            std::lock_guard<std::mutex> lock(this->repos->mtx);
+
             this->repos->pushPendingData();
 
             NLDB_PROFILE_FUNCTION();
