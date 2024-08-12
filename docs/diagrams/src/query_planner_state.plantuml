@@ -1,0 +1,21 @@
+@startuml query_planner_state
+title How a query is built
+caption final = query gets executed
+
+hide empty members
+
+[*] --> Query
+
+Query --> QueryPlanner: from
+Query --> CollectionQuery : collection
+CollectionQuery --> Query
+
+QueryPlanner --> [*]: insert
+QueryPlanner --> [*]: update
+QueryPlanner --> [*]: remove
+QueryPlanner --> QueryPlannerSelect: select
+
+QueryPlannerSelect --> QueryPlannerSelect: where/page/groupBy/sortBy
+QueryPlannerSelect --> [*]: execute
+
+@enduml

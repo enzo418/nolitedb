@@ -1,0 +1,56 @@
+@startuml repository
+hide empty members
+
+struct DataAccess {
+    DataAccess(connection: IDB*);
+}
+
+note left of DataAccess
+Ensures that all the DataAccess
+share the same connection
+endnote
+
+DataAccess --* IRepositoryCollection: respositoryCollection
+DataAccess --* IRepositoryProperty: respositoryProperty
+DataAccess --* IValuesDAO: respositoryValues
+
+interface IRepositoryCollection {
+    add(name:string, ownerID: int): int
+    find(id: int): optional<Collection>
+    find(name: string): optional<Collection>
+    exists(name: string): boolean
+    exists(id: int): optional<Collection>
+    findByOwner(ownerID: int): optional<Collection>
+    getOwnerId(collID: int): optional<id>
+}
+
+interface IRepositoryProperty {
+    add(name: string, type: PropertyType, collectionID: int): int
+    add(name: string): int
+    find(propID: int): optional<Property>
+    find(collectionID: int, propertyName: string): optional<Property>
+    exists(collectionID: int, propertyName: string): boolean
+    findAll(collectionId: int): list<Property>
+}
+
+interface IValuesDAO {
+    addStringLike(propID:int, objID: int, type: PropertyType, value: string): void
+    addObject(propID:int): int
+    addObject(propID:int, objID:int): int
+    
+    updateStringLike(propID:int, objID: int, value: string): void
+
+    exists(propID:int, objID:int, type: PropertyType): boolean
+    existsObject(propID:int, objID:int, type: PropertyType): boolean
+    
+    findObjectId(propID:int, objID: int): int
+
+    removeObject(objID: int): void
+}
+
+interface IObjectDAO {
+    add(propID: int): int
+    remove(objID: int): void
+}
+
+@enduml

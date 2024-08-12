@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="767px" preserveAspectRatio="none" style="width:2050px;height:767px;background:#FFFFFF;" version="1.1" viewBox="0 0 2050 767" width="2050px" zoomAndPan="magnify"><defs/><g><!--MD5=[c48e0de25b4e8e65693fec2e72397901]
+class IQueryRunner--><g id="elem_IQueryRunner"><rect codeLine="4" fill="#F1F1F1" height="116.2717" id="IQueryRunner" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="337" x="108.5" y="264"/><ellipse cx="228.75" cy="280" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M224.7813,286.5 L224.7813,284.7969 L227.1406,284.5313 L227.1406,276.3281 L224.7813,276.0625 L224.7813,274.3594 L231.9219,274.3594 L231.9219,276.0625 L229.5,276.3281 L229.5,284.5313 L231.9219,284.7969 L231.9219,286.5 L224.7813,286.5 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="88" x="249.25" y="285.432">IQueryRunner</text><line style="stroke:#181818;stroke-width:0.5;" x1="109.5" x2="444.5" y1="296" y2="296"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="301" x="114.5" y="314.9659">select(data:QueryPlannerContextSelect): json</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="301" x="114.5" y="334.0339">insert(data:QueryPlannerContextInsert): void</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="319" x="114.5" y="353.1018">update(data:QueryPlannerContextUpdate): void</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="325" x="114.5" y="372.1697">remove(data:QueryPlannerContextRemove): void</text></g><!--MD5=[53588918967b4b1e8de0f4f91f8d277d]
+class QueryPlannerContext--><g id="elem_QueryPlannerContext"><rect codeLine="11" fill="#F1F1F1" height="78.1358" id="QueryPlannerContext" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="209" x="480.5" y="283"/><ellipse cx="510.35" cy="299" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M510.0219,305.6719 Q509.1,305.6719 508.2094,305.5 Q507.3188,305.3125 506.5375,304.9375 L506.5375,302.6875 Q507.4906,303.1719 508.3656,303.4063 Q509.2563,303.625 510.1,303.625 Q510.975,303.625 511.5375,303.3281 Q512.1,303.0313 512.1,302.25 Q512.1,301.7031 511.8031,301.4063 Q511.5063,301.0938 510.9438,300.8125 Q510.3813,300.5313 509.6,300.125 Q508.8188,299.7031 508.1625,299.2188 Q507.5219,298.7188 507.1469,298.0469 Q506.7719,297.375 506.7719,296.4219 Q506.7719,294.7969 507.8656,294 Q508.975,293.1875 510.7563,293.1875 Q511.475,293.1875 512.4594,293.3594 Q513.4438,293.5156 514.3969,293.9688 L513.6156,295.8906 Q512.7719,295.5313 512.0844,295.3906 Q511.4125,295.2344 510.8969,295.2344 Q510.0531,295.2344 509.6625,295.5781 Q509.2875,295.9063 509.2875,296.5469 Q509.2875,297.0313 509.5219,297.3438 Q509.7719,297.6406 510.2406,297.8906 Q510.725,298.1406 511.4594,298.5156 Q512.4594,299 513.1625,299.4688 Q513.8656,299.9375 514.2406,300.5625 Q514.6156,301.1719 514.6156,302.1094 Q514.6156,303.2969 514.0375,304.0938 Q513.475,304.875 512.4281,305.2813 Q511.3969,305.6719 510.0219,305.6719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="144" x="527.65" y="304.432">QueryPlannerContext</text><line style="stroke:#181818;stroke-width:0.5;" x1="481.5" x2="688.5" y1="315" y2="315"/><ellipse cx="491.5" cy="330.034" fill="none" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="183" x="500.5" y="333.9659">from: list&lt;CollectionQuery&gt;</text><ellipse cx="491.5" cy="349.1019" fill="none" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="129" x="500.5" y="353.0339">repos: Repositories</text></g><!--MD5=[9e6503ebc89adc07b38156521f698596]
+class QueryPlannerContextSelect--><g id="elem_QueryPlannerContextSelect"><rect codeLine="18" fill="#F1F1F1" height="135.3396" id="QueryPlannerContextSelect" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="361" x="782.5" y="486"/><ellipse cx="866.75" cy="502" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M866.4219,508.6719 Q865.5,508.6719 864.6094,508.5 Q863.7188,508.3125 862.9375,507.9375 L862.9375,505.6875 Q863.8906,506.1719 864.7656,506.4063 Q865.6563,506.625 866.5,506.625 Q867.375,506.625 867.9375,506.3281 Q868.5,506.0313 868.5,505.25 Q868.5,504.7031 868.2031,504.4063 Q867.9063,504.0938 867.3438,503.8125 Q866.7813,503.5313 866,503.125 Q865.2188,502.7031 864.5625,502.2188 Q863.9219,501.7188 863.5469,501.0469 Q863.1719,500.375 863.1719,499.4219 Q863.1719,497.7969 864.2656,497 Q865.375,496.1875 867.1563,496.1875 Q867.875,496.1875 868.8594,496.3594 Q869.8438,496.5156 870.7969,496.9688 L870.0156,498.8906 Q869.1719,498.5313 868.4844,498.3906 Q867.8125,498.2344 867.2969,498.2344 Q866.4531,498.2344 866.0625,498.5781 Q865.6875,498.9063 865.6875,499.5469 Q865.6875,500.0313 865.9219,500.3438 Q866.1719,500.6406 866.6406,500.8906 Q867.125,501.1406 867.8594,501.5156 Q868.8594,502 869.5625,502.4688 Q870.2656,502.9375 870.6406,503.5625 Q871.0156,504.1719 871.0156,505.1094 Q871.0156,506.2969 870.4375,507.0938 Q869.875,507.875 868.8281,508.2813 Q867.7969,508.6719 866.4219,508.6719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="184" x="887.25" y="507.432">QueryPlannerContextSelect</text><line style="stroke:#181818;stroke-width:0.5;" x1="783.5" x2="1142.5" y1="518" y2="518"/><ellipse cx="793.5" cy="533.034" fill="none" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="335" x="802.5" y="536.9659">select_value: list&lt;Property | AggregatedProperty&gt;</text><ellipse cx="793.5" cy="552.1019" fill="none" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="293" x="802.5" y="556.0339">where_value: optional&lt;PropertyExpression&gt;</text><ellipse cx="793.5" cy="571.1698" fill="none" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="307" x="802.5" y="575.1018">pagination_value: optional&lt;QueryPagination&gt;</text><ellipse cx="793.5" cy="590.2377" fill="none" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="200" x="802.5" y="594.1697">groupBy_value: list&lt;Property&gt;</text><ellipse cx="793.5" cy="609.3056" fill="none" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="229" x="802.5" y="613.2376">sortBy_value: list&lt;SortedProperty&gt;</text></g><!--MD5=[857c32f710321731b6e20cc780aaa524]
+class QueryPlannerContextInsert--><g id="elem_QueryPlannerContextInsert"><rect codeLine="26" fill="#F1F1F1" height="59.0679" id="QueryPlannerContextInsert" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="216" x="7" y="524"/><ellipse cx="22" cy="540" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M21.6719,546.6719 Q20.75,546.6719 19.8594,546.5 Q18.9688,546.3125 18.1875,545.9375 L18.1875,543.6875 Q19.1406,544.1719 20.0156,544.4063 Q20.9063,544.625 21.75,544.625 Q22.625,544.625 23.1875,544.3281 Q23.75,544.0313 23.75,543.25 Q23.75,542.7031 23.4531,542.4063 Q23.1563,542.0938 22.5938,541.8125 Q22.0313,541.5313 21.25,541.125 Q20.4688,540.7031 19.8125,540.2188 Q19.1719,539.7188 18.7969,539.0469 Q18.4219,538.375 18.4219,537.4219 Q18.4219,535.7969 19.5156,535 Q20.625,534.1875 22.4063,534.1875 Q23.125,534.1875 24.1094,534.3594 Q25.0938,534.5156 26.0469,534.9688 L25.2656,536.8906 Q24.4219,536.5313 23.7344,536.3906 Q23.0625,536.2344 22.5469,536.2344 Q21.7031,536.2344 21.3125,536.5781 Q20.9375,536.9063 20.9375,537.5469 Q20.9375,538.0313 21.1719,538.3438 Q21.4219,538.6406 21.8906,538.8906 Q22.375,539.1406 23.1094,539.5156 Q24.1094,540 24.8125,540.4688 Q25.5156,540.9375 25.8906,541.5625 Q26.2656,542.1719 26.2656,543.1094 Q26.2656,544.2969 25.6875,545.0938 Q25.125,545.875 24.0781,546.2813 Q23.0469,546.6719 21.6719,546.6719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="184" x="36" y="545.432">QueryPlannerContextInsert</text><line style="stroke:#181818;stroke-width:0.5;" x1="8" x2="222" y1="556" y2="556"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="163" x="13" y="574.9659">documents: list&lt;Object&gt;</text></g><!--MD5=[38a0c76a08c0d4bd7454e18e74d20ae2]
+class QueryPlannerContextUpdate--><g id="elem_QueryPlannerContextUpdate"><rect codeLine="30" fill="#F1F1F1" height="78.1358" id="QueryPlannerContextUpdate" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="225" x="258.5" y="514.5"/><ellipse cx="273.5" cy="530.5" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M273.1719,537.1719 Q272.25,537.1719 271.3594,537 Q270.4688,536.8125 269.6875,536.4375 L269.6875,534.1875 Q270.6406,534.6719 271.5156,534.9063 Q272.4063,535.125 273.25,535.125 Q274.125,535.125 274.6875,534.8281 Q275.25,534.5313 275.25,533.75 Q275.25,533.2031 274.9531,532.9063 Q274.6563,532.5938 274.0938,532.3125 Q273.5313,532.0313 272.75,531.625 Q271.9688,531.2031 271.3125,530.7188 Q270.6719,530.2188 270.2969,529.5469 Q269.9219,528.875 269.9219,527.9219 Q269.9219,526.2969 271.0156,525.5 Q272.125,524.6875 273.9063,524.6875 Q274.625,524.6875 275.6094,524.8594 Q276.5938,525.0156 277.5469,525.4688 L276.7656,527.3906 Q275.9219,527.0313 275.2344,526.8906 Q274.5625,526.7344 274.0469,526.7344 Q273.2031,526.7344 272.8125,527.0781 Q272.4375,527.4063 272.4375,528.0469 Q272.4375,528.5313 272.6719,528.8438 Q272.9219,529.1406 273.3906,529.3906 Q273.875,529.6406 274.6094,530.0156 Q275.6094,530.5 276.3125,530.9688 Q277.0156,531.4375 277.3906,532.0625 Q277.7656,532.6719 277.7656,533.6094 Q277.7656,534.7969 277.1875,535.5938 Q276.625,536.375 275.5781,536.7813 Q274.5469,537.1719 273.1719,537.1719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="193" x="287.5" y="535.932">QueryPlannerContextUpdate</text><line style="stroke:#181818;stroke-width:0.5;" x1="259.5" x2="482.5" y1="546.5" y2="546.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109" x="264.5" y="565.4659">documentID: int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="88" x="264.5" y="584.5339">value: Object</text></g><!--MD5=[c2e2687c21762a8a137317a8acaefd82]
+class QueryPlannerContextRemove--><g id="elem_QueryPlannerContextRemove"><rect codeLine="35" fill="#F1F1F1" height="59.0679" id="QueryPlannerContextRemove" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="229" x="518.5" y="524"/><ellipse cx="533.5" cy="540" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M533.1719,546.6719 Q532.25,546.6719 531.3594,546.5 Q530.4688,546.3125 529.6875,545.9375 L529.6875,543.6875 Q530.6406,544.1719 531.5156,544.4063 Q532.4063,544.625 533.25,544.625 Q534.125,544.625 534.6875,544.3281 Q535.25,544.0313 535.25,543.25 Q535.25,542.7031 534.9531,542.4063 Q534.6563,542.0938 534.0938,541.8125 Q533.5313,541.5313 532.75,541.125 Q531.9688,540.7031 531.3125,540.2188 Q530.6719,539.7188 530.2969,539.0469 Q529.9219,538.375 529.9219,537.4219 Q529.9219,535.7969 531.0156,535 Q532.125,534.1875 533.9063,534.1875 Q534.625,534.1875 535.6094,534.3594 Q536.5938,534.5156 537.5469,534.9688 L536.7656,536.8906 Q535.9219,536.5313 535.2344,536.3906 Q534.5625,536.2344 534.0469,536.2344 Q533.2031,536.2344 532.8125,536.5781 Q532.4375,536.9063 532.4375,537.5469 Q532.4375,538.0313 532.6719,538.3438 Q532.9219,538.6406 533.3906,538.8906 Q533.875,539.1406 534.6094,539.5156 Q535.6094,540 536.3125,540.4688 Q537.0156,540.9375 537.3906,541.5625 Q537.7656,542.1719 537.7656,543.1094 Q537.7656,544.2969 537.1875,545.0938 Q536.625,545.875 535.5781,546.2813 Q534.5469,546.6719 533.1719,546.6719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="197" x="547.5" y="545.432">QueryPlannerContextRemove</text><line style="stroke:#181818;stroke-width:0.5;" x1="519.5" x2="746.5" y1="556" y2="556"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109" x="524.5" y="574.9659">documentID: int</text></g><!--MD5=[aa0413ebcb3d9bdac345f8a00fac6760]
+class QueryPlanner--><g id="elem_QueryPlanner"><rect codeLine="39" fill="#F1F1F1" height="143.3396" id="QueryPlanner" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="514" x="706" y="11"/><ellipse cx="912.25" cy="27" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M911.7188,33.9219 Q909.9688,33.9219 908.8281,33.1875 Q907.7031,32.4375 907.1406,31.0938 Q906.5938,29.7344 906.5938,27.9375 Q906.5938,25.9063 907.25,24.4531 Q907.9063,23 909.1875,22.2188 Q910.4688,21.4375 912.3438,21.4375 Q913.2344,21.4375 913.9063,21.625 Q914.5781,21.7969 915.2656,22.1406 L914.4531,24.1563 Q913.8281,23.8438 913.2813,23.7188 Q912.75,23.5938 912.2656,23.5938 Q911.0938,23.5938 910.3906,24.125 Q909.6875,24.6563 909.3906,25.6094 Q909.0938,26.5625 909.0938,27.8281 Q909.0938,29.8438 909.8125,30.8125 Q910.5313,31.7656 912.125,31.7656 Q912.7188,31.7656 913.3438,31.6094 Q913.9688,31.4531 914.7969,31.0781 L914.7969,33.2969 Q914.0625,33.6094 913.2656,33.7656 Q912.4844,33.9219 911.7188,33.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="93" x="932.75" y="32.432">QueryPlanner</text><line style="stroke:#181818;stroke-width:0.5;" x1="707" x2="1219" y1="43" y2="43"/><ellipse cx="717" cy="58.034" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="272" x="726" y="61.9659">QueryPlanner(ctx: QueryPlannerContext)</text><line style="stroke:#181818;stroke-width:1.0;stroke-dasharray:1.0,2.0;" x1="707" x2="1219" y1="70.0679" y2="70.0679"/><ellipse cx="717" cy="85.1019" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="488" x="726" y="89.0339">select(properties...: Property | AggregatedProperty): QueryPlannerSelect</text><ellipse cx="717" cy="104.1698" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="124" x="726" y="108.1018">insert(object): void</text><ellipse cx="717" cy="123.2377" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="180" x="726" y="127.1697">update(id: int, object): void</text><ellipse cx="717" cy="142.3056" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="133" x="726" y="146.2376">remove(id: int): void</text></g><!--MD5=[c160724f8e3bb89ca8141a12554ac2e3]
+class Collection--><g id="elem_Collection"><rect codeLine="53" fill="#F1F1F1" height="124.2717" id="Collection" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="130" x="1790" y="20.5"/><ellipse cx="1819.4" cy="36.5" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1818.8688,43.4219 Q1817.1188,43.4219 1815.9781,42.6875 Q1814.8531,41.9375 1814.2906,40.5938 Q1813.7438,39.2344 1813.7438,37.4375 Q1813.7438,35.4063 1814.4,33.9531 Q1815.0563,32.5 1816.3375,31.7188 Q1817.6188,30.9375 1819.4938,30.9375 Q1820.3844,30.9375 1821.0563,31.125 Q1821.7281,31.2969 1822.4156,31.6406 L1821.6031,33.6563 Q1820.9781,33.3438 1820.4313,33.2188 Q1819.9,33.0938 1819.4156,33.0938 Q1818.2438,33.0938 1817.5406,33.625 Q1816.8375,34.1563 1816.5406,35.1094 Q1816.2438,36.0625 1816.2438,37.3281 Q1816.2438,39.3438 1816.9625,40.3125 Q1817.6813,41.2656 1819.275,41.2656 Q1819.8688,41.2656 1820.4938,41.1094 Q1821.1188,40.9531 1821.9469,40.5781 L1821.9469,42.7969 Q1821.2125,43.1094 1820.4156,43.2656 Q1819.6344,43.4219 1818.8688,43.4219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="66" x="1836.6" y="41.932">Collection</text><line style="stroke:#181818;stroke-width:0.5;" x1="1791" x2="1919" y1="52.5" y2="52.5"/><polygon fill="none" points="1801,62.534,1805,66.534,1801,70.534,1797,66.534" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="39" x="1810" y="71.4659">id: int</text><polygon fill="none" points="1801,81.6019,1805,85.6019,1801,89.6019,1797,85.6019" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86" x="1810" y="90.5339">name: string</text><line style="stroke:#181818;stroke-width:0.5;" x1="1791" x2="1919" y1="98.6358" y2="98.6358"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="70" x="1796" y="117.6018">getId(): int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="118" x="1796" y="136.6697">getName(): string</text></g><!--MD5=[268e1a17877a1e724869b43040f4a341]
+class CollectionQuery--><g id="elem_CollectionQuery"><rect codeLine="61" fill="#F1F1F1" height="170.4075" id="CollectionQuery" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="376" x="1667" y="237"/><ellipse cx="1797.25" cy="253" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1796.7188,259.9219 Q1794.9688,259.9219 1793.8281,259.1875 Q1792.7031,258.4375 1792.1406,257.0938 Q1791.5938,255.7344 1791.5938,253.9375 Q1791.5938,251.9063 1792.25,250.4531 Q1792.9063,249 1794.1875,248.2188 Q1795.4688,247.4375 1797.3438,247.4375 Q1798.2344,247.4375 1798.9063,247.625 Q1799.5781,247.7969 1800.2656,248.1406 L1799.4531,250.1563 Q1798.8281,249.8438 1798.2813,249.7188 Q1797.75,249.5938 1797.2656,249.5938 Q1796.0938,249.5938 1795.3906,250.125 Q1794.6875,250.6563 1794.3906,251.6094 Q1794.0938,252.5625 1794.0938,253.8281 Q1794.0938,255.8438 1794.8125,256.8125 Q1795.5313,257.7656 1797.125,257.7656 Q1797.7188,257.7656 1798.3438,257.6094 Q1798.9688,257.4531 1799.7969,257.0781 L1799.7969,259.2969 Q1799.0625,259.6094 1798.2656,259.7656 Q1797.4844,259.9219 1796.7188,259.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="107" x="1817.75" y="258.432">CollectionQuery</text><line style="stroke:#181818;stroke-width:0.5;" x1="1668" x2="2042" y1="269" y2="269"/><polygon fill="none" points="1678,279.034,1682,283.034,1678,287.034,1674,283.034" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="150" x="1687" y="287.9659">alias: optional&lt;string&gt;</text><line style="stroke:#181818;stroke-width:1.0;" x1="1668" x2="2042" y1="296.0679" y2="296.0679"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="312" x="1673" y="315.0339">CollectionQuery(name: string, alias:string = "")</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="364" x="1673" y="334.1018">CollectionQuery(collection: Collection, alias:string = "")</text><line style="stroke:#181818;stroke-width:1.0;stroke-dasharray:1.0,2.0;" x1="1668" x2="2042" y1="342.2038" y2="342.2038"/><ellipse cx="1678" cy="357.2377" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="213" x="1687" y="361.1697">as(alias:string): CollectionQuery</text><ellipse cx="1678" cy="376.3056" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="110" x="1687" y="380.2376">getAlias(): string</text><ellipse cx="1678" cy="395.3735" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="222" x="1687" y="399.3055">hasCollectionAssigned(): boolean</text></g><!--MD5=[18f7e86c37f82f74a5b47630a2c4b8a7]
+class QueryPlannerSources--><g id="elem_QueryPlannerSources"><rect codeLine="72" fill="#F1F1F1" height="105.2038" id="QueryPlannerSources" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="396" x="1236" y="269.5"/><ellipse cx="1356.75" cy="285.5" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1356.2188,292.4219 Q1354.4688,292.4219 1353.3281,291.6875 Q1352.2031,290.9375 1351.6406,289.5938 Q1351.0938,288.2344 1351.0938,286.4375 Q1351.0938,284.4063 1351.75,282.9531 Q1352.4063,281.5 1353.6875,280.7188 Q1354.9688,279.9375 1356.8438,279.9375 Q1357.7344,279.9375 1358.4063,280.125 Q1359.0781,280.2969 1359.7656,280.6406 L1358.9531,282.6563 Q1358.3281,282.3438 1357.7813,282.2188 Q1357.25,282.0938 1356.7656,282.0938 Q1355.5938,282.0938 1354.8906,282.625 Q1354.1875,283.1563 1353.8906,284.1094 Q1353.5938,285.0625 1353.5938,286.3281 Q1353.5938,288.3438 1354.3125,289.3125 Q1355.0313,290.2656 1356.625,290.2656 Q1357.2188,290.2656 1357.8438,290.1094 Q1358.4688,289.9531 1359.2969,289.5781 L1359.2969,291.7969 Q1358.5625,292.1094 1357.7656,292.2656 Q1356.9844,292.4219 1356.2188,292.4219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="146" x="1377.25" y="290.932">QueryPlannerSources</text><line style="stroke:#181818;stroke-width:0.5;" x1="1237" x2="1631" y1="301.5" y2="301.5"/><ellipse cx="1247" cy="316.534" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="325" x="1256" y="320.4659">QueryPlannerSources(ctx: QueryPlannerContext)</text><line style="stroke:#181818;stroke-width:1.0;stroke-dasharray:1.0,2.0;" x1="1237" x2="1631" y1="328.5679" y2="328.5679"/><ellipse cx="1247" cy="343.6019" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="303" x="1256" y="347.5339">with(collection: string): QueryPlannerSources</text><ellipse cx="1247" cy="362.6698" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="370" x="1256" y="366.6018">with(collection: CollectionQuery): QueryPlannerSources</text></g><!--MD5=[91221848cc6fc2b51471cfb300e81a0a]
+class Query--><g id="elem_Query"><rect codeLine="79" fill="#F1F1F1" height="151.3396" id="Query" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="399" x="1305.5" y="7"/><ellipse cx="1480.25" cy="23" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1479.7188,29.9219 Q1477.9688,29.9219 1476.8281,29.1875 Q1475.7031,28.4375 1475.1406,27.0938 Q1474.5938,25.7344 1474.5938,23.9375 Q1474.5938,21.9063 1475.25,20.4531 Q1475.9063,19 1477.1875,18.2188 Q1478.4688,17.4375 1480.3438,17.4375 Q1481.2344,17.4375 1481.9063,17.625 Q1482.5781,17.7969 1483.2656,18.1406 L1482.4531,20.1563 Q1481.8281,19.8438 1481.2813,19.7188 Q1480.75,19.5938 1480.2656,19.5938 Q1479.0938,19.5938 1478.3906,20.125 Q1477.6875,20.6563 1477.3906,21.6094 Q1477.0938,22.5625 1477.0938,23.8281 Q1477.0938,25.8438 1477.8125,26.8125 Q1478.5313,27.7656 1480.125,27.7656 Q1480.7188,27.7656 1481.3438,27.6094 Q1481.9688,27.4531 1482.7969,27.0781 L1482.7969,29.2969 Q1482.0625,29.6094 1481.2656,29.7656 Q1480.4844,29.9219 1479.7188,29.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="41" x="1500.75" y="28.432">Query</text><line style="stroke:#181818;stroke-width:0.5;" x1="1306.5" x2="1703.5" y1="39" y2="39"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="106" x="1311.5" y="57.9659">connection: IDB</text><line style="stroke:#181818;stroke-width:1.0;" x1="1306.5" x2="1703.5" y1="66.0679" y2="66.0679"/><ellipse cx="1316.5" cy="81.1019" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="151" x="1325.5" y="85.0339">Query(connection:IDB)</text><line style="stroke:#181818;stroke-width:1.0;stroke-dasharray:1.0,2.0;" x1="1306.5" x2="1703.5" y1="93.1358" y2="93.1358"/><ellipse cx="1316.5" cy="108.1698" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="306" x="1325.5" y="112.1018">from(collection: string): QueryPlannerSources</text><ellipse cx="1316.5" cy="127.2377" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="373" x="1325.5" y="131.1697">from(collection: CollectionQuery): QueryPlannerSources</text><ellipse cx="1316.5" cy="146.3056" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="273" x="1325.5" y="150.2376">collection(name: string): CollectionQuery</text></g><!--MD5=[be0b338023cf33a807199acfae71902b]
+class QueryPagination--><g id="elem_QueryPagination"><rect codeLine="93" fill="#F1F1F1" height="78.1358" id="QueryPagination" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="155" x="885.5" y="682"/><ellipse cx="905" cy="698" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M904.6719,704.6719 Q903.75,704.6719 902.8594,704.5 Q901.9688,704.3125 901.1875,703.9375 L901.1875,701.6875 Q902.1406,702.1719 903.0156,702.4063 Q903.9063,702.625 904.75,702.625 Q905.625,702.625 906.1875,702.3281 Q906.75,702.0313 906.75,701.25 Q906.75,700.7031 906.4531,700.4063 Q906.1563,700.0938 905.5938,699.8125 Q905.0313,699.5313 904.25,699.125 Q903.4688,698.7031 902.8125,698.2188 Q902.1719,697.7188 901.7969,697.0469 Q901.4219,696.375 901.4219,695.4219 Q901.4219,693.7969 902.5156,693 Q903.625,692.1875 905.4063,692.1875 Q906.125,692.1875 907.1094,692.3594 Q908.0938,692.5156 909.0469,692.9688 L908.2656,694.8906 Q907.4219,694.5313 906.7344,694.3906 Q906.0625,694.2344 905.5469,694.2344 Q904.7031,694.2344 904.3125,694.5781 Q903.9375,694.9063 903.9375,695.5469 Q903.9375,696.0313 904.1719,696.3438 Q904.4219,696.6406 904.8906,696.8906 Q905.375,697.1406 906.1094,697.5156 Q907.1094,698 907.8125,698.4688 Q908.5156,698.9375 908.8906,699.5625 Q909.2656,700.1719 909.2656,701.1094 Q909.2656,702.2969 908.6875,703.0938 Q908.125,703.875 907.0781,704.2813 Q906.0469,704.6719 904.6719,704.6719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="113" x="920" y="703.432">QueryPagination</text><line style="stroke:#181818;stroke-width:0.5;" x1="886.5" x2="1039.5" y1="714" y2="714"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="116" x="891.5" y="732.9659">pageNumber: int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="143" x="891.5" y="752.0339">elementsPerPage: int</text></g><!--MD5=[f379be3dc40aa5b4ad2e611babe87444]
+class QueryPlannerSelect--><g id="elem_QueryPlannerSelect"><rect codeLine="98" fill="#F1F1F1" height="162.4075" id="QueryPlannerSelect" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="476" x="725" y="241"/><ellipse cx="892.25" cy="257" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M891.7188,263.9219 Q889.9688,263.9219 888.8281,263.1875 Q887.7031,262.4375 887.1406,261.0938 Q886.5938,259.7344 886.5938,257.9375 Q886.5938,255.9063 887.25,254.4531 Q887.9063,253 889.1875,252.2188 Q890.4688,251.4375 892.3438,251.4375 Q893.2344,251.4375 893.9063,251.625 Q894.5781,251.7969 895.2656,252.1406 L894.4531,254.1563 Q893.8281,253.8438 893.2813,253.7188 Q892.75,253.5938 892.2656,253.5938 Q891.0938,253.5938 890.3906,254.125 Q889.6875,254.6563 889.3906,255.6094 Q889.0938,256.5625 889.0938,257.8281 Q889.0938,259.8438 889.8125,260.8125 Q890.5313,261.7656 892.125,261.7656 Q892.7188,261.7656 893.3438,261.6094 Q893.9688,261.4531 894.7969,261.0781 L894.7969,263.2969 Q894.0625,263.6094 893.2656,263.7656 Q892.4844,263.9219 891.7188,263.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="133" x="912.75" y="262.432">QueryPlannerSelect</text><line style="stroke:#181818;stroke-width:0.5;" x1="726" x2="1200" y1="273" y2="273"/><ellipse cx="736" cy="288.034" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="352" x="745" y="291.9659">QueryPlannerSelect(ctx: QueryPlannerContextSelect)</text><line style="stroke:#181818;stroke-width:1.0;stroke-dasharray:1.0,2.0;" x1="726" x2="1200" y1="300.0679" y2="300.0679"/><ellipse cx="736" cy="315.1019" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="413" x="745" y="319.0339">where(q: LogicalExpressionOfProperties): QueryPlannerSelect</text><ellipse cx="736" cy="334.1698" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="450" x="745" y="338.1018">page(pageNumber: int, elementsPerPage: int): QueryPlannerSelect</text><ellipse cx="736" cy="353.2377" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="353" x="745" y="357.1697">groupBy(properties...: Property): QueryPlannerSelect</text><ellipse cx="736" cy="372.3056" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="382" x="745" y="376.2376">sortBy(properties...: SortedProperty): QueryPlannerSelect</text><ellipse cx="736" cy="391.3735" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96" x="745" y="395.3055">execute(): json</text></g><!--MD5=[e90bba14b86b63806892665c599b4afb]
+reverse link IQueryRunner to QueryPlannerContext--><g id="link_IQueryRunner_QueryPlannerContext"><path codeLine="16" d="M458.96,322 C466.07,322 473.18,322 480.28,322 " fill="none" id="IQueryRunner-backto-QueryPlannerContext" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="445.74,322,451.74,326,457.74,322,451.74,318,445.74,322" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[fab2f1c1d83524978267234828d87948]
+reverse link QueryPlannerContext to QueryPlannerContextSelect--><g id="link_QueryPlannerContext_QueryPlannerContextSelect"><path d="M655.41,372.52 C672.45,384.1 690.73,396.2 708,407 C750.89,433.82 798.85,461.72 841.51,485.82 " fill="none" id="QueryPlannerContext-backto-QueryPlannerContextSelect" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="651.41,378.26,638.87,361.17,659.32,366.71,651.41,378.26" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[d2e71f51342cd205fe9621f344357d3a]
+reverse link QueryPlannerContext to QueryPlannerContextInsert--><g id="link_QueryPlannerContext_QueryPlannerContextInsert"><path d="M519.67,372.61 C501.86,384.82 482.18,397.2 463,407 C369.74,454.66 336.89,443.89 241,486 C215.41,497.24 187.86,511.51 165.07,523.95 " fill="none" id="QueryPlannerContext-backto-QueryPlannerContextInsert" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="515.71,366.83,536.09,361.03,523.78,378.27,515.71,366.83" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[a3e50b67c55b1532ad0a7ce42b1a4ce1]
+reverse link QueryPlannerContext to QueryPlannerContextUpdate--><g id="link_QueryPlannerContext_QueryPlannerContextUpdate"><path d="M535.64,375.94 C496.23,418.2 441.94,476.42 406.66,514.25 " fill="none" id="QueryPlannerContext-backto-QueryPlannerContextUpdate" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="530.66,371.01,549.42,361.15,540.9,380.56,530.66,371.01" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[193dc960312a22ae9eb05c0d10a4cd50]
+reverse link QueryPlannerContext to QueryPlannerContextRemove--><g id="link_QueryPlannerContext_QueryPlannerContextRemove"><path d="M597.09,380.82 C606.63,426.4 619.52,488.04 626.98,523.71 " fill="none" id="QueryPlannerContext-backto-QueryPlannerContextRemove" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="590.22,382.16,592.98,361.15,603.93,379.3,590.22,382.16" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[f1c4fc04479e664981876656b1fd03e1]
+link QueryPlanner to QueryPlannerContext--><g id="link_QueryPlanner_QueryPlannerContext"><path codeLine="48" d="M842.46,154.14 C799.67,179.71 751.38,209.16 708,237 C689.08,249.14 668.82,262.73 650.32,275.37 " fill="none" id="QueryPlanner-to-QueryPlannerContext" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="639.35,282.9,646.5605,282.8076,649.2485,276.1162,642.038,276.2086,639.35,282.9" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="46" x="785" y="202.897">context</text></g><!--MD5=[1ef785c5d188da064797272b69b03a2e]
+reverse link Collection to CollectionQuery--><g id="link_Collection_CollectionQuery"><path d="M1855,164.84 C1855,188.05 1855,213.39 1855,236.78 " fill="none" id="Collection-backto-CollectionQuery" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1848,164.66,1855,144.66,1862,164.66,1848,164.66" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[c962eb7275e82ec2dd65e2d43c53b3d1]
+reverse link QueryPlanner to QueryPlannerSources--><g id="link_QueryPlanner_QueryPlannerSources"><path d="M1120.93,163.14 C1190.38,198.16 1269.97,238.29 1331.52,269.33 " fill="none" id="QueryPlanner-backto-QueryPlannerSources" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1117.75,169.37,1103.04,154.11,1124.05,156.87,1117.75,169.37" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[3c892f3ee7f652c4ccdb758e9072bda8]
+link Query to CollectionQuery--><g id="link_Query_CollectionQuery"><path codeLine="89" d="M1615.26,158.32 C1650.59,182.3 1690.03,209.05 1726.54,233.83 " fill="none" id="Query-to-CollectionQuery" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="1730.98,236.84,1725.7766,228.4779,1726.8419,234.0335,1721.2863,235.0989,1730.98,236.84" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[dba95d1739b2bf1a40603cac76dc37de]
+link Query to QueryPlannerSources--><g id="link_Query_QueryPlannerSources"><path codeLine="90" d="M1482.63,158.32 C1472.37,192.65 1460.4,232.68 1450.91,264.45 " fill="none" id="Query-to-QueryPlannerSources" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="1449.4,269.47,1455.8072,261.9902,1450.8302,264.6789,1448.1414,259.7019,1449.4,269.47" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[5a3dbffa6796216f978fc5e0187ef715]
+link QueryPlanner to QueryPlannerSelect--><g id="link_QueryPlanner_QueryPlannerSelect"><path codeLine="108" d="M963,154.11 C963,179.62 963,208.7 963,235.36 " fill="none" id="QueryPlanner-to-QueryPlannerSelect" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="963,240.66,967,231.66,963,235.66,959,231.66,963,240.66" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[9b20435bc263b72024b1a5ec75bc34b5]
+link QueryPlannerSelect to QueryPlannerContextSelect--><g id="link_QueryPlannerSelect_QueryPlannerContextSelect"><path codeLine="110" d="M963,403.27 C963,425.85 963,450.4 963,472.94 " fill="none" id="QueryPlannerSelect-to-QueryPlannerContextSelect" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="963,485.95,967,479.95,963,473.95,959,479.95,963,485.95" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="46" x="964" y="451.897">context</text></g><!--MD5=[10d246e06cd994cf1b51b395efdd9094]
+link QueryPlannerContextSelect to QueryPagination--><g id="link_QueryPlannerContextSelect_QueryPagination"><path codeLine="112" d="M963,621.34 C963,640.04 963,659.86 963,676.8 " fill="none" id="QueryPlannerContextSelect-to-QueryPagination" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="963,681.96,967,672.96,963,676.96,959,672.96,963,681.96" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[fe4d9271ef5c8a9a6552b25d9d166e89]
+@startuml
+hide empty members
+'skinparam linetype ortho
+
+interface IQueryRunner {
+    select(data:QueryPlannerContextSelect): json
+    insert(data:QueryPlannerContextInsert): void
+    update(data:QueryPlannerContextUpdate): void
+    remove(data:QueryPlannerContextRemove): void
+}
+
+struct QueryPlannerContext {
+    +from: list<CollectionQuery>
+    +repos: Repositories
+}
+
+QueryPlannerContext -left-* IQueryRunner
+
+struct QueryPlannerContextSelect extends QueryPlannerContext {
+    +select_value: list<Property | AggregatedProperty>
+    +where_value: optional<PropertyExpression>
+    +pagination_value: optional<QueryPagination>
+    +groupBy_value: list<Property>
+    +sortBy_value: list<SortedProperty>
+}
+
+struct QueryPlannerContextInsert extends QueryPlannerContext {
+    documents: list<Object>
+}
+
+struct QueryPlannerContextUpdate extends QueryPlannerContext {
+    documentID: int
+    value: Object
+}
+
+struct QueryPlannerContextRemove extends QueryPlannerContext  {
+    documentID: int
+}
+
+class QueryPlanner {
+    +QueryPlanner(ctx: QueryPlannerContext)
+    ..
+    +select(properties...: Property | AggregatedProperty): QueryPlannerSelect
+    +insert(object): void
+    +update(id: int, object): void
+    +remove(id: int): void
+}
+
+QueryPlanner - -* QueryPlannerContext: context
+' QueryPlanner ..> QueryPlannerContextInsert
+' QueryPlanner .left.> QueryPlannerContextRemove
+' QueryPlanner .left.> QueryPlannerContextUpdate
+
+class Collection {
+    #id: int
+    #name: string
+
+    getId(): int
+    getName(): string
+}
+
+class CollectionQuery extends Collection {
+    #alias: optional<string>
+    - -
+    CollectionQuery(name: string, alias:string = "")
+    CollectionQuery(collection: Collection, alias:string = "")
+    ..
+    +as(alias:string): CollectionQuery
+    +getAlias(): string
+    +hasCollectionAssigned(): boolean
+}
+
+class QueryPlannerSources extends QueryPlanner {
+    +QueryPlannerSources(ctx: QueryPlannerContext)
+    ..
+    + with(collection: string): QueryPlannerSources
+    + with(collection: CollectionQuery): QueryPlannerSources
+}
+
+class Query {
+    connection: IDB
+    - -
+    + Query(connection:IDB)
+    ..
+    + from(collection: string): QueryPlannerSources
+    + from(collection: CollectionQuery): QueryPlannerSources
+    + collection(name: string): CollectionQuery
+}
+
+Query ..> CollectionQuery
+Query ..> QueryPlannerSources
+
+
+struct QueryPagination {
+    pageNumber: int
+    elementsPerPage: int
+}
+
+class QueryPlannerSelect {
+    +QueryPlannerSelect(ctx: QueryPlannerContextSelect)
+    ..
+    +where(q: LogicalExpressionOfProperties): QueryPlannerSelect
+    +page(pageNumber: int, elementsPerPage: int): QueryPlannerSelect
+    +groupBy(properties...: Property): QueryPlannerSelect
+    +sortBy(properties...: SortedProperty): QueryPlannerSelect
+    +execute(): json
+}
+
+QueryPlanner ..> QueryPlannerSelect
+
+QueryPlannerSelect - -* QueryPlannerContextSelect: context
+
+QueryPlannerContextSelect ..> QueryPagination
+@enduml
+
+@startuml
+hide empty members
+
+interface IQueryRunner {
+    select(data:QueryPlannerContextSelect): json
+    insert(data:QueryPlannerContextInsert): void
+    update(data:QueryPlannerContextUpdate): void
+    remove(data:QueryPlannerContextRemove): void
+}
+
+struct QueryPlannerContext {
+    +from: list<CollectionQuery>
+    +repos: Repositories
+}
+
+QueryPlannerContext -left-* IQueryRunner
+
+struct QueryPlannerContextSelect extends QueryPlannerContext {
+    +select_value: list<Property | AggregatedProperty>
+    +where_value: optional<PropertyExpression>
+    +pagination_value: optional<QueryPagination>
+    +groupBy_value: list<Property>
+    +sortBy_value: list<SortedProperty>
+}
+
+struct QueryPlannerContextInsert extends QueryPlannerContext {
+    documents: list<Object>
+}
+
+struct QueryPlannerContextUpdate extends QueryPlannerContext {
+    documentID: int
+    value: Object
+}
+
+struct QueryPlannerContextRemove extends QueryPlannerContext  {
+    documentID: int
+}
+
+class QueryPlanner {
+    +QueryPlanner(ctx: QueryPlannerContext)
+    ..
+    +select(properties...: Property | AggregatedProperty): QueryPlannerSelect
+    +insert(object): void
+    +update(id: int, object): void
+    +remove(id: int): void
+}
+
+QueryPlanner - -* QueryPlannerContext: context
+
+class Collection {
+    #id: int
+    #name: string
+
+    getId(): int
+    getName(): string
+}
+
+class CollectionQuery extends Collection {
+    #alias: optional<string>
+    - -
+    CollectionQuery(name: string, alias:string = "")
+    CollectionQuery(collection: Collection, alias:string = "")
+    ..
+    +as(alias:string): CollectionQuery
+    +getAlias(): string
+    +hasCollectionAssigned(): boolean
+}
+
+class QueryPlannerSources extends QueryPlanner {
+    +QueryPlannerSources(ctx: QueryPlannerContext)
+    ..
+    + with(collection: string): QueryPlannerSources
+    + with(collection: CollectionQuery): QueryPlannerSources
+}
+
+class Query {
+    connection: IDB
+    - -
+    + Query(connection:IDB)
+    ..
+    + from(collection: string): QueryPlannerSources
+    + from(collection: CollectionQuery): QueryPlannerSources
+    + collection(name: string): CollectionQuery
+}
+
+Query ..> CollectionQuery
+Query ..> QueryPlannerSources
+
+
+struct QueryPagination {
+    pageNumber: int
+    elementsPerPage: int
+}
+
+class QueryPlannerSelect {
+    +QueryPlannerSelect(ctx: QueryPlannerContextSelect)
+    ..
+    +where(q: LogicalExpressionOfProperties): QueryPlannerSelect
+    +page(pageNumber: int, elementsPerPage: int): QueryPlannerSelect
+    +groupBy(properties...: Property): QueryPlannerSelect
+    +sortBy(properties...: SortedProperty): QueryPlannerSelect
+    +execute(): json
+}
+
+QueryPlanner ..> QueryPlannerSelect
+
+QueryPlannerSelect - -* QueryPlannerContextSelect: context
+
+QueryPlannerContextSelect ..> QueryPagination
+@enduml
+
+PlantUML version 1.2022.8(Sun Sep 25 06:00:33 ART 2022)
+(MIT source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

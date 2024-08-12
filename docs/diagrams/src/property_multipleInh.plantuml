@@ -1,0 +1,127 @@
+@startuml property
+
+hide empty members
+skinparam linetype ortho
+
+enum PropertyType {
+  STRING
+  DOUBLE
+  INTEGER
+}
+
+class Property {
+    # name: string
+    # type: PropertyType
+    # id: int
+    # collectionID: int
+    
+    getName(): string
+    getType(): PropertyType
+    getId(): int
+    getCollectionId(): int
+}
+
+interface SortProperty {
+    desc(): SortedProperty
+    asc(): SortedProperty
+}
+
+interface AggregateProperty {
+    countAs(alias:string): AggregatedProperty
+    maxAs(alias:string): AggregatedProperty
+    minAs(alias:string): AggregatedProperty
+    sumAs(alias:string): AggregatedProperty
+    averageAs(alias:string): AggregatedProperty
+}
+
+interface LogicalProperty {
+    operator>(right: LogicConstValue) : PropertyExpression 
+    operator>=(right: LogicConstValue) : PropertyExpression 
+    operator<(right: LogicConstValue) : PropertyExpression 
+    operator<=(right: LogicConstValue) : PropertyExpression 
+    operator==(right: LogicConstValue) : PropertyExpression 
+    operator!=(right: LogicConstValue) : PropertyExpression 
+    operator%(right: LogicConstValue) : PropertyExpression 
+    operator^(right: LogicConstValue) : PropertyExpression 
+}
+
+Property ..|> LogicalProperty
+Property ..|> AggregateProperty
+Property ..|> SortProperty
+
+Property ..> PropertyType
+
+class LogicConstValue << variant >> << (D, orchid) >> {
+    string
+    int
+    double
+    Property
+}
+
+note right of Property::"operator>(right: LogicConstValue)"
+    and all the 
+    above operators
+end note
+
+enum AggregationType {
+    COUNT
+    AVG
+    SUM
+    MAX
+    MIN
+}
+
+struct AggregatedProperty {
+    type: AggregationType
+    alias: string
+}
+
+enum SortType {
+    ASC
+    DESC
+}
+
+struct SortedProperty {
+    type: SortType
+}
+
+AggregatedProperty ..> AggregationType
+SortedProperty .right.> SortType
+
+Property *-left- AggregatedProperty : property
+Property *-right- SortedProperty : property
+
+class PropertyExpressionOperand << variant >> << (D, orchid) >> {
+ LogicConstValue
+ PropertyExpression
+}
+
+enum PropertyExpressionOperator {
+    EQ
+    NEQ
+    GT
+    GTE
+    LT
+    LTE
+    LIKE
+    NLIKE
+    AND
+    OR
+    NOT
+}
+
+struct PropertyExpression {
+    type: PropertyExpressionOperator
+
+    +operator&&(right: PropertyExpression): PropertyExpression
+    +operator||(right: PropertyExpression): PropertyExpression
+    +operator~(): PropertyExpression
+}
+
+PropertyExpression --* PropertyExpressionOperand: left
+PropertyExpression --* PropertyExpressionOperand: right
+PropertyExpression ..> PropertyExpressionOperator
+
+Property ..> PropertyExpression
+
+@enduml

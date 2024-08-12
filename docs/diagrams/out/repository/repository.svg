@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="382px" preserveAspectRatio="none" style="width:1384px;height:382px;background:#FFFFFF;" version="1.1" viewBox="0 0 1384 382" width="1384px" zoomAndPan="magnify"><defs/><g><!--MD5=[ce9560a30efbe5dc54bef772049eaadc]
+class DataAccess--><g id="elem_DataAccess"><rect codeLine="3" fill="#F1F1F1" height="59.0679" id="DataAccess" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="214" x="495" y="7"/><ellipse cx="559.75" cy="23" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M559.4219,29.6719 Q558.5,29.6719 557.6094,29.5 Q556.7188,29.3125 555.9375,28.9375 L555.9375,26.6875 Q556.8906,27.1719 557.7656,27.4063 Q558.6563,27.625 559.5,27.625 Q560.375,27.625 560.9375,27.3281 Q561.5,27.0313 561.5,26.25 Q561.5,25.7031 561.2031,25.4063 Q560.9063,25.0938 560.3438,24.8125 Q559.7813,24.5313 559,24.125 Q558.2188,23.7031 557.5625,23.2188 Q556.9219,22.7188 556.5469,22.0469 Q556.1719,21.375 556.1719,20.4219 Q556.1719,18.7969 557.2656,18 Q558.375,17.1875 560.1563,17.1875 Q560.875,17.1875 561.8594,17.3594 Q562.8438,17.5156 563.7969,17.9688 L563.0156,19.8906 Q562.1719,19.5313 561.4844,19.3906 Q560.8125,19.2344 560.2969,19.2344 Q559.4531,19.2344 559.0625,19.5781 Q558.6875,19.9063 558.6875,20.5469 Q558.6875,21.0313 558.9219,21.3438 Q559.1719,21.6406 559.6406,21.8906 Q560.125,22.1406 560.8594,22.5156 Q561.8594,23 562.5625,23.4688 Q563.2656,23.9375 563.6406,24.5625 Q564.0156,25.1719 564.0156,26.1094 Q564.0156,27.2969 563.4375,28.0938 Q562.875,28.875 561.8281,29.2813 Q560.7969,29.6719 559.4219,29.6719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="76" x="580.25" y="28.432">DataAccess</text><line style="stroke:#181818;stroke-width:0.5;" x1="496" x2="708" y1="39" y2="39"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="202" x="501" y="57.9659">DataAccess(connection: IDB*);</text></g><g id="elem_GMN3"><path d="M254.5,14 L254.5,59.412 A0,0 0 0 0 254.5,59.412 L459.5,59.412 A0,0 0 0 0 459.5,59.412 L459.5,40.5 L494.86,36.5 L459.5,32.5 L459.5,24 L449.5,14 L254.5,14 A0,0 0 0 0 254.5,14 " fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><path d="M449.5,14 L449.5,24 L459.5,24 L449.5,14 " fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="184" x="260.5" y="32.897">Ensures that all the DataAccess</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="161" x="260.5" y="50.603">share the same connection</text></g><!--MD5=[42b715fcc1beb3abb9567c7aa3cc8796]
+class IRepositoryCollection--><g id="elem_IRepositoryCollection"><rect codeLine="16" fill="#F1F1F1" height="154.4075" id="IRepositoryCollection" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="336" x="7" y="183.5"/><ellipse cx="103.75" cy="199.5" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M99.7813,206 L99.7813,204.2969 L102.1406,204.0313 L102.1406,195.8281 L99.7813,195.5625 L99.7813,193.8594 L106.9219,193.8594 L106.9219,195.5625 L104.5,195.8281 L104.5,204.0313 L106.9219,204.2969 L106.9219,206 L99.7813,206 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="134" x="124.25" y="204.932">IRepositoryCollection</text><line style="stroke:#181818;stroke-width:0.5;" x1="8" x2="342" y1="215.5" y2="215.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="233" x="13" y="234.4659">add(name:string, ownerID: int): int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="219" x="13" y="253.5339">find(id: int): optional&lt;Collection&gt;</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="266" x="13" y="272.6018">find(name: string): optional&lt;Collection&gt;</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="194" x="13" y="291.6697">exists(name: string): boolean</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="230" x="13" y="310.7376">exists(id: int): optional&lt;Collection&gt;</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="324" x="13" y="329.8055">findByOwner(ownerID: int): optional&lt;Collection&gt;</text></g><!--MD5=[dee60a643aa1ba0d65e7ff45683255ad]
+class IRepositoryProperty--><g id="elem_IRepositoryProperty"><rect codeLine="25" fill="#F1F1F1" height="116.2717" id="IRepositoryProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="447" x="378.5" y="202.5"/><ellipse cx="534.25" cy="218.5" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M530.2813,225 L530.2813,223.2969 L532.6406,223.0313 L532.6406,214.8281 L530.2813,214.5625 L530.2813,212.8594 L537.4219,212.8594 L537.4219,214.5625 L535,214.8281 L535,223.0313 L537.4219,223.2969 L537.4219,225 L530.2813,225 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="127" x="554.75" y="223.932">IRepositoryProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="379.5" x2="824.5" y1="234.5" y2="234.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="435" x="384.5" y="253.4659">add(name: string, type: PropertyType, collectionID: int = null): int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="430" x="384.5" y="272.5339">find(collectionID: int, propertyName: string): optional&lt;Property&gt;</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="367" x="384.5" y="291.6018">exists(collectionID: int, propertyName: string): boolean</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="240" x="384.5" y="310.6697">find(collectionId: int): list&lt;Property&gt;</text></g><!--MD5=[d3566f52c6e294759dfd3ab985db0fdf]
+class IValuesDAO--><g id="elem_IValuesDAO"><rect codeLine="32" fill="#F1F1F1" height="230.6792" id="IValuesDAO" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="517" x="860.5" y="145"/><ellipse cx="1078.25" cy="161" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1074.2813,167.5 L1074.2813,165.7969 L1076.6406,165.5313 L1076.6406,157.3281 L1074.2813,157.0625 L1074.2813,155.3594 L1081.4219,155.3594 L1081.4219,157.0625 L1079,157.3281 L1079,165.5313 L1081.4219,165.7969 L1081.4219,167.5 L1074.2813,167.5 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="73" x="1098.75" y="166.432">IValuesDAO</text><line style="stroke:#181818;stroke-width:0.5;" x1="861.5" x2="1376.5" y1="177" y2="177"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="505" x="866.5" y="195.9659">addStringLike(propID:int, docID: int, type: PropertyType, value: string): void</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="173" x="866.5" y="215.0339">addObject(propID:int): int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="866.5" y="234.1018"> </text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="393" x="866.5" y="253.1697">updateStringLike(propID:int, docID: int, value: string): void</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="866.5" y="272.2376"> </text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="380" x="866.5" y="291.3055">exists(propID:int, docID:int, type: PropertyType): boolean</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="866.5" y="310.3734"> </text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="366" x="866.5" y="329.4414">findObject(propID:int, docID: int): ValueObjectMapped</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="866.5" y="348.5093"> </text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="279" x="866.5" y="367.5772">removeAllFromDocument(docID: int): void</text></g><!--MD5=[b55482cce6ecf0033fe54eae270bb0fb]
+link DataAccess to IRepositoryCollection--><g id="link_DataAccess_IRepositoryCollection"><path codeLine="12" d="M533.84,66.02 C511.8,75.4 487.3,85.99 465,96 C418.39,116.93 405.94,120.68 361,145 C342.84,154.83 323.99,165.65 305.57,176.61 " fill="none" id="DataAccess-to-IRepositoryCollection" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="294.16,183.44,301.3624,183.7939,304.4592,177.2816,297.2568,176.9277,294.16,183.44" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="127" x="466" y="110.897">respositoryCollection</text></g><!--MD5=[6ed29968b0cc382c0405e33248f45420]
+link DataAccess to IRepositoryProperty--><g id="link_DataAccess_IRepositoryProperty"><path codeLine="13" d="M602,66.07 C602,97.03 602,147.59 602,189.26 " fill="none" id="DataAccess-to-IRepositoryProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="602,202.44,606,196.44,602,190.44,598,196.44,602,202.44" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="121" x="603" y="110.897">respositoryProperty</text></g><!--MD5=[8b5d6e64c438b81b1a726ac1ac335071]
+link DataAccess to IValuesDAO--><g id="link_DataAccess_IValuesDAO"><path codeLine="14" d="M668.53,66.07 C715.29,86.15 781.25,114.47 848.3,143.26 " fill="none" id="DataAccess-to-IValuesDAO" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="860.39,148.45,856.4552,142.4071,849.3637,143.715,853.2985,149.7579,860.39,148.45" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="107" x="771" y="110.897">respositoryValues</text></g><!--MD5=[5a987451dc1e151d1151ca6ca6fc209e]
+@startuml
+hide empty members
+
+struct DataAccess {
+    DataAccess(connection: IDB*);
+}
+
+note left of DataAccess
+Ensures that all the DataAccess
+share the same connection
+endnote
+
+DataAccess - -* IRepositoryCollection: respositoryCollection
+DataAccess - -* IRepositoryProperty: respositoryProperty
+DataAccess - -* IValuesDAO: respositoryValues
+
+interface IRepositoryCollection {
+    add(name:string, ownerID: int): int
+    find(id: int): optional<Collection>
+    find(name: string): optional<Collection>
+    exists(name: string): boolean
+    exists(id: int): optional<Collection>
+    findByOwner(ownerID: int): optional<Collection>
+}
+
+interface IRepositoryProperty {
+    add(name: string, type: PropertyType, collectionID: int = null): int
+    find(collectionID: int, propertyName: string): optional<Property>
+    exists(collectionID: int, propertyName: string): boolean
+    find(collectionId: int): list<Property>
+}
+
+interface IValuesDAO {
+    addStringLike(propID:int, docID: int, type: PropertyType, value: string): void
+    addObject(propID:int): int
+    
+    updateStringLike(propID:int, docID: int, value: string): void
+
+    exists(propID:int, docID:int, type: PropertyType): boolean
+    
+    findObject(propID:int, docID: int): ValueObjectMapped
+
+    removeAllFromDocument(docID: int): void
+}
+@enduml
+
+PlantUML version 1.2022.8(Sun Sep 25 06:00:33 ART 2022)
+(MIT source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

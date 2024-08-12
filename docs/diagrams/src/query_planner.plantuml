@@ -1,0 +1,102 @@
+@startuml query_planner
+hide empty members
+'skinparam linetype ortho
+
+interface IQueryRunner {
+    select(data:QueryPlannerContextSelect): json
+    insert(data:QueryPlannerContextInsert): void
+    update(data:QueryPlannerContextUpdate): void
+    remove(data:QueryPlannerContextRemove): void
+}
+
+struct QueryPlannerContext {
+    +from: list<Collection>
+    +repos: Repositories
+}
+
+QueryPlannerContext -left-* IQueryRunner
+
+struct QueryPlannerContextSelect extends QueryPlannerContext {
+    +select_value: list<Property | AggregatedProperty>
+    +where_value: optional<PropertyExpression>
+    +pagination_value: optional<QueryPagination>
+    +groupBy_value: list<Property>
+    +sortBy_value: list<SortedProperty>
+}
+
+struct QueryPlannerContextInsert extends QueryPlannerContext {
+    documents: list<Object>
+}
+
+struct QueryPlannerContextUpdate extends QueryPlannerContext {
+    documentID: int
+    value: Object
+}
+
+struct QueryPlannerContextRemove extends QueryPlannerContext  {
+    documentID: int
+}
+
+class QueryPlanner {
+    +QueryPlanner(ctx: QueryPlannerContext)
+    ..
+    +select(properties...: Property | AggregatedProperty | Collection): QueryPlannerSelect
+    +insert(object): void
+    +update(id: int, object): void
+    +remove(id: int): void
+}
+
+QueryPlanner --* QueryPlannerContext: context
+' QueryPlanner ..> QueryPlannerContextInsert
+' QueryPlanner .left.> QueryPlannerContextRemove
+' QueryPlanner .left.> QueryPlannerContextUpdate
+
+class Collection {
+    #id: int
+    #name: string
+    #alias: optional<string>
+    +Collection(name: string, alias:string = "")
+    +getId(): int
+    +getName(): string
+    +as(alias:string): Collection
+    +getAlias(): string
+    +operator[](propertyName:string): Property
+}
+
+
+class Query {
+    connection: IDB
+    --
+    + Query(connection:IDB)
+    ..
+    + from(collection: string): QueryPlanner
+    + from(collection: Collection): QueryPlanner
+    + collection(name: string): Collection
+}
+
+Query ..> Collection
+Query ..> QueryPlanner
+
+
+struct QueryPagination {
+    pageNumber: int
+    elementsPerPage: int
+}
+
+class QueryPlannerSelect {
+    +QueryPlannerSelect(ctx: QueryPlannerContextSelect)
+    ..
+    +where(q: LogicalExpressionOfProperties): QueryPlannerSelect
+    +page(pageNumber: int, elementsPerPage: int): QueryPlannerSelect
+    +groupBy(properties...: Property): QueryPlannerSelect
+    +sortBy(properties...: SortedProperty): QueryPlannerSelect
+    +execute(): json
+}
+
+QueryPlanner ..> QueryPlannerSelect
+
+QueryPlannerSelect --* QueryPlannerContextSelect: context
+
+QueryPlannerContextSelect ..> QueryPagination
+
+@enduml

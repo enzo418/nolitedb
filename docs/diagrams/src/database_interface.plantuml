@@ -1,0 +1,33 @@
+@startuml database_interface
+hide empty members
+
+interface IDB {
+    open(connectionString:string)
+    close()
+    executeReader(query:string, params: map<string, any>): IDBQueryReader
+    execute(query:string, params: map<string, any>): void
+    executeAndGetFirstInt(query:string, params: map<string, any>): optional<int64>
+    getLastInsertedRowId(): snowflake
+    begin():void
+    commit():void
+    rollback():void
+    getLastErrorMessage(): string
+}
+
+interface IDBQueryReader {
+    readRow(row: IDBRowReader): boolean
+}
+
+interface IDBRowReader {
+    readString(columnIndex:int): string
+    readInt64(columnIndex:int): int64
+    readInt32(columnIndex:int): int
+    readDouble(columnIndex:int): double 
+    readBoolean(columnIndex:int) : bool;
+    isNull(columnIndex:int): boolean
+}
+
+IDB ..> IDBQueryReader
+IDBQueryReader ..> IDBRowReader
+
+@enduml

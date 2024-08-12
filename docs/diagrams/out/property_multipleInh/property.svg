@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="809px" preserveAspectRatio="none" style="width:2054px;height:809px;background:#FFFFFF;" version="1.1" viewBox="0 0 2054 809" width="2054px" zoomAndPan="magnify"><defs/><g><!--MD5=[b7b2a37e41fc7860b2beae32fdcac153]
+class PropertyType--><g id="elem_PropertyType"><rect codeLine="3" fill="#F1F1F1" height="97.2038" id="PropertyType" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="121" x="7" y="360.5"/><ellipse cx="22" cy="376.5" fill="#EB937F" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M18.3594,383 L18.3594,370.8594 L26.0156,370.8594 L26.0156,372.9844 L20.7344,372.9844 L20.7344,375.6406 L25.75,375.6406 L25.75,377.7656 L20.7344,377.7656 L20.7344,380.875 L26.0156,380.875 L26.0156,383 L18.3594,383 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="89" x="36" y="381.932">PropertyType</text><line style="stroke:#181818;stroke-width:0.5;" x1="8" x2="127" y1="392.5" y2="392.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="51" x="13" y="411.4659">STRING</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55" x="13" y="430.5339">DOUBLE</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="59" x="13" y="449.6018">INTEGER</text></g><!--MD5=[ad09692045c0465b80646fb253f88c95]
+class LogicConstValue--><g id="elem_LogicConstValue"><rect codeLine="9" fill="#F1F1F1" height="129.6837" id="LogicConstValue" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="142" x="163.5" y="344"/><ellipse cx="178.5" cy="366.706" fill="#DA70D6" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M175.2656,373.206 L175.2656,361.0654 L179.0156,361.0654 Q181.3906,361.0654 182.7813,362.581 Q184.1875,364.081 184.1875,367.0341 Q184.1875,370.0029 182.75,371.6123 Q181.3125,373.206 178.8281,373.206 L175.2656,373.206 Z M178.7031,371.1123 Q180.25,371.1123 180.9688,370.1123 Q181.6875,369.1123 181.6875,367.0498 Q181.6875,365.0185 180.9844,364.0966 Q180.2969,363.1591 178.9063,363.1591 L177.7031,363.1591 L177.7031,371.1123 L178.7031,371.1123 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="51" x="222" y="361.8281">«variant»</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="110" x="192.5" y="380.31">LogicConstValue</text><line style="stroke:#181818;stroke-width:0.5;" x1="164.5" x2="304.5" y1="389.412" y2="389.412"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="40" x="169.5" y="408.378">string</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="18" x="169.5" y="427.4459">int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="47" x="169.5" y="446.5138">double</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="57" x="169.5" y="465.5817">Property</text></g><!--MD5=[1f752f351d4aaddef6f72f48d9ee5b31]
+class BaseProperty--><g id="elem_BaseProperty"><rect codeLine="16" fill="#F1F1F1" height="200.5433" id="BaseProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="171" x="830" y="35.5"/><ellipse cx="867.5" cy="51.5" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M866.9688,58.4219 Q865.2188,58.4219 864.0781,57.6875 Q862.9531,56.9375 862.3906,55.5938 Q861.8438,54.2344 861.8438,52.4375 Q861.8438,50.4063 862.5,48.9531 Q863.1563,47.5 864.4375,46.7188 Q865.7188,45.9375 867.5938,45.9375 Q868.4844,45.9375 869.1563,46.125 Q869.8281,46.2969 870.5156,46.6406 L869.7031,48.6563 Q869.0781,48.3438 868.5313,48.2188 Q868,48.0938 867.5156,48.0938 Q866.3438,48.0938 865.6406,48.625 Q864.9375,49.1563 864.6406,50.1094 Q864.3438,51.0625 864.3438,52.3281 Q864.3438,54.3438 865.0625,55.3125 Q865.7813,56.2656 867.375,56.2656 Q867.9688,56.2656 868.5938,56.1094 Q869.2188,55.9531 870.0469,55.5781 L870.0469,57.7969 Q869.3125,58.1094 868.5156,58.2656 Q867.7344,58.4219 866.9688,58.4219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="89" x="886.5" y="56.932">BaseProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="831" x2="1000" y1="67.5" y2="67.5"/><polygon fill="none" points="841,77.534,845,81.534,841,85.534,837,81.534" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86" x="850" y="86.4659">name: string</text><polygon fill="none" points="841,96.6019,845,100.6019,841,104.6019,837,100.6019" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126" x="850" y="105.5339">type: PropertyType</text><polygon fill="none" points="841,115.6698,845,119.6698,841,123.6698,837,119.6698" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="39" x="850" y="124.6018">id: int</text><polygon fill="none" points="841,134.7377,845,138.7377,841,142.7377,837,138.7377" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="105" x="850" y="143.6697">collectionID: int</text><line style="stroke:#181818;stroke-width:0.5;" x1="831" x2="1000" y1="151.7717" y2="151.7717"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="118" x="836" y="170.7376">getName(): string</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="159" x="836" y="189.8055">getType(): PropertyType</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="70" x="836" y="208.8734">getId(): int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="136" x="836" y="227.9414">getCollectionId(): int</text></g><!--MD5=[107ac53c8f32381ecd272f3dbee38ca6]
+class SortProperty--><g id="elem_SortProperty"><rect codeLine="28" fill="#F1F1F1" height="124.2717" id="SortProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="243" x="1036" y="74"/><ellipse cx="1111.25" cy="90" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1110.7188,96.9219 Q1108.9688,96.9219 1107.8281,96.1875 Q1106.7031,95.4375 1106.1406,94.0938 Q1105.5938,92.7344 1105.5938,90.9375 Q1105.5938,88.9063 1106.25,87.4531 Q1106.9063,86 1108.1875,85.2188 Q1109.4688,84.4375 1111.3438,84.4375 Q1112.2344,84.4375 1112.9063,84.625 Q1113.5781,84.7969 1114.2656,85.1406 L1113.4531,87.1563 Q1112.8281,86.8438 1112.2813,86.7188 Q1111.75,86.5938 1111.2656,86.5938 Q1110.0938,86.5938 1109.3906,87.125 Q1108.6875,87.6563 1108.3906,88.6094 Q1108.0938,89.5625 1108.0938,90.8281 Q1108.0938,92.8438 1108.8125,93.8125 Q1109.5313,94.7656 1111.125,94.7656 Q1111.7188,94.7656 1112.3438,94.6094 Q1112.9688,94.4531 1113.7969,94.0781 L1113.7969,96.2969 Q1113.0625,96.6094 1112.2656,96.7656 Q1111.4844,96.9219 1110.7188,96.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="84" x="1131.75" y="95.432">SortProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="1037" x2="1278" y1="106" y2="106"/><polygon fill="none" points="1047,116.034,1051,120.034,1047,124.034,1043,120.034" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="129" x="1056" y="124.9659">prop: BaseProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="1037" x2="1278" y1="133.0679" y2="133.0679"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="231" x="1042" y="152.0339">SortProperty(prop: BaseProperty&amp;)</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="148" x="1042" y="171.1018">desc(): SortedProperty</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="139" x="1042" y="190.1697">asc(): SortedProperty</text></g><!--MD5=[f1419358c0ce713118562bb51c782b4e]
+class AggregateProperty--><g id="elem_AggregateProperty"><rect codeLine="36" fill="#F1F1F1" height="200.5433" id="AggregateProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="310" x="1314.5" y="35.5"/><ellipse cx="1401.25" cy="51.5" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1400.7188,58.4219 Q1398.9688,58.4219 1397.8281,57.6875 Q1396.7031,56.9375 1396.1406,55.5938 Q1395.5938,54.2344 1395.5938,52.4375 Q1395.5938,50.4063 1396.25,48.9531 Q1396.9063,47.5 1398.1875,46.7188 Q1399.4688,45.9375 1401.3438,45.9375 Q1402.2344,45.9375 1402.9063,46.125 Q1403.5781,46.2969 1404.2656,46.6406 L1403.4531,48.6563 Q1402.8281,48.3438 1402.2813,48.2188 Q1401.75,48.0938 1401.2656,48.0938 Q1400.0938,48.0938 1399.3906,48.625 Q1398.6875,49.1563 1398.3906,50.1094 Q1398.0938,51.0625 1398.0938,52.3281 Q1398.0938,54.3438 1398.8125,55.3125 Q1399.5313,56.2656 1401.125,56.2656 Q1401.7188,56.2656 1402.3438,56.1094 Q1402.9688,55.9531 1403.7969,55.5781 L1403.7969,57.7969 Q1403.0625,58.1094 1402.2656,58.2656 Q1401.4844,58.4219 1400.7188,58.4219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="128" x="1421.75" y="56.932">AggregateProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="1315.5" x2="1623.5" y1="67.5" y2="67.5"/><polygon fill="none" points="1325.5,77.534,1329.5,81.534,1325.5,85.534,1321.5,81.534" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="129" x="1334.5" y="86.4659">prop: BaseProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="1315.5" x2="1623.5" y1="94.5679" y2="94.5679"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="265" x="1320.5" y="113.5339">AggregateProperty(prop: BaseProperty)</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="1320.5" y="132.6018"> </text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="282" x="1320.5" y="151.6697">countAs(alias:string): AggregatedProperty</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="272" x="1320.5" y="170.7376">maxAs(alias:string): AggregatedProperty</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="270" x="1320.5" y="189.8055">minAs(alias:string): AggregatedProperty</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="273" x="1320.5" y="208.8734">sumAs(alias:string): AggregatedProperty</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="298" x="1320.5" y="227.9414">averageAs(alias:string): AggregatedProperty</text></g><!--MD5=[8e9d8eceb034a97d11474599779c1eba]
+class LogicalProperty--><g id="elem_LogicalProperty"><rect codeLine="48" fill="#F1F1F1" height="257.7471" id="LogicalProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="387" x="1660" y="7"/><ellipse cx="1797.25" cy="23" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1796.7188,29.9219 Q1794.9688,29.9219 1793.8281,29.1875 Q1792.7031,28.4375 1792.1406,27.0938 Q1791.5938,25.7344 1791.5938,23.9375 Q1791.5938,21.9063 1792.25,20.4531 Q1792.9063,19 1794.1875,18.2188 Q1795.4688,17.4375 1797.3438,17.4375 Q1798.2344,17.4375 1798.9063,17.625 Q1799.5781,17.7969 1800.2656,18.1406 L1799.4531,20.1563 Q1798.8281,19.8438 1798.2813,19.7188 Q1797.75,19.5938 1797.2656,19.5938 Q1796.0938,19.5938 1795.3906,20.125 Q1794.6875,20.6563 1794.3906,21.6094 Q1794.0938,22.5625 1794.0938,23.8281 Q1794.0938,25.8438 1794.8125,26.8125 Q1795.5313,27.7656 1797.125,27.7656 Q1797.7188,27.7656 1798.3438,27.6094 Q1798.9688,27.4531 1799.7969,27.0781 L1799.7969,29.2969 Q1799.0625,29.6094 1798.2656,29.7656 Q1797.4844,29.9219 1796.7188,29.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="104" x="1817.75" y="28.432">LogicalProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="1661" x2="2046" y1="39" y2="39"/><polygon fill="none" points="1671,49.034,1675,53.034,1671,57.034,1667,53.034" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="129" x="1680" y="57.9659">prop: BaseProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="1661" x2="2046" y1="66.0679" y2="66.0679"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="241" x="1666" y="85.0339">LogicalProperty(prop: BaseProperty)</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="1666" y="104.1018"> </text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="367" x="1666" y="123.1697">operator&gt;(right: LogicConstValue) : PropertyExpression</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="375" x="1666" y="142.2376">operator&gt;=(right: LogicConstValue) : PropertyExpression</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="367" x="1666" y="161.3055">operator&lt;(right: LogicConstValue) : PropertyExpression</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="375" x="1666" y="180.3734">operator&lt;=(right: LogicConstValue) : PropertyExpression</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="375" x="1666" y="199.4414">operator==(right: LogicConstValue) : PropertyExpression</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="371" x="1666" y="218.5093">operator!=(right: LogicConstValue) : PropertyExpression</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="371" x="1666" y="237.5772">operator%(right: LogicConstValue) : PropertyExpression</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="367" x="1666" y="256.6451">operator^(right: LogicConstValue) : PropertyExpression</text></g><!--MD5=[1146bcca7ed1f73bac03c9231565ecb9]
+class IntegerProperty--><g id="elem_IntegerProperty"><rect codeLine="63" fill="#F1F1F1" height="32" id="IntegerProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="139" x="1169" y="393"/><ellipse cx="1184" cy="409" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1183.4688,415.9219 Q1181.7188,415.9219 1180.5781,415.1875 Q1179.4531,414.4375 1178.8906,413.0938 Q1178.3438,411.7344 1178.3438,409.9375 Q1178.3438,407.9063 1179,406.4531 Q1179.6563,405 1180.9375,404.2188 Q1182.2188,403.4375 1184.0938,403.4375 Q1184.9844,403.4375 1185.6563,403.625 Q1186.3281,403.7969 1187.0156,404.1406 L1186.2031,406.1563 Q1185.5781,405.8438 1185.0313,405.7188 Q1184.5,405.5938 1184.0156,405.5938 Q1182.8438,405.5938 1182.1406,406.125 Q1181.4375,406.6563 1181.1406,407.6094 Q1180.8438,408.5625 1180.8438,409.8281 Q1180.8438,411.8438 1181.5625,412.8125 Q1182.2813,413.7656 1183.875,413.7656 Q1184.4688,413.7656 1185.0938,413.6094 Q1185.7188,413.4531 1186.5469,413.0781 L1186.5469,415.2969 Q1185.8125,415.6094 1185.0156,415.7656 Q1184.2344,415.9219 1183.4688,415.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="107" x="1198" y="414.432">IntegerProperty</text></g><!--MD5=[0e39f0d3164dfb718d51f609b53c755d]
+class DoubleProperty--><g id="elem_DoubleProperty"><rect codeLine="66" fill="#F1F1F1" height="32" id="DoubleProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="137" x="1367" y="393"/><ellipse cx="1382" cy="409" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1381.4688,415.9219 Q1379.7188,415.9219 1378.5781,415.1875 Q1377.4531,414.4375 1376.8906,413.0938 Q1376.3438,411.7344 1376.3438,409.9375 Q1376.3438,407.9063 1377,406.4531 Q1377.6563,405 1378.9375,404.2188 Q1380.2188,403.4375 1382.0938,403.4375 Q1382.9844,403.4375 1383.6563,403.625 Q1384.3281,403.7969 1385.0156,404.1406 L1384.2031,406.1563 Q1383.5781,405.8438 1383.0313,405.7188 Q1382.5,405.5938 1382.0156,405.5938 Q1380.8438,405.5938 1380.1406,406.125 Q1379.4375,406.6563 1379.1406,407.6094 Q1378.8438,408.5625 1378.8438,409.8281 Q1378.8438,411.8438 1379.5625,412.8125 Q1380.2813,413.7656 1381.875,413.7656 Q1382.4688,413.7656 1383.0938,413.6094 Q1383.7188,413.4531 1384.5469,413.0781 L1384.5469,415.2969 Q1383.8125,415.6094 1383.0156,415.7656 Q1382.2344,415.9219 1381.4688,415.9219 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="105" x="1396" y="414.432">DoubleProperty</text></g><!--MD5=[6b626634f3bb0842bebd5e499c80b711]
+class Property--><g id="elem_Property"><rect codeLine="70" fill="#F1F1F1" height="129.6837" id="Property" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="89" x="381" y="71"/><ellipse cx="396" cy="93.706" fill="#DA70D6" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M392.7656,100.206 L392.7656,88.0654 L396.5156,88.0654 Q398.8906,88.0654 400.2813,89.581 Q401.6875,91.081 401.6875,94.0341 Q401.6875,97.0029 400.25,98.6123 Q398.8125,100.206 396.3281,100.206 L392.7656,100.206 Z M396.2031,98.1123 Q397.75,98.1123 398.4688,97.1123 Q399.1875,96.1123 399.1875,94.0498 Q399.1875,92.0185 398.4844,91.0966 Q397.7969,90.1591 396.4063,90.1591 L395.2031,90.1591 L395.2031,98.1123 L396.2031,98.1123 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="51" x="413" y="88.8281">«variant»</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="57" x="410" y="107.31">Property</text><line style="stroke:#181818;stroke-width:0.5;" x1="382" x2="469" y1="116.412" y2="116.412"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="40" x="387" y="135.378">string</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="18" x="387" y="154.4459">int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="47" x="387" y="173.5138">double</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="57" x="387" y="192.5817">Property</text></g><!--MD5=[ef8a845501223fe3a509a6dc39a974ed]
+class AggregationType--><g id="elem_AggregationType"><rect codeLine="85" fill="#F1F1F1" height="135.3396" id="AggregationType" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="148" x="351.5" y="610.5"/><ellipse cx="366.5" cy="626.5" fill="#EB937F" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M362.8594,633 L362.8594,620.8594 L370.5156,620.8594 L370.5156,622.9844 L365.2344,622.9844 L365.2344,625.6406 L370.25,625.6406 L370.25,627.7656 L365.2344,627.7656 L365.2344,630.875 L370.5156,630.875 L370.5156,633 L362.8594,633 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="116" x="380.5" y="631.932">AggregationType</text><line style="stroke:#181818;stroke-width:0.5;" x1="352.5" x2="498.5" y1="642.5" y2="642.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="49" x="357.5" y="661.4659">COUNT</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="27" x="357.5" y="680.5339">AVG</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="31" x="357.5" y="699.6018">SUM</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="30" x="357.5" y="718.6697">MAX</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="29" x="357.5" y="737.7376">MIN</text></g><!--MD5=[7d5e827e80b628ab382fb03e2d5c9da6]
+class AggregatedProperty--><g id="elem_AggregatedProperty"><rect codeLine="93" fill="#F1F1F1" height="59.0679" id="AggregatedProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="169" x="341" y="379.5"/><ellipse cx="356" cy="395.5" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M355.6719,402.1719 Q354.75,402.1719 353.8594,402 Q352.9688,401.8125 352.1875,401.4375 L352.1875,399.1875 Q353.1406,399.6719 354.0156,399.9063 Q354.9063,400.125 355.75,400.125 Q356.625,400.125 357.1875,399.8281 Q357.75,399.5313 357.75,398.75 Q357.75,398.2031 357.4531,397.9063 Q357.1563,397.5938 356.5938,397.3125 Q356.0313,397.0313 355.25,396.625 Q354.4688,396.2031 353.8125,395.7188 Q353.1719,395.2188 352.7969,394.5469 Q352.4219,393.875 352.4219,392.9219 Q352.4219,391.2969 353.5156,390.5 Q354.625,389.6875 356.4063,389.6875 Q357.125,389.6875 358.1094,389.8594 Q359.0938,390.0156 360.0469,390.4688 L359.2656,392.3906 Q358.4219,392.0313 357.7344,391.8906 Q357.0625,391.7344 356.5469,391.7344 Q355.7031,391.7344 355.3125,392.0781 Q354.9375,392.4063 354.9375,393.0469 Q354.9375,393.5313 355.1719,393.8438 Q355.4219,394.1406 355.8906,394.3906 Q356.375,394.6406 357.1094,395.0156 Q358.1094,395.5 358.8125,395.9688 Q359.5156,396.4375 359.8906,397.0625 Q360.2656,397.6719 360.2656,398.6094 Q360.2656,399.7969 359.6875,400.5938 Q359.125,401.375 358.0781,401.7813 Q357.0469,402.1719 355.6719,402.1719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="137" x="370" y="400.932">AggregatedProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="342" x2="509" y1="411.5" y2="411.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="153" x="347" y="430.4659">type: AggregationType</text></g><!--MD5=[475533bf6c0770e0769c177789961f4f]
+class SortType--><g id="elem_SortType"><rect codeLine="97" fill="#F1F1F1" height="78.1358" id="SortType" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="91" x="566" y="639"/><ellipse cx="581" cy="655" fill="#EB937F" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M577.3594,661.5 L577.3594,649.3594 L585.0156,649.3594 L585.0156,651.4844 L579.7344,651.4844 L579.7344,654.1406 L584.75,654.1406 L584.75,656.2656 L579.7344,656.2656 L579.7344,659.375 L585.0156,659.375 L585.0156,661.5 L577.3594,661.5 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="59" x="595" y="660.432">SortType</text><line style="stroke:#181818;stroke-width:0.5;" x1="567" x2="656" y1="671" y2="671"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="26" x="572" y="689.9659">ASC</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="35" x="572" y="709.0339">DESC</text></g><!--MD5=[0b4dc0f41ef46e3055fc128e1de6fe17]
+class SortedProperty--><g id="elem_SortedProperty"><rect codeLine="102" fill="#F1F1F1" height="59.0679" id="SortedProperty" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="133" x="545" y="379.5"/><ellipse cx="560" cy="395.5" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M559.6719,402.1719 Q558.75,402.1719 557.8594,402 Q556.9688,401.8125 556.1875,401.4375 L556.1875,399.1875 Q557.1406,399.6719 558.0156,399.9063 Q558.9063,400.125 559.75,400.125 Q560.625,400.125 561.1875,399.8281 Q561.75,399.5313 561.75,398.75 Q561.75,398.2031 561.4531,397.9063 Q561.1563,397.5938 560.5938,397.3125 Q560.0313,397.0313 559.25,396.625 Q558.4688,396.2031 557.8125,395.7188 Q557.1719,395.2188 556.7969,394.5469 Q556.4219,393.875 556.4219,392.9219 Q556.4219,391.2969 557.5156,390.5 Q558.625,389.6875 560.4063,389.6875 Q561.125,389.6875 562.1094,389.8594 Q563.0938,390.0156 564.0469,390.4688 L563.2656,392.3906 Q562.4219,392.0313 561.7344,391.8906 Q561.0625,391.7344 560.5469,391.7344 Q559.7031,391.7344 559.3125,392.0781 Q558.9375,392.4063 558.9375,393.0469 Q558.9375,393.5313 559.1719,393.8438 Q559.4219,394.1406 559.8906,394.3906 Q560.375,394.6406 561.1094,395.0156 Q562.1094,395.5 562.8125,395.9688 Q563.5156,396.4375 563.8906,397.0625 Q564.2656,397.6719 564.2656,398.6094 Q564.2656,399.7969 563.6875,400.5938 Q563.125,401.375 562.0781,401.7813 Q561.0469,402.1719 559.6719,402.1719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="101" x="574" y="400.932">SortedProperty</text><line style="stroke:#181818;stroke-width:0.5;" x1="546" x2="677" y1="411.5" y2="411.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96" x="551" y="430.4659">type: SortType</text></g><!--MD5=[21a0e71c2445661e396dc0d41245bed8]
+class PropertyExpressionOperand--><g id="elem_PropertyExpressionOperand"><rect codeLine="112" fill="#F1F1F1" height="91.5479" id="PropertyExpressionOperand" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="222" x="751.5" y="632"/><ellipse cx="766.5" cy="654.706" fill="#DA70D6" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M763.2656,661.206 L763.2656,649.0654 L767.0156,649.0654 Q769.3906,649.0654 770.7813,650.581 Q772.1875,652.081 772.1875,655.0341 Q772.1875,658.0029 770.75,659.6123 Q769.3125,661.206 766.8281,661.206 L763.2656,661.206 Z M766.7031,659.1123 Q768.25,659.1123 768.9688,658.1123 Q769.6875,657.1123 769.6875,655.0498 Q769.6875,653.0185 768.9844,652.0966 Q768.2969,651.1591 766.9063,651.1591 L765.7031,651.1591 L765.7031,659.1123 L766.7031,659.1123 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="51" x="850" y="649.8281">«variant»</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="190" x="780.5" y="668.31">PropertyExpressionOperand</text><line style="stroke:#181818;stroke-width:0.5;" x1="752.5" x2="972.5" y1="677.412" y2="677.412"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="110" x="757.5" y="696.378">LogicConstValue</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="130" x="757.5" y="715.4459">PropertyExpression</text></g><!--MD5=[c4988d5050011c17cfa22668f29cf8dc]
+class PropertyExpressionOperator--><g id="elem_PropertyExpressionOperator"><rect codeLine="117" fill="#F1F1F1" height="249.7471" id="PropertyExpressionOperator" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="223" x="1009" y="553"/><ellipse cx="1024" cy="569" fill="#EB937F" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1020.3594,575.5 L1020.3594,563.3594 L1028.0156,563.3594 L1028.0156,565.4844 L1022.7344,565.4844 L1022.7344,568.1406 L1027.75,568.1406 L1027.75,570.2656 L1022.7344,570.2656 L1022.7344,573.375 L1028.0156,573.375 L1028.0156,575.5 L1020.3594,575.5 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="191" x="1038" y="574.432">PropertyExpressionOperator</text><line style="stroke:#181818;stroke-width:0.5;" x1="1010" x2="1231" y1="585" y2="585"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="19" x="1015" y="603.9659">EQ</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="30" x="1015" y="623.0339">NEQ</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="18" x="1015" y="642.1018">GT</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="26" x="1015" y="661.1697">GTE</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="15" x="1015" y="680.2376">LT</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="23" x="1015" y="699.3055">LTE</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="29" x="1015" y="718.3734">LIKE</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="40" x="1015" y="737.4414">NLIKE</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="30" x="1015" y="756.5093">AND</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="20" x="1015" y="775.5772">OR</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="30" x="1015" y="794.6451">NOT</text></g><!--MD5=[719863c63d44d5d570a9b67192a311a1]
+class PropertyExpression--><g id="elem_PropertyExpression"><rect codeLine="131" fill="#F1F1F1" height="124.2717" id="PropertyExpression" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="421" x="713" y="347"/><ellipse cx="854.25" cy="363" fill="#F1F1F1" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M853.9219,369.6719 Q853,369.6719 852.1094,369.5 Q851.2188,369.3125 850.4375,368.9375 L850.4375,366.6875 Q851.3906,367.1719 852.2656,367.4063 Q853.1563,367.625 854,367.625 Q854.875,367.625 855.4375,367.3281 Q856,367.0313 856,366.25 Q856,365.7031 855.7031,365.4063 Q855.4063,365.0938 854.8438,364.8125 Q854.2813,364.5313 853.5,364.125 Q852.7188,363.7031 852.0625,363.2188 Q851.4219,362.7188 851.0469,362.0469 Q850.6719,361.375 850.6719,360.4219 Q850.6719,358.7969 851.7656,358 Q852.875,357.1875 854.6563,357.1875 Q855.375,357.1875 856.3594,357.3594 Q857.3438,357.5156 858.2969,357.9688 L857.5156,359.8906 Q856.6719,359.5313 855.9844,359.3906 Q855.3125,359.2344 854.7969,359.2344 Q853.9531,359.2344 853.5625,359.5781 Q853.1875,359.9063 853.1875,360.5469 Q853.1875,361.0313 853.4219,361.3438 Q853.6719,361.6406 854.1406,361.8906 Q854.625,362.1406 855.3594,362.5156 Q856.3594,363 857.0625,363.4688 Q857.7656,363.9375 858.1406,364.5625 Q858.5156,365.1719 858.5156,366.1094 Q858.5156,367.2969 857.9375,368.0938 Q857.375,368.875 856.3281,369.2813 Q855.2969,369.6719 853.9219,369.6719 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="130" x="874.75" y="368.432">PropertyExpression</text><line style="stroke:#181818;stroke-width:0.5;" x1="714" x2="1133" y1="379" y2="379"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="228" x="719" y="397.9659">type: PropertyExpressionOperator</text><line style="stroke:#181818;stroke-width:0.5;" x1="714" x2="1133" y1="406.0679" y2="406.0679"/><ellipse cx="724" cy="421.1019" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="395" x="733" y="425.0339">operator&amp;&amp;(right: PropertyExpression): PropertyExpression</text><ellipse cx="724" cy="440.1698" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="391" x="733" y="444.1018">operator||(right: PropertyExpression): PropertyExpression</text><ellipse cx="724" cy="459.2377" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="212" x="733" y="463.1697">operator~(): PropertyExpression</text></g><!--MD5=[e5ee437ed249dc1836593c92b55ca288]
+reverse link BaseProperty to IntegerProperty--><g id="link_BaseProperty_IntegerProperty"><path d="M1003.84,251.4 C1008.65,256.14 1013.54,260.7 1018.5,265 C1070.43,310.05 1094.18,306.03 1151.5,344 C1175.42,359.84 1201.82,379.61 1219.2,392.95 " fill="none" id="BaseProperty-backto-IntegerProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="998.54,255.99,989.71,236.73,1008.63,246.28,998.54,255.99" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[c76accf8f2f0e2a144f8ddf1a51e36fb]
+reverse link SortProperty to IntegerProperty--><g id="link_SortProperty_IntegerProperty"><path d="M1181.57,217.54 C1200.09,279.5 1224.13,359.92 1233.98,392.89 " fill="none" id="SortProperty-backto-IntegerProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1174.8,219.32,1175.78,198.16,1188.21,215.31,1174.8,219.32" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[3573c23a1dc04a1cc6a294b7741acf59]
+reverse link AggregateProperty to IntegerProperty--><g id="link_AggregateProperty_IntegerProperty"><path d="M1371.22,252.3 C1324.91,306.63 1274.83,365.38 1251.65,392.58 " fill="none" id="AggregateProperty-backto-IntegerProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1366.17,247.44,1384.47,236.76,1376.82,256.52,1366.17,247.44" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[e9c896c4352cd546637219317020de25]
+reverse link LogicalProperty to IntegerProperty--><g id="link_LogicalProperty_IntegerProperty"><path d="M1640.85,265.13 C1514.26,315.86 1468.36,294.7 1349.5,344 C1317.04,357.47 1282.36,378.69 1260.57,392.96 " fill="none" id="LogicalProperty-backto-IntegerProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1638.55,258.5,1659.7,257.29,1643.92,271.43,1638.55,258.5" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[b42c01a001520a1d94be1003ce68fa09]
+reverse link BaseProperty to DoubleProperty--><g id="link_BaseProperty_DoubleProperty"><path d="M999.17,250.51 C1005.36,255.8 1011.81,260.69 1018.5,265 C1048.11,284.08 1292.91,330.63 1325.5,344 C1357.8,357.25 1392.13,378.53 1413.68,392.87 " fill="none" id="BaseProperty-backto-DoubleProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="994.16,255.4,984.34,236.62,1003.73,245.18,994.16,255.4" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[525d4639706d2257615eed459fb86cdd]
+reverse link SortProperty to DoubleProperty--><g id="link_SortProperty_DoubleProperty"><path d="M1233.74,211.99 C1253.78,230.2 1275.86,249.02 1297.5,265 C1318.65,280.62 1328.78,277.6 1348.5,295 C1382.47,324.98 1412.33,369.84 1426.6,392.99 " fill="none" id="SortProperty-backto-DoubleProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1228.79,216.95,1218.85,198.24,1238.3,206.67,1228.79,216.95" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[06952772c84744c1800b289f012355ee]
+reverse link AggregateProperty to DoubleProperty--><g id="link_AggregateProperty_DoubleProperty"><path d="M1454.46,256.85 C1447.81,309.87 1440.75,366.14 1437.44,392.58 " fill="none" id="AggregateProperty-backto-DoubleProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1447.55,255.73,1456.98,236.76,1461.44,257.47,1447.55,255.73" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[42a61206ba4076bb0351a5db2eab250b]
+reverse link LogicalProperty to DoubleProperty--><g id="link_LogicalProperty_DoubleProperty"><path d="M1729.18,278.71 C1714.54,291.57 1699.2,303.63 1683.5,314 C1625.4,352.39 1549.38,378.23 1496.9,392.95 " fill="none" id="LogicalProperty-backto-DoubleProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1724.67,273.35,1744.17,265.06,1734.09,283.7,1724.67,273.35" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[4f6f57e005846e1d8013259b5fd926ea]
+link Property to PropertyType--><g id="link_Property_PropertyType"><path codeLine="82" d="M380.85,168.94 C325.15,209.04 227.28,280.28 145.5,344 C140,348.29 134.32,352.79 128.66,357.33 " fill="none" id="Property-to-PropertyType" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="124.74,360.48,134.2587,357.9514,128.6345,357.3443,129.2416,351.7201,124.74,360.48" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[7c53d553acb5fa952b00e327c6d1520e]
+link Property to LogicConstValue--><g id="link_Property_LogicConstValue"><path codeLine="83" d="M380.96,200.2 C351.49,242.01 312.86,296.83 282.67,339.66 " fill="none" id="Property-to-LogicConstValue" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="279.77,343.76,288.2176,338.6966,282.645,339.6692,281.6724,334.0966,279.77,343.76" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[04262da7554a857b9d32a59a8ef7e42a]
+link AggregatedProperty to AggregationType--><g id="link_AggregatedProperty_AggregationType"><path codeLine="106" d="M425.5,438.57 C425.5,478 425.5,550.4 425.5,605.11 " fill="none" id="AggregatedProperty-to-AggregationType" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="425.5,610.35,429.5,601.35,425.5,605.35,421.5,601.35,425.5,610.35" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[126926882524bf1fdaa6da6bea474263]
+link SortedProperty to SortType--><g id="link_SortedProperty_SortType"><path codeLine="107" d="M611.5,438.57 C611.5,485.36 611.5,578.59 611.5,633.59 " fill="none" id="SortedProperty-to-SortType" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="611.5,638.79,615.5,629.79,611.5,633.79,607.5,629.79,611.5,638.79" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[046b157d9e46684cc4b090f0c3a63cb6]
+reverse link Property to AggregatedProperty--><g id="link_Property_AggregatedProperty"><path codeLine="109" d="M425.5,214.51 C425.5,269.64 425.5,340.55 425.5,379.4 " fill="none" id="Property-backto-AggregatedProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="425.5,201.22,421.5,207.22,425.5,213.22,429.5,207.22,425.5,201.22" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="53" x="426.5" y="309.897">property</text></g><!--MD5=[ff0d1667c08c87ca890e5f41659278bd]
+reverse link Property to SortedProperty--><g id="link_Property_SortedProperty"><path codeLine="110" d="M458.24,213.02 C466.91,230.58 476.85,248.84 487.5,265 C515.8,307.94 555.84,351.82 582.69,379.45 " fill="none" id="Property-backto-SortedProperty" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="452.6,201.31,451.6036,208.4519,457.8129,212.1186,458.8093,204.9766,452.6,201.31" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="53" x="522.5" y="309.897">property</text></g><!--MD5=[d39332819ca3fb8f9f4da001ddc9c86d]
+link PropertyExpression to PropertyExpressionOperand--><g id="link_PropertyExpression_PropertyExpressionOperand"><path codeLine="139" d="M874.53,471.02 C868.36,481.5 862.99,492.68 859.5,504 C848.1,541 848.94,584.6 852.58,618.77 " fill="none" id="PropertyExpression-to-PropertyExpressionOperand" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="854.16,631.84,857.4121,625.4039,852.7219,619.9265,849.4698,626.3626,854.16,631.84" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="19" x="860.5" y="518.897">left</text></g><!--MD5=[d39332819ca3fb8f9f4da001ddc9c86d]
+link PropertyExpression to PropertyExpressionOperand--><g id="link_PropertyExpression_PropertyExpressionOperand"><path codeLine="140" d="M909.51,471.26 C899.35,515.72 885.69,575.49 875.72,619.14 " fill="none" id="PropertyExpression-to-PropertyExpressionOperand-1" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="872.81,631.86,878.0465,626.9023,875.4843,620.1618,870.2477,625.1195,872.81,631.86" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="29" x="901.5" y="518.897">right</text></g><!--MD5=[686a631c7c993ecb92b58144d23f2b0d]
+link PropertyExpression to PropertyExpressionOperator--><g id="link_PropertyExpression_PropertyExpressionOperator"><path codeLine="141" d="M968.7,471.26 C985.73,494.35 1005.81,521.56 1025.69,548.51 " fill="none" id="PropertyExpression-to-PropertyExpressionOperator" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="1028.88,552.83,1026.7626,543.2114,1025.9145,548.8044,1020.3216,547.9563,1028.88,552.83" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[92849d49a3f89318cc933ea206f42dd9]
+link Property to PropertyExpression--><g id="link_Property_PropertyExpression"><path codeLine="143" d="M444.52,201.09 C454.14,224 468.02,248.26 487.5,265 C521.73,294.41 541.54,281.2 584.5,295 C634.28,310.99 688.03,328.7 737.73,345.27 " fill="none" id="Property-to-PropertyExpression" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="742.53,346.87,735.2628,340.2226,737.788,345.2846,732.7261,347.8098,742.53,346.87" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[739bdc5e2b289c39ab0b4fca2e6baca5]
+@startuml
+hide empty members
+
+enum PropertyType {
+  STRING
+  DOUBLE
+  INTEGER
+}
+
+class LogicConstValue << variant >> << (D, orchid) >> {
+    string
+    int
+    double
+    Property
+}
+
+class BaseProperty {
+    # name: string
+    # type: PropertyType
+    # id: int
+    # collectionID: int
+    
+    getName(): string
+    getType(): PropertyType
+    getId(): int
+    getCollectionId(): int
+}
+
+class SortProperty {
+    # prop: BaseProperty
+
+    SortProperty(prop: BaseProperty&)
+    desc(): SortedProperty
+    asc(): SortedProperty
+}
+
+class AggregateProperty {
+    # prop: BaseProperty
+
+    AggregateProperty(prop: BaseProperty)
+
+    countAs(alias:string): AggregatedProperty
+    maxAs(alias:string): AggregatedProperty
+    minAs(alias:string): AggregatedProperty
+    sumAs(alias:string): AggregatedProperty
+    averageAs(alias:string): AggregatedProperty
+}
+
+class LogicalProperty {
+    # prop: BaseProperty
+
+    LogicalProperty(prop: BaseProperty)
+
+    operator>(right: LogicConstValue) : PropertyExpression 
+    operator>=(right: LogicConstValue) : PropertyExpression 
+    operator<(right: LogicConstValue) : PropertyExpression 
+    operator<=(right: LogicConstValue) : PropertyExpression 
+    operator==(right: LogicConstValue) : PropertyExpression 
+    operator!=(right: LogicConstValue) : PropertyExpression 
+    operator%(right: LogicConstValue) : PropertyExpression 
+    operator^(right: LogicConstValue) : PropertyExpression 
+}
+' maybe ISortProperty
+class IntegerProperty extends BaseProperty, SortProperty, AggregateProperty, LogicalProperty {
+}
+
+class DoubleProperty extends BaseProperty, SortProperty, AggregateProperty, LogicalProperty {
+}
+
+
+class Property << variant >> << (D, orchid) >> {
+    string
+    int
+    double
+    Property
+}
+
+note right of Property::"operator>(right: LogicConstValue)"
+    and all the 
+    above operators
+end note
+
+Property ..> PropertyType
+Property ..> LogicConstValue
+
+enum AggregationType {
+    COUNT
+    AVG
+    SUM
+    MAX
+    MIN
+}
+
+struct AggregatedProperty {
+    type: AggregationType
+}
+
+enum SortType {
+    ASC
+    DESC
+}
+
+struct SortedProperty {
+    type: SortType
+}
+
+AggregatedProperty ..> AggregationType
+SortedProperty ..> SortType
+
+Property *- - AggregatedProperty : property
+Property *- - SortedProperty : property
+
+class PropertyExpressionOperand << variant >> << (D, orchid) >> {
+ LogicConstValue
+ PropertyExpression
+}
+
+enum PropertyExpressionOperator {
+    EQ
+    NEQ
+    GT
+    GTE
+    LT
+    LTE
+    LIKE
+    NLIKE
+    AND
+    OR
+    NOT
+}
+
+struct PropertyExpression {
+    type: PropertyExpressionOperator
+
+    +operator&&(right: PropertyExpression): PropertyExpression
+    +operator||(right: PropertyExpression): PropertyExpression
+    +operator~(): PropertyExpression
+}
+
+PropertyExpression - -* PropertyExpressionOperand: left
+PropertyExpression - -* PropertyExpressionOperand: right
+PropertyExpression ..> PropertyExpressionOperator
+
+Property ..> PropertyExpression
+@enduml
+
+@startuml
+hide empty members
+
+enum PropertyType {
+  STRING
+  DOUBLE
+  INTEGER
+}
+
+class LogicConstValue << variant >> << (D, orchid) >> {
+    string
+    int
+    double
+    Property
+}
+
+class BaseProperty {
+    # name: string
+    # type: PropertyType
+    # id: int
+    # collectionID: int
+    
+    getName(): string
+    getType(): PropertyType
+    getId(): int
+    getCollectionId(): int
+}
+
+class SortProperty {
+    # prop: BaseProperty
+
+    SortProperty(prop: BaseProperty&)
+    desc(): SortedProperty
+    asc(): SortedProperty
+}
+
+class AggregateProperty {
+    # prop: BaseProperty
+
+    AggregateProperty(prop: BaseProperty)
+
+    countAs(alias:string): AggregatedProperty
+    maxAs(alias:string): AggregatedProperty
+    minAs(alias:string): AggregatedProperty
+    sumAs(alias:string): AggregatedProperty
+    averageAs(alias:string): AggregatedProperty
+}
+
+class LogicalProperty {
+    # prop: BaseProperty
+
+    LogicalProperty(prop: BaseProperty)
+
+    operator>(right: LogicConstValue) : PropertyExpression 
+    operator>=(right: LogicConstValue) : PropertyExpression 
+    operator<(right: LogicConstValue) : PropertyExpression 
+    operator<=(right: LogicConstValue) : PropertyExpression 
+    operator==(right: LogicConstValue) : PropertyExpression 
+    operator!=(right: LogicConstValue) : PropertyExpression 
+    operator%(right: LogicConstValue) : PropertyExpression 
+    operator^(right: LogicConstValue) : PropertyExpression 
+}
+class IntegerProperty extends BaseProperty, SortProperty, AggregateProperty, LogicalProperty {
+}
+
+class DoubleProperty extends BaseProperty, SortProperty, AggregateProperty, LogicalProperty {
+}
+
+
+class Property << variant >> << (D, orchid) >> {
+    string
+    int
+    double
+    Property
+}
+
+note right of Property::"operator>(right: LogicConstValue)"
+    and all the 
+    above operators
+end note
+
+Property ..> PropertyType
+Property ..> LogicConstValue
+
+enum AggregationType {
+    COUNT
+    AVG
+    SUM
+    MAX
+    MIN
+}
+
+struct AggregatedProperty {
+    type: AggregationType
+}
+
+enum SortType {
+    ASC
+    DESC
+}
+
+struct SortedProperty {
+    type: SortType
+}
+
+AggregatedProperty ..> AggregationType
+SortedProperty ..> SortType
+
+Property *- - AggregatedProperty : property
+Property *- - SortedProperty : property
+
+class PropertyExpressionOperand << variant >> << (D, orchid) >> {
+ LogicConstValue
+ PropertyExpression
+}
+
+enum PropertyExpressionOperator {
+    EQ
+    NEQ
+    GT
+    GTE
+    LT
+    LTE
+    LIKE
+    NLIKE
+    AND
+    OR
+    NOT
+}
+
+struct PropertyExpression {
+    type: PropertyExpressionOperator
+
+    +operator&&(right: PropertyExpression): PropertyExpression
+    +operator||(right: PropertyExpression): PropertyExpression
+    +operator~(): PropertyExpression
+}
+
+PropertyExpression - -* PropertyExpressionOperand: left
+PropertyExpression - -* PropertyExpressionOperand: right
+PropertyExpression ..> PropertyExpressionOperator
+
+Property ..> PropertyExpression
+@enduml
+
+PlantUML version 1.2022.8(Sun Sep 25 06:00:33 ART 2022)
+(MIT source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

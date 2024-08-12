@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="501px" preserveAspectRatio="none" style="width:756px;height:501px;background:#FFFFFF;" version="1.1" viewBox="0 0 756 501" width="756px" zoomAndPan="magnify"><defs/><g><!--MD5=[abb30e38f22bccd5d9ddeb26c52d1cb0]
+class IDB--><g id="elem_IDB"><rect codeLine="3" fill="#F1F1F1" height="173.4754" id="IDB" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="535" x="214" y="7"/><ellipse cx="466.25" cy="23" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M462.2813,29.5 L462.2813,27.7969 L464.6406,27.5313 L464.6406,19.3281 L462.2813,19.0625 L462.2813,17.3594 L469.4219,17.3594 L469.4219,19.0625 L467,19.3281 L467,27.5313 L469.4219,27.7969 L469.4219,29.5 L462.2813,29.5 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="22" x="486.75" y="28.432">IDB</text><line style="stroke:#181818;stroke-width:0.5;" x1="215" x2="748" y1="39" y2="39"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="201" x="220" y="57.9659">open(connectionString:string)</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="42" x="220" y="77.0339">close()</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="497" x="220" y="96.1018">executeReader(query:string, params: map&lt;string, any&gt;): IDBQueryReader</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="364" x="220" y="115.1697">execute(query:string, params: map&lt;string, any&gt;): void</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="523" x="220" y="134.2376">executeAndGetFirstInt(query:string, params: map&lt;string, any&gt;): optional&lt;int&gt;</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="182" x="220" y="153.3055">getLastInsertedRowId(): int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="199" x="220" y="172.3734">getLastErrorMessage(): string</text></g><path d="M6,57 L6,120.118 A0,0 0 0 0 6,120.118 L179,120.118 A0,0 0 0 0 179,120.118 L179,92.559 L218,90.6698 L179,84.559 L179,67 L169,57 L6,57 A0,0 0 0 0 6,57 " fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><path d="M169,57 L169,67 L179,67 L169,57 " fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="115" x="12" y="75.897">Converts the query</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="138" x="12" y="93.603">context to the engine's</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="152" x="12" y="111.309">sql dialect and executes it</text><!--MD5=[49f946a40da7aedd4c8a60f6e7815398]
+class IDBQueryReader--><g id="elem_IDBQueryReader"><rect codeLine="19" fill="#F1F1F1" height="59.0679" id="IDBQueryReader" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="274" x="344.5" y="240"/><ellipse cx="425.25" cy="256" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M421.2813,262.5 L421.2813,260.7969 L423.6406,260.5313 L423.6406,252.3281 L421.2813,252.0625 L421.2813,250.3594 L428.4219,250.3594 L428.4219,252.0625 L426,252.3281 L426,260.5313 L428.4219,260.7969 L428.4219,262.5 L421.2813,262.5 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="104" x="445.75" y="261.432">IDBQueryReader</text><line style="stroke:#181818;stroke-width:0.5;" x1="345.5" x2="617.5" y1="272" y2="272"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="262" x="350.5" y="290.9659">readRow(row: IDBRowReader): boolean</text></g><!--MD5=[56adcec861d53e94cd1ef01b8c33497d]
+class IDBRowReader--><g id="elem_IDBRowReader"><rect codeLine="23" fill="#F1F1F1" height="135.3396" id="IDBRowReader" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="264" x="349.5" y="359"/><ellipse cx="431.25" cy="375" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M427.2813,381.5 L427.2813,379.7969 L429.6406,379.5313 L429.6406,371.3281 L427.2813,371.0625 L427.2813,369.3594 L434.4219,369.3594 L434.4219,371.0625 L432,371.3281 L432,379.5313 L434.4219,379.7969 L434.4219,381.5 L427.2813,381.5 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="92" x="451.75" y="380.432">IDBRowReader</text><line style="stroke:#181818;stroke-width:0.5;" x1="350.5" x2="612.5" y1="391" y2="391"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="238" x="355.5" y="409.9659">readString(columnIndex:int): string</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="210" x="355.5" y="429.0339">readInt64(columnIndex:int): int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="210" x="355.5" y="448.1018">readInt32(columnIndex:int): int</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="252" x="355.5" y="467.1697">readDouble(columnIndex:int): double</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="219" x="355.5" y="486.2376">isNull(columnIndex:int): boolean</text></g><!--MD5=[7361bb2abda626d32f6f949ca451ccbd]
+link IDB to IDBQueryReader--><g id="link_IDB_IDBQueryReader"><path codeLine="31" d="M481.5,180.23 C481.5,199.49 481.5,218.84 481.5,234.5 " fill="none" id="IDB-to-IDBQueryReader" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="481.5,239.66,485.5,230.66,481.5,234.66,477.5,230.66,481.5,239.66" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[998822ee9b94e22af3f84f86f6f59903]
+link IDBQueryReader to IDBRowReader--><g id="link_IDBQueryReader_IDBRowReader"><path codeLine="32" d="M481.5,299.29 C481.5,314.66 481.5,334.32 481.5,353.52 " fill="none" id="IDBQueryReader-to-IDBRowReader" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="481.5,358.92,485.5,349.92,481.5,353.92,477.5,349.92,481.5,358.92" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[e29971024bfc9671acdef9271ff4df6d]
+@startuml
+hide empty members
+
+interface IDB {
+    open(connectionString:string)
+    close()
+    executeReader(query:string, params: map<string, any>): IDBQueryReader
+    execute(query:string, params: map<string, any>): void
+    executeAndGetFirstInt(query:string, params: map<string, any>): optional<int>
+    getLastInsertedRowId(): int
+    getLastErrorMessage(): string
+}
+
+note left of IDB::executeReader
+Converts the query
+context to the engine's
+sql dialect and executes it
+endnote
+
+interface IDBQueryReader {
+    readRow(row: IDBRowReader): boolean
+}
+
+interface IDBRowReader {
+    readString(columnIndex:int): string
+    readInt64(columnIndex:int): int
+    readInt32(columnIndex:int): int
+    readDouble(columnIndex:int): double 
+    isNull(columnIndex:int): boolean
+}
+
+IDB ..> IDBQueryReader
+IDBQueryReader ..> IDBRowReader
+@enduml
+
+PlantUML version 1.2022.8(Sun Sep 25 06:00:33 ART 2022)
+(MIT source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

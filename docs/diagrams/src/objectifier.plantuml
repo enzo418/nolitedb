@@ -1,0 +1,8 @@
+@startuml objectifier
+hide empty members
+
+class Objectify {
+    {static} +parseObject(props: list<Property | AggregatedProperty>, row: IDBRowReader): Object
+}
+
+@enduml
